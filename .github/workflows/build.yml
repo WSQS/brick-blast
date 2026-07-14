@@ -24,16 +24,21 @@ jobs:
         id: setup
         run: |
           GODOT_DIR="$HOME/.local/share/godot"
-          mkdir -p "$GODOT_DIR/templates"
+          mkdir -p "$GODOT_DIR"
           wget -q "https://downloads.godotengine.org/?flavor=stable&platform=linux.64&slug=linux.x86_64.zip&version=4.7" -O /tmp/godot.zip
           unzip -q /tmp/godot.zip -d "$GODOT_DIR/"
           chmod +x "$GODOT_DIR"/Godot_v*
           GODOT_BIN=$(ls "$GODOT_DIR"/Godot_v*)
           echo "godot=$GODOT_BIN" >> $GITHUB_OUTPUT
+          # Get version and install templates
+          VERSION=$("$GODOT_BIN" --version)
+          echo "Godot version: $VERSION"
+          TPL_DIR="$HOME/.local/share/godot/export_templates/$VERSION"
+          mkdir -p "$TPL_DIR"
           wget -q "https://downloads.godotengine.org/?flavor=stable&platform=templates&slug=export_templates.tpz&version=4.7" -O /tmp/templates.tpz
-          VERSION=$("$GODOT_BIN" --version | head -1)
-          mkdir -p "$HOME/.local/share/godot/export_templates/$VERSION"
-          unzip -o -j /tmp/templates.tpz -d "$HOME/.local/share/godot/export_templates/$VERSION/"
+          unzip -o -j /tmp/templates.tpz -d "$TPL_DIR/"
+          echo "=== Templates installed ==="
+          ls -la "$TPL_DIR/"
 
       - name: Import project
         run: |
