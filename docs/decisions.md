@@ -23,6 +23,17 @@ Newest and pending at the top.
 
 ## Resolved Decisions
 
+### D013: Outcome — 星级评价框架 (2026-07-14)
+
+**Context**: 当前为二元 win/lose，D010 决定了星级评价但未定标准。
+**Decision**:
+- ⭐ 通关
+- ⭐⭐ 通关 + 最大 combo ≥ 阈值（初始 10，playtest 调整）
+- ⭐⭐⭐ 通关 + 不丢球
+**Rationale**: 星级 = combo 表现 + 完美度。具体数值不绑死，playtest 后调整。
+
+---
+
 ### D012: Procedures — 球粘挡板 + 暂停，关卡过渡推迟 (2026-07-14)
 
 **Context**: 当前球自动发射，玩家缺乏掌控感；无暂停功能；无关卡间过渡。

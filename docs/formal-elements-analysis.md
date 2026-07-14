@@ -145,22 +145,24 @@ No issues identified.
 
 ## 8. Outcome
 
-**Status**: ⚠️
+**Status**: ⚠️ → 决策已定 (D013)，待实现
 
-**Current**: Binary — Win (all bricks cleared) / Lose (0 lives remaining).
-
-**Gaps**:
-- No gradation of outcome (perfect clear vs. barely survived)
-- No score-based ranking or stars
-- No "how well did you do?" feedback beyond raw score number
+**Decision (D013)**: 星级评价
+- ⭐ 通关
+- ⭐⭐ 通关 + 最大 combo ≥ 10（playtest 调整）
+- ⭐⭐⭐ 通关 + 不丢球
 
 ---
 
-## Summary: Priority Actions
+## Summary: Decision Status
 
-| Priority | Element | Gap | Impact |
-|----------|---------|-----|--------|
-| 1 | Resources | Only Lives + unused Score | Blocks all progression systems |
-| 2 | Objectives | Binary win/lose, no mode structure | Blocks game depth |
-| 3 | Conflict | No dilemmas | Every playthrough feels identical |
-| 4 | Procedures | No player control over start/pace | Reduces sense of agency |
+| Element | Status | Decision |
+|---------|--------|----------|
+| Players | ✅ | No change needed |
+| Objectives | D010 | Construction + Forbidden Act → Outwit |
+| Procedures | D012 | Ball sticks to paddle + pause, level transition deferred |
+| Rules | ✅ | Combo rule added via D011, no other changes |
+| Resources | D011 | Combo system (方案 A: paddle reset) |
+| Conflict | ✅ | Solved by D011 (combo creates dilemma) |
+| Boundaries | ✅ | No change needed |
+| Outcome | D013 | 3-star rating: clear / combo≥10 / no lives lost |
