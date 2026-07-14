@@ -70,5 +70,4 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Restart"
 
-[connection signal="area_entered" from="Ball" to="Ball" method="_on_area_entered"]
 [connection signal="pressed" from="HUD/RestartButton" to="." method="_on_restart_pressed"]
