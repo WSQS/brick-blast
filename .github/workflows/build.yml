@@ -20,44 +20,73 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Decode Android keystore
+      - name: Setup Godot
+        id: setup
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > brick-blast.keystore
-          echo "=== Keystore file check ==="
-          ls -la brick-blast.keystore
+          GODOT_DIR="$HOME/.local/share/godot"
+          mkdir -p "$GODOT_DIR/templates"
+          wget -q "https://downloads.godotengine.org/?flavor=stable&platform=linux.64&slug=linux.x86_64.zip&version=4.7" -O /tmp/godot.zip
+          unzip -q /tmp/godot.zip -d "$GODOT_DIR/"
+          chmod +x "$GODOT_DIR"/Godot_v*
+          GODOT_BIN=$(ls "$GODOT_DIR"/Godot_v*)
+          echo "godot=$GODOT_BIN" >> $GITHUB_OUTPUT
+          wget -q "https://downloads.godotengine.org/?flavor=stable&platform=templates&slug=export_templates.tpz&version=4.7" -O /tmp/templates.tpz
+          VERSION=$("$GODOT_BIN" --version | head -1)
+          mkdir -p "$HOME/.local/share/godot/export_templates/$VERSION"
+          unzip -o -j /tmp/templates.tpz -d "$HOME/.local/share/godot/export_templates/$VERSION/"
+
+      - name: Import project
+        run: |
+          ${{ steps.setup.outputs.godot }} --headless --import || true
+
+      - name: Export Windows
+        run: |
+          mkdir -p build
+          ${{ steps.setup.outputs.godot }} --headless --export-release "Windows Desktop" build/brick-blast-windows.exe
+
+      - name: Export Linux
+        run: |
+          mkdir -p build
+          ${{ steps.setup.outputs.godot }} --headless --export-release "Linux" build/brick-blast-linux.x86_64
+
+      - name: Export Web
+        run: |
+          mkdir -p build/web
+          ${{ steps.setup.outputs.godot }} --headless --export-release "Web" build/web/index.html
+
+      - name: Decode Android keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > brick-blast.keystore
 
       - name: Inject Android signing passwords
         run: |
           sed -i 's|password/keystore_release=""|password/keystore_release="${{ secrets.ANDROID_KEYSTORE_PASS }}"|' export_presets.cfg
           sed -i 's|password/key_release=""|password/key_release="${{ secrets.ANDROID_KEY_PASS }}"|' export_presets.cfg
-          echo "=== Verifying export_presets.cfg ==="
-          grep "password/" export_presets.cfg
-          echo "=== Verifying keystore location ==="
-          pwd
-          ls -la brick-blast.keystore
-          echo "=== Project dir contents ==="
-          ls -la export_presets.cfg
 
-      - name: Export game
-        id: export
-        uses: firebelley/godot-export@v7.0.0
-        with:
-          godot_executable_download_url: https://downloads.godotengine.org/?flavor=stable&platform=linux.64&slug=linux.x86_64.zip&version=4.7
-          godot_export_templates_download_url: https://downloads.godotengine.org/?flavor=stable&platform=templates&slug=export_templates.tpz&version=4.7
-          relative_project_path: ./
-          export_debug: false
-          archive_output: true
+      - name: Export Android
+        run: |
+          mkdir -p build
+          ${{ steps.setup.outputs.godot }} --headless --export-release "Android" build/brick-blast-android.apk
+
+      - name: Archive builds
+        run: |
+          mkdir -p archives
+          cd build
+          zip -r ../archives/brick-blast-windows.zip brick-blast-windows.exe
+          zip -r ../archives/brick-blast-linux.zip brick-blast-linux.x86_64
+          zip -r ../archives/brick-blast-web.zip web
+          zip -r ../archives/brick-blast-android.zip brick-blast-android.apk
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: brick-blast-build-${{ github.run_number }}
-          path: ${{ steps.export.outputs.archive_directory }}/*
+          path: archives/*
 
       - name: Create release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ steps.export.outputs.archive_directory }}/*
+          files: archives/*
           draft: true
           generate_release_notes: true
+
