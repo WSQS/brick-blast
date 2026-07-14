@@ -32,6 +32,9 @@ All notable changes to brick-blast will be documented in this file.
 
 ### Fixed
 
+- **球碰砖块不反弹（关键 bug）**: `.tscn` 中声明的 `groups = ["brick"]` 在 `PackedScene.instantiate() + add_child()` 后**不会保留**。碰撞时 `collider.is_in_group("brick")` 永远返回 false，碰撞处理代码被跳过，球卡在砖块表面。
+  - 修复：`main.gd._spawn_bricks()` 中显式 `brick.add_to_group("brick")`
+  - 修复：`paddle.gd._ready()` 中显式 `add_to_group("paddle")`
 - ball.gd: 修复 `_check_collisions` 碰撞检测滞后一帧导致穿砖
 - ball.gd: 修复 `area_entered` 边沿触发在高速下丢失碰撞
 - ball.gd: 添加位置修正（碰撞后将球推出物体表面）

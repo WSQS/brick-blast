@@ -60,6 +60,7 @@ func _spawn_bricks() -> void:
 				start_x + col * (BRICK_W + BRICK_GAP) + BRICK_W / 2.0,
 				BRICK_MARGIN_TOP + row * (BRICK_H + BRICK_GAP) + BRICK_H / 2.0,
 			)
+			brick.add_to_group("brick")
 			brick.destroyed.connect(_on_brick_destroyed)
 			bricks.add_child(brick)
 			bricks_left += 1

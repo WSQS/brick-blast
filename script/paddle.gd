@@ -6,6 +6,11 @@ const MOVE_SPEED: float = 600.0
 var bounds: Rect2 = Rect2(0, 0, 480, 720)
 
 
+func _ready() -> void:
+	if not is_in_group("paddle"):
+		add_to_group("paddle")
+
+
 func _physics_process(delta: float) -> void:
 	var target_x := position.x
 
