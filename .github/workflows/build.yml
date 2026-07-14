@@ -32,6 +32,11 @@ jobs:
           sed -i 's|password/key_release=""|password/key_release="${{ secrets.ANDROID_KEY_PASS }}"|' export_presets.cfg
           echo "=== Verifying export_presets.cfg ==="
           grep "password/" export_presets.cfg
+          echo "=== Verifying keystore location ==="
+          pwd
+          ls -la brick-blast.keystore
+          echo "=== Project dir contents ==="
+          ls -la export_presets.cfg
 
       - name: Export game
         id: export
