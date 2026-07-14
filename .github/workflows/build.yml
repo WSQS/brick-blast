@@ -27,6 +27,8 @@ jobs:
         run: |
           sed -i 's|password/keystore_release=""|password/keystore_release="${{ secrets.ANDROID_KEYSTORE_PASS }}"|' export_presets.cfg
           sed -i 's|password/key_release=""|password/key_release="${{ secrets.ANDROID_KEY_PASS }}"|' export_presets.cfg
+          echo "=== Verifying export_presets.cfg ==="
+          grep "password/" export_presets.cfg
 
       - name: Export game
         id: export
@@ -37,9 +39,6 @@ jobs:
           relative_project_path: ./
           export_debug: false
           archive_output: true
-        env:
-          ANDROID_KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
-          ANDROID_KEY_PASS: ${{ secrets.ANDROID_KEY_PASS }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
