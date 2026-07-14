@@ -4,6 +4,7 @@ extends StaticBody2D
 const MOVE_SPEED: float = 600.0
 
 var bounds: Rect2 = Rect2(0, 0, 480, 720)
+var _last_mouse_x: float = -1.0
 
 
 func _physics_process(delta: float) -> void:
@@ -16,10 +17,11 @@ func _physics_process(delta: float) -> void:
 	if dir != 0.0:
 		target_x += dir * MOVE_SPEED * delta
 	else:
-		# Mouse / touch follow
+		# Mouse / touch follow — only when mouse actually moves
 		var mouse_x := get_global_mouse_position().x
-		if mouse_x > 0.0 and mouse_x < bounds.size.x:
+		if _last_mouse_x < 0.0 or absf(mouse_x - _last_mouse_x) > 1.0:
 			target_x = mouse_x
+		_last_mouse_x = mouse_x
 
 	# Clamp within bounds
 	var half_w: float = $CollisionShape2D.shape.size.x / 2.0
