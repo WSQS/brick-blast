@@ -4,6 +4,13 @@ All notable changes to brick-blast will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- 主菜单场景 (`scene/menu.tscn`)：标题 + Start + Quit 按钮
+- 游戏入口改为菜单 (`run/main_scene = res://scene/menu.tscn`)
+- 游戏结束后显示 Menu 按钮可返回主菜单
+- 完整游戏循环：Menu → Playing → Game Over / Win → Menu / Restart
+
 ### Architecture Decision: CharacterBody2D (2026-07-14)
 
 **问题**: Ball 使用 `Area2D`，在 `_physics_process` 中手动 `position += velocity` 移动。

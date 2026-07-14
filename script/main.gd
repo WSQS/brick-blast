@@ -29,6 +29,7 @@ const START_LIVES: int = 3
 @onready var lives_label: Label = $HUD/LivesLabel
 @onready var message: Label = $HUD/Message
 @onready var restart_button: Button = $HUD/RestartButton
+@onready var menu_button: Button = $HUD/MenuButton
 
 var lives: int = START_LIVES
 var score: int = 0
@@ -98,6 +99,7 @@ func _win() -> void:
 	message.text = "YOU WIN!"
 	message.show()
 	restart_button.show()
+	menu_button.show()
 
 
 func _lose() -> void:
@@ -105,6 +107,7 @@ func _lose() -> void:
 	message.text = "GAME OVER"
 	message.show()
 	restart_button.show()
+	menu_button.show()
 
 
 func _update_hud() -> void:
@@ -114,3 +117,7 @@ func _update_hud() -> void:
 
 func _on_restart_pressed() -> void:
 	get_tree().reload_current_scene()
+
+
+func _on_menu_pressed() -> void:
+	get_tree().change_scene_to_file("res://scene/menu.tscn")
