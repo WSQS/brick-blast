@@ -6,10 +6,21 @@ All notable changes to brick-blast will be documented in this file.
 
 ### Added
 
+- Combo 系统 (D011)：连续击破砖块累积 combo，分数随 combo 缩放
+- 球粘挡板 (D012)：球开局粘在挡板上，按 Space / 点击发射
+- 星级评价 (D013)：通关后根据 combo 和命数计算 1-3 星
+- 暂停功能 (D012)：Esc 暂停/恢复，显示 PAUSED 提示
 - 主菜单场景 (`scene/menu.tscn`)：标题 + Start + Quit 按钮
 - 游戏入口改为菜单 (`run/main_scene = res://scene/menu.tscn`)
 - 游戏结束后显示 Menu 按钮可返回主菜单
 - 完整游戏循环：Menu → Playing → Game Over / Win → Menu / Restart
+
+### Fixed
+
+- **暂停后挡板仍可移动**: 原方案使用 `get_tree().paused` + `PROCESS_MODE_ALWAYS`，
+  `process_mode` 继承导致 paddle/ball 在暂停时仍运行。
+  改为自定义 `paused` 变量，各节点显式检查 `parent.paused`，
+  不依赖引擎全局暂停机制。
 
 ### Architecture Decision: CharacterBody2D (2026-07-14)
 

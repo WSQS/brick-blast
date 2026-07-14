@@ -1,0 +1,75 @@
+# brick-blast
+
+A classic brick-breaker game built with [Godot 4.7](https://godotengine.org).
+
+## Features
+
+- **Ball & paddle physics**: `CharacterBody2D` + `move_and_collide` for CCD (no tunneling)
+- **Combo system**: consecutive brick destructions build combo, scaling score
+- **Ball stick**: ball waits on paddle until launch (Space / click)
+- **Star rating**: 1-3 stars based on combo performance and lives lost
+- **Pause / resume**: Esc to toggle
+- **Main menu**: title screen with Start / Quit
+
+## Requirements
+
+- Godot 4.7+ (GL Compatibility renderer)
+- GUT v9.6.1 (bundled in `addons/gut/`)
+
+## Getting Started
+
+```bash
+# Clone
+git clone <repo-url>
+cd brick-blast
+
+# Open in Godot
+# Launch the Godot editor and open the project, then press F5 to run
+```
+
+The game starts at the main menu (`res://scene/menu.tscn`).
+
+## Controls
+
+| Action | Key / Input |
+|--------|-------------|
+| Move paddle | Mouse / Arrow keys |
+| Launch ball | Space / Click |
+| Pause | Esc |
+| Restart | Restart button (after game over) |
+
+## Project Structure
+
+```
+brick-blast/
+├── scene/          # .tscn scene files (main, menu, ball, brick, paddle)
+├── script/         # .gd scripts
+├── test/unit/      # GUT unit tests
+├── docs/           # Design decisions and analysis
+├── addons/gut/     # GUT testing framework
+├── project.godot   # Godot project config
+└── CHANGELOG.md    # Change history
+```
+
+## Running Tests
+
+```bash
+cmd /c '"<godot_path>" --headless -s addons\gut\gut_cmdln.gd -gdir=res://test/unit -gexit 2>&1'
+```
+
+Example:
+
+```bash
+cmd /c '"C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.windows.opt.tools.64.exe" --headless -s addons\gut\gut_cmdln.gd -gdir=res://test/unit -gexit 2>&1'
+```
+
+## Documentation
+
+- [CHANGELOG.md](CHANGELOG.md) - change history
+- [docs/decisions.md](docs/decisions.md) - architecture decision records
+- [docs/formal-elements-analysis.md](docs/formal-elements-analysis.md) - game design analysis
+- [copilot-instructions.md](copilot-instructions.md) - project conventions and gotchas
+
+## License
+
+MIT
