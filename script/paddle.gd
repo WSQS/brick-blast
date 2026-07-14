@@ -1,4 +1,4 @@
-extends Area2D
+extends StaticBody2D
 ## Paddle — moves horizontally, follows mouse / touch / arrow keys.
 
 const MOVE_SPEED: float = 600.0
@@ -23,3 +23,8 @@ func _physics_process(delta: float) -> void:
 	var half_w: float = $CollisionShape2D.shape.size.x / 2.0
 	target_x = clampf(target_x, bounds.position.x + half_w, bounds.end.x - half_w)
 	position.x = target_x
+
+
+func get_rect() -> Rect2:
+	var s: Vector2 = $CollisionShape2D.shape.size
+	return Rect2(global_position - s / 2.0, s)

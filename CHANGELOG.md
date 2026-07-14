@@ -1,0 +1,40 @@
+# Changelog
+
+All notable changes to brick-blast will be documented in this file.
+
+## [Unreleased]
+
+### Architecture Decision: CharacterBody2D (2026-07-14)
+
+**问题**: Ball 使用 `Area2D`，在 `_physics_process` 中手动 `position += velocity` 移动。
+`Area2D` 的碰撞检测（`get_overlapping_areas()` / `intersect_shape()`）由 `PhysicsServer2D`
+在物理步进开始时更新，永远滞后一帧。结果：球的高速移动会导致碰撞检测完全失效（穿砖）。
+
+**决策**: 将 Ball 从 `Area2D` 改为 `CharacterBody2D`。
+
+| 组件 | 旧类型 | 新类型 | 原因 |
+|------|--------|--------|------|
+| Ball | Area2D | CharacterBody2D | `move_and_collide()` 自带 CCD，碰撞结果即时返回 |
+| Brick | Area2D | StaticBody2D | 静态碰撞体，供 `move_and_collide` 检测 |
+| Paddle | Area2D | StaticBody2D（或 AnimatableBody2D） | 同上 |
+
+**选择 CharacterBody2D 而非 RigidBody2D 的原因**:
+- 打砖块的反弹是规则驱动的，不是物理模拟
+- 挡板角度反弹需要精确控制（命中位置 → 出射角）
+- 后续道具（穿透、粘球、弧线）更容易在 CharacterBody2D 上实现
+- 参考项目 Brick Blast 也使用自建物理（等价于 CharacterBody2D 路线）
+
+### Added
+
+- GUT (Godot Unit Test) v9.6.1 测试框架
+- 17 个纯函数碰撞数学单元测试（墙壁/砖块/挡板/重叠检测）
+- 物理碰撞集成测试（基于 `wait_physics_frames` 驱动真实物理引擎）
+
+### Fixed
+
+- ball.gd: 修复 `_check_collisions` 碰撞检测滞后一帧导致穿砖
+- ball.gd: 修复 `area_entered` 边沿触发在高速下丢失碰撞
+- ball.gd: 添加位置修正（碰撞后将球推出物体表面）
+- main.gd: 修复 `COLORS[row % COLORS.size()]` 表达式损坏
+- main.gdc: 修复 `brick_scene` @export 赋值顺序（script 必须先于 export 属性）
+- brick.gd: 修复 `var s :=` 类型推断失败

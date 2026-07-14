@@ -22,8 +22,8 @@ const START_LIVES: int = 3
 @export var brick_scene: PackedScene
 
 @onready var playfield: Rect2 = _compute_playfield()
-@onready var ball: Area2D = $Ball
-@onready var paddle: Area2D = $Paddle
+@onready var ball: CharacterBody2D = $Ball
+@onready var paddle: StaticBody2D = $Paddle
 @onready var bricks: Node2D = $Bricks
 @onready var score_label: Label = $HUD/ScoreLabel
 @onready var lives_label: Label = $HUD/LivesLabel
@@ -54,7 +54,7 @@ func _spawn_bricks() -> void:
 
 	for row in range(ROWS):
 		for col in range(COLS):
-			var brick: Area2D = brick_scene.instantiate()
+			var brick: StaticBody2D = brick_scene.instantiate()
 			brick.color = COLORS[row % COLORS.size()]
 			brick.position = Vector2(
 				start_x + col * (BRICK_W + BRICK_GAP) + BRICK_W / 2.0,
