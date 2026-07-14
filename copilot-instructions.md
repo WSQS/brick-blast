@@ -72,6 +72,48 @@ Start-Process "C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.
 - Scene scripts go in `script/`, scene files in `scene/`, tests in `test/unit/`
 - Update `CHANGELOG.md` for notable changes
 
+## Git Commit Convention (Angular)
+
+Follow the [Angular commit convention](https://github.com/angular/angular/blob/main/CONTRIBUTING.md#commit). Format:
+
+```
+<type>(<scope>): <short subject in lowercase>
+
+<optional body, wrap at 72 chars>
+
+<optional footer>
+```
+
+### Types
+
+| Type | When to use |
+|------|-------------|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `refactor` | Code change that neither fixes a bug nor adds a feature |
+| `test` | Adding or modifying tests |
+| `docs` | Documentation only changes |
+| `style` | Formatting, no code change |
+| `chore` | Build, tooling, dependencies, CI |
+
+### Rules
+
+- Subject line: lowercase, no period, imperative mood (e.g. "add", not "added")
+- Scope: optional, single word for the affected area (e.g. `ball`, `brick`, `menu`, `test`)
+- Body: explain **what** and **why**, not how
+- Breaking changes: add `BREAKING CHANGE:` in footer
+- Use multiple `-m` flags if needed, but keep the structure
+
+### Examples
+
+```
+feat(menu): add main menu with start and quit buttons
+fix(ball): bounce off brick surface instead of sticking
+refactor(physics): migrate ball from area2d to characterbody2d
+test(collision): add game-over regression test
+docs: update changelog with architecture decision
+```
+
 ## Bug Fix Workflow
 
 When fixing a bug, follow this process:
