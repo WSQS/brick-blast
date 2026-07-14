@@ -14,6 +14,7 @@ config/name="brick-blast"
 run/main_scene="res://scene/menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
+config/version="0.0.1"
 
 [display]
 
