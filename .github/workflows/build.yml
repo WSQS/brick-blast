@@ -43,11 +43,26 @@ jobs:
           name: brick-blast-build-${{ github.run_number }}
           path: ${{ steps.export.outputs.archive_directory }}/*
 
+      - name: Extract APK from zip
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          cd ${{ steps.export.outputs.archive_directory }}
+          for f in *Android*.zip; do
+            unzip -o "$f" -d .
+          done
+          # Collect final release files: zips + raw apk
+          mkdir -p release
+          cp *.zip release/ 2>/dev/null || true
+          cp *.apk release/ 2>/dev/null || true
+          ls -la release/
+
       - name: Create release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ steps.export.outputs.archive_directory }}/*
+          files: ${{ steps.export.outputs.archive_directory }}/release/*
+          draft: true
+          generate_release_notes: true
           draft: true
           generate_release_notes: true
 
