@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://script/upgrade_panel.gd" id="1_panel"]
 
 [node name="UpgradePanel" type="CanvasLayer"]
+script = ExtResource("1_panel")
 
 [node name="Overlay" type="ColorRect" parent="."]
 anchors_preset = 15
