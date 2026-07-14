@@ -20,6 +20,9 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Decode Android keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > brick-blast.keystore
+
       - name: Export game
         id: export
         uses: firebelley/godot-export@v7.0.0
@@ -29,6 +32,9 @@ jobs:
           relative_project_path: ./
           export_debug: false
           archive_output: true
+        env:
+          ANDROID_KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+          ANDROID_KEY_PASS: ${{ secrets.ANDROID_KEY_PASS }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
