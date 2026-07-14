@@ -86,12 +86,3 @@ static func bounce_off_paddle(pos: Vector2, paddle_rect: Rect2, speed: float) ->
 	var offset: float = clampf((pos.x - paddle_center_x) / (paddle_rect.size.x / 2.0), -1.0, 1.0)
 	var angle := offset * deg_to_rad(60.0)
 	return Vector2(sin(angle), -cos(angle)) * speed
-
-
-## Checks whether a circle (center, radius) overlaps a rect.
-static func circle_overlaps_rect(center: Vector2, radius: float, rect: Rect2) -> bool:
-	var closest := Vector2(
-		clampf(center.x, rect.position.x, rect.end.x),
-		clampf(center.y, rect.position.y, rect.end.y),
-	)
-	return center.distance_squared_to(closest) <= radius * radius

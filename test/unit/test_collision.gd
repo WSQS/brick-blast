@@ -12,6 +12,15 @@ const BRICK_RECT: Rect2 = Rect2(100 - 26, 50 - 11, 52, 22)
 const PADDLE_RECT: Rect2 = Rect2(240 - 48, 660 - 7, 96, 14)
 
 
+# Migrated from ball.gd — only used in tests now
+static func circle_overlaps_rect(center: Vector2, radius: float, rect: Rect2) -> bool:
+	var closest := Vector2(
+		clampf(center.x, rect.position.x, rect.end.x),
+		clampf(center.y, rect.position.y, rect.end.y),
+	)
+	return center.distance_squared_to(closest) <= radius * radius
+
+
 # ---------------------------------------------------------------------------
 # Wall collision (calc_wall_bounce)
 # ---------------------------------------------------------------------------
@@ -70,16 +79,16 @@ func test_paddle_speed_preserved() -> void:
 # ---------------------------------------------------------------------------
 
 func test_circle_overlaps_rect_true_when_inside() -> void:
-	assert_true(BallScript.circle_overlaps_rect(Vector2(100, 50), RADIUS, BRICK_RECT), "Center of rect should overlap")
+	assert_true(circle_overlaps_rect(Vector2(100, 50), RADIUS, BRICK_RECT), "Center of rect should overlap")
 
 
 func test_circle_overlaps_rect_true_when_touching_edge() -> void:
-	assert_true(BallScript.circle_overlaps_rect(Vector2(100 + 26 + RADIUS - 1, 50), RADIUS, BRICK_RECT), "Just touching edge should overlap")
+	assert_true(circle_overlaps_rect(Vector2(100 + 26 + RADIUS - 1, 50), RADIUS, BRICK_RECT), "Just touching edge should overlap")
 
 
 func test_circle_overlaps_rect_false_when_far() -> void:
-	assert_false(BallScript.circle_overlaps_rect(Vector2(300, 300), RADIUS, BRICK_RECT), "Far away should not overlap")
+	assert_false(circle_overlaps_rect(Vector2(300, 300), RADIUS, BRICK_RECT), "Far away should not overlap")
 
 
 func test_circle_overlaps_rect_false_when_gap() -> void:
-	assert_false(BallScript.circle_overlaps_rect(Vector2(100 + 26 + RADIUS + 5, 50), RADIUS, BRICK_RECT), "Clear gap should not overlap")
+	assert_false(circle_overlaps_rect(Vector2(100 + 26 + RADIUS + 5, 50), RADIUS, BRICK_RECT), "Clear gap should not overlap")
