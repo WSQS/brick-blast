@@ -20,78 +20,35 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Godot
-        id: setup
-        run: |
-          GODOT_DIR="$HOME/.local/share/godot"
-          mkdir -p "$GODOT_DIR"
-          wget -q "https://downloads.godotengine.org/?flavor=stable&platform=linux.64&slug=linux.x86_64.zip&version=4.7" -O /tmp/godot.zip
-          unzip -q /tmp/godot.zip -d "$GODOT_DIR/"
-          chmod +x "$GODOT_DIR"/Godot_v*
-          GODOT_BIN=$(ls "$GODOT_DIR"/Godot_v*)
-          echo "godot=$GODOT_BIN" >> $GITHUB_OUTPUT
-          # Get version and install templates
-          VERSION=$("$GODOT_BIN" --version)
-          echo "Godot version: $VERSION"
-          TPL_DIR="$HOME/.local/share/godot/export_templates/$VERSION"
-          mkdir -p "$TPL_DIR"
-          wget -q "https://downloads.godotengine.org/?flavor=stable&platform=templates&slug=export_templates.tpz&version=4.7" -O /tmp/templates.tpz
-          unzip -o -j /tmp/templates.tpz -d "$TPL_DIR/"
-          echo "=== Templates installed ==="
-          ls -la "$TPL_DIR/"
-
-      - name: Import project
-        run: |
-          ${{ steps.setup.outputs.godot }} --headless --import || true
-
-      - name: Export Windows
-        run: |
-          mkdir -p build
-          ${{ steps.setup.outputs.godot }} --headless --export-release "Windows Desktop" build/brick-blast-windows.exe
-
-      - name: Export Linux
-        run: |
-          mkdir -p build
-          ${{ steps.setup.outputs.godot }} --headless --export-release "Linux" build/brick-blast-linux.x86_64
-
-      - name: Export Web
-        run: |
-          mkdir -p build/web
-          ${{ steps.setup.outputs.godot }} --headless --export-release "Web" build/web/index.html
-
       - name: Decode Android keystore
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > brick-blast.keystore
 
-      - name: Inject Android signing passwords
-        run: |
-          sed -i 's|password/keystore_release=""|password/keystore_release="${{ secrets.ANDROID_KEYSTORE_PASS }}"|' export_presets.cfg
-          sed -i 's|password/key_release=""|password/key_release="${{ secrets.ANDROID_KEY_PASS }}"|' export_presets.cfg
-
-      - name: Export Android
-        run: |
-          mkdir -p build
-          ${{ steps.setup.outputs.godot }} --headless --export-release "Android" build/brick-blast-android.apk
-
-      - name: Archive builds
-        run: |
-          mkdir -p archives
-          cd build
-          zip -r ../archives/brick-blast-windows.zip brick-blast-windows.exe
-          zip -r ../archives/brick-blast-linux.zip brick-blast-linux.x86_64
-          zip -r ../archives/brick-blast-web.zip web
-          zip -r ../archives/brick-blast-android.zip brick-blast-android.apk
+      - name: Export game
+        id: export
+        uses: firebelley/godot-export@v7.0.0
+        with:
+          godot_executable_download_url: https://downloads.godotengine.org/?flavor=stable&platform=linux.64&slug=linux.x86_64.zip&version=4.7
+          godot_export_templates_download_url: https://downloads.godotengine.org/?flavor=stable&platform=templates&slug=export_templates.tpz&version=4.7
+          relative_project_path: ./
+          export_debug: false
+          archive_output: true
+        env:
+          GODOT_ANDROID_KEYSTORE_RELEASE_PATH: ${{ github.workspace }}/brick-blast.keystore
+          GODOT_ANDROID_KEYSTORE_RELEASE_USER: brick-blast
+          GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASS }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: brick-blast-build-${{ github.run_number }}
-          path: archives/*
+          path: ${{ steps.export.outputs.archive_directory }}/*
 
       - name: Create release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: archives/*
+          files: ${{ steps.export.outputs.archive_directory }}/*
           draft: true
           generate_release_notes: true
+
 
