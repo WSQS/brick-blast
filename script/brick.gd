@@ -17,5 +17,5 @@ func destroy() -> void:
 
 
 func get_rect() -> Rect2:
-	var s := $CollisionShape2D.shape.size
+	var s: Vector2 = $CollisionShape2D.shape.size
 	return Rect2(global_position - s / 2.0, s)

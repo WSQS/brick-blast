@@ -54,8 +54,8 @@ func _spawn_bricks() -> void:
 
 	for row in range(ROWS):
 		for col in range(COLS):
-			var brick: Area2D = BRICK_SCENE.instantiate()
-			brick.color = COLORSbrick_sceneRS.size()]
+			var brick: Area2D = brick_scene.instantiate()
+			brick.color = COLORS[row % COLORS.size()]
 			brick.position = Vector2(
 				start_x + col * (BRICK_W + BRICK_GAP) + BRICK_W / 2.0,
 				BRICK_MARGIN_TOP + row * (BRICK_H + BRICK_GAP) + BRICK_H / 2.0,

@@ -6,8 +6,8 @@
 [ext_resource type="PackedScene" path="res://scene/brick.tscn" id="4_brick"]
 
 [node name="Main" type="Node2D"]
-brick_scene = ExtResource("4_brick")
 script = ExtResource("1_main")
+brick_scene = ExtResource("4_brick")
 
 [node name="Background" type="ColorRect" parent="."]
 offset_right = 480.0
