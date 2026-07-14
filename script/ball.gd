@@ -47,7 +47,8 @@ func _physics_process(delta: float) -> void:
 
 	# Fell below paddle — notify main
 	if global_position.y > bounds.end.y + 50:
-		get_parent()._on_ball_lost()
+		if parent and parent.has_method("_on_ball_lost"):
+			parent._on_ball_lost()
 
 
 func _handle_walls() -> void:
