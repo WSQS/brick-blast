@@ -15,6 +15,12 @@ All notable changes to brick-blast will be documented in this file.
 - 游戏结束后显示 Menu 按钮可返回主菜单
 - 完整游戏循环：Menu → Playing → Game Over / Win → Menu / Restart
 
+### Changed
+
+- **Paddle 移除 group 机制**: paddle 是唯一节点，不需要 group 查找。
+  ball.gd 碰撞检测从 `collider.is_in_group("paddle")` 改为 `collider == parent.paddle`。
+  删除 paddle.gd 的 `_ready()` group 注册和 paddle.tscn 的 `groups` 声明。
+
 ### Fixed
 
 - **暂停后挡板仍可移动**: 原方案使用 `get_tree().paused` + `PROCESS_MODE_ALWAYS`，
