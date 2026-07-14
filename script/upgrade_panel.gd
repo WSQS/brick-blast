@@ -7,6 +7,7 @@ signal upgrade_selected(upgrade)
 
 const CHOICE_COUNT: int = 3
 
+@onready var overlay: ColorRect = $Overlay
 @onready var buttons: Array[Button] = [
 	$Overlay/CenterContainer/VBoxContainer/Choice0,
 	$Overlay/CenterContainer/VBoxContainer/Choice1,
@@ -17,6 +18,7 @@ const CHOICE_COUNT: int = 3
 func _ready() -> void:
 	for i in buttons.size():
 		buttons[i].pressed.connect(_on_choice_pressed.bind(i))
+	_hide_panel()
 
 
 func show_choices() -> void:
@@ -24,11 +26,18 @@ func show_choices() -> void:
 	for i in choices.size():
 		buttons[i].text = "%s\n%s" % [choices[i].display_name, choices[i].description]
 		buttons[i].set_meta("upgrade", choices[i])
-		buttons[i].show()
-	show()
+	_show_panel()
 
 
 func _on_choice_pressed(index: int) -> void:
 	var upgrade = buttons[index].get_meta("upgrade")
-	hide()
+	_hide_panel()
 	upgrade_selected.emit(upgrade)
+
+
+func _show_panel() -> void:
+	overlay.show()
+
+
+func _hide_panel() -> void:
+	overlay.hide()

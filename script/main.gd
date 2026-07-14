@@ -57,9 +57,9 @@ var rounds_cleared: int = 0
 func _ready() -> void:
 	paddle.bounds = playfield
 	ball.bounds = playfield
+	upgrade_panel.hide()
 	if upgrade_panel and upgrade_panel.has_signal("upgrade_selected"):
 		upgrade_panel.upgrade_selected.connect(_on_upgrade_selected)
-		upgrade_panel.hide()
 	_spawn_bricks()
 	_reset_round()
 	_update_hud()
