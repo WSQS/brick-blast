@@ -1,6 +1,8 @@
 extends Node2D
 ## Main — orchestrates the game: spawns bricks, manages score, win/lose state.
 
+const UpgradeScript = preload("res://script/upgrade.gd")
+
 const COLS: int = 8
 const ROWS: int = 5
 const BRICK_W: float = 52.0
@@ -31,6 +33,7 @@ const START_LIVES: int = 3
 @onready var message: Label = $HUD/Message
 @onready var restart_button: Button = $HUD/RestartButton
 @onready var menu_button: Button = $HUD/MenuButton
+@onready var upgrade_panel = $UpgradePanel
 
 var lives: int = START_LIVES
 var score: int = 0
@@ -46,10 +49,17 @@ var lives_lost_this_level: int = 0
 # Ball stick state (D012): ball waits on paddle until player launches
 var ball_stuck: bool = true
 
+# Upgrade state (D014)
+var upgrades: Dictionary = {}  # UpgradeScript.Type -> count
+var rounds_cleared: int = 0
+
 
 func _ready() -> void:
 	paddle.bounds = playfield
 	ball.bounds = playfield
+	if upgrade_panel and upgrade_panel.has_signal("upgrade_selected"):
+		upgrade_panel.upgrade_selected.connect(_on_upgrade_selected)
+		upgrade_panel.hide()
 	_spawn_bricks()
 	_reset_round()
 	_update_hud()
@@ -150,11 +160,17 @@ func _on_ball_lost() -> void:
 
 
 func _win() -> void:
+	rounds_cleared += 1
 	var star_count := _compute_stars()
 	var star_str := ""
 	for i in star_count:
 		star_str += "*"
-	_end_game("YOU WIN! %s" % star_str)
+	message.text = "ROUND CLEAR! %s" % star_str
+	message.show()
+	# Show upgrade choices (D014)
+	await get_tree().create_timer(1.0).timeout
+	message.hide()
+	upgrade_panel.show_choices()
 
 
 func _compute_stars() -> int:
@@ -177,6 +193,37 @@ func _end_game(text: String) -> void:
 	message.show()
 	restart_button.show()
 	menu_button.show()
+
+
+func _on_upgrade_selected(upgrade) -> void:
+	upgrades[upgrade.id] = upgrades.get(upgrade.id, 0) + 1
+	_apply_upgrade(upgrade.id)
+	_start_next_round()
+
+
+func _apply_upgrade(id: int) -> void:
+	match id:
+		UpgradeScript.Type.PADDLE_WIDE:
+			var shape: RectangleShape2D = paddle.get_node("CollisionShape2D").shape
+			shape.size.x *= 1.5
+		UpgradeScript.Type.SLOW_BALL:
+			ball._speed *= 0.8
+		UpgradeScript.Type.EXTRA_LIFE:
+			lives += 1
+		UpgradeScript.Type.MULTI_BALL:
+			pass  # Phase 3
+		UpgradeScript.Type.PIERCE:
+			pass  # Phase 3
+
+
+func _start_next_round() -> void:
+	# Reset per-round state but keep upgrades
+	bricks_left = 0
+	_spawn_bricks()
+	_reset_round()
+	lives_lost_this_level = 0
+	max_combo = 0
+	_update_hud()
 
 
 func _update_hud() -> void:
