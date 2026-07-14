@@ -23,6 +23,17 @@ Newest and pending at the top.
 
 ## Resolved Decisions
 
+### D012: Procedures — 球粘挡板 + 暂停，关卡过渡推迟 (2026-07-14)
+
+**Context**: 当前球自动发射，玩家缺乏掌控感；无暂停功能；无关卡间过渡。
+**Decisions**:
+1. 球粘挡板（做）：球贴在挡板上跟随移动，点击/空格发射。与 combo 系统配套——玩家可选择起始位置和发射时机，combo 归因于技能而非随机
+2. 暂停（做，最小化）：Esc 键暂停，显示 Pause + 继续按钮 + 菜单按钮。移��端手指离开自动暂停
+3. 关卡间过渡（推迟到 Phase 2）：等强化系统启动时再设计
+**Priority**: 球粘挡板 + combo 系统一起做；暂停顺手加；关卡过渡推迟
+
+---
+
 ### D011: Resources — Combo 系统（方案 A：碰挡板重置） (2026-07-14)
 
 **Context**: 当前资源只有 Lives 和无消费出口的 Score。Objectives 决策（D010）要求引入连击系统驱动星级评价。

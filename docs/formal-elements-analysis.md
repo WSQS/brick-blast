@@ -54,18 +54,19 @@ Fullerton's objective types:
 
 ## 3. Procedures
 
-**Status**: ⚠️
+**Status**: ⚠️ → 决策已定 (D012)，待实现
 
-**Current flow**:
-```
-Menu → Start → Ball auto-launches → Play (move paddle, bounce ball, break bricks)
-  → Win (all bricks cleared) OR Lose (3 balls lost) → Restart / Menu
-```
+**Decision (D012)**:
+1. **球粘挡板**（待实现）：球贴在挡板上跟随移动，点击/空格发射。与 combo 配套
+2. **暂停**（待实现）：Esc 暂停，最小化 UI
+3. **关卡间过渡**：推迟到 Phase 2
 
-**Gaps**:
-- Ball auto-launches — player has no "I'm ready" control
-- No transition between rounds/waves (if endless or multi-level)
-- No pause
+**Target flow**:
+```
+Menu → Start → Ball sticks to paddle → Click/Space to launch → Play (combo, bricks)
+  → Win/Lose → Restart/Menu
+  Esc → Pause (Resume / Menu)
+```
 
 ---
 
