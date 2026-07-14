@@ -1,5 +1,5 @@
 ---
-name: sync-docs
+name: doc-sync
 description: Use when the user asks to sync, update, or reconcile documentation with the actual codebase — after refactoring, feature changes, or before a release. Triggers on mentions of docs being stale, out of date, or needing to match reality.
 ---
 
