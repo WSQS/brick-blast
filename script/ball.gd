@@ -18,6 +18,11 @@ func launch(direction: Vector2) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	# Skip physics when ball is stuck to paddle (D012)
+	var parent := get_parent()
+	if parent and parent.get("ball_stuck") == true:
+		return
+
 	var collision := move_and_collide(velocity * delta)
 
 	# Wall collisions (left / right / top) via bounds check
@@ -33,6 +38,9 @@ func _physics_process(delta: float) -> void:
 				velocity = bounce_off_paddle(global_position, collider.get_rect(), _speed)
 				_speed = minf(_speed * 1.03, MAX_SPEED)
 				velocity = velocity.normalized() * _speed
+				# Notify main to reset combo (D011)
+				if parent and parent.has_method("_on_paddle_hit"):
+					parent._on_paddle_hit()
 
 	# Fell below paddle — notify main
 	if global_position.y > bounds.end.y + 50:
