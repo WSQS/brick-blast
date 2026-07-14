@@ -20,7 +20,7 @@ Targets Windows + Android + Web.
 | Brick | `StaticBody2D` | Destructible block, emits `destroyed` signal |
 | Paddle | `StaticBody2D` | Mouse/keyboard controlled, angle-based reflection |
 
-Collision is handled by the **physics engine** (`move_and_collide` returns immediate collision info). Pure math helpers (wall bounce, paddle angle, circle-rect overlap) are static methods on `ball.gd` for unit testing.
+Collision is handled by the **physics engine** (`move_and_collide` returns immediate collision info). Pure math helpers (wall bounce, paddle angle) are static methods on `ball.gd` for unit testing.
 
 ## Critical Godot Gotchas (learned the hard way)
 
@@ -67,7 +67,7 @@ Start-Process "C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.
 ## Code Conventions
 
 - Use tabs for indentation (Godot default)
-- Static helper methods prefixed with `calc_` / `bounce_` / `circle_` on `ball.gd`
+- Static helper methods prefixed with `calc_` / `bounce_` on `ball.gd`
 - Collision layer/mask: everything on layer 1, mask 1
 - Scene scripts go in `script/`, scene files in `scene/`, tests in `test/unit/`
 - Update `CHANGELOG.md` for notable changes

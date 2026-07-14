@@ -8,10 +8,11 @@ Newest and pending at the top.
 
 ## Pending Decisions
 
-### P002: 下一功能方向
-基于 Objectives 决策（D010），第一步实现挑战条件系统（Forbidden Act）。
-具体内容：连击为主的挑战条件 + 星级评价。
-**Status**: 待实现。
+### P002: 强化选择系统细节
+基于 Objectives 决策（D010），挑战条件系统（combo + 星级评价）已完成。
+下一步为强化选择系统（Outwit）。
+具体内容：强化池、稀有度、星级如何影响选择数量/质量。
+**Status**: 待实现。详见 [roadmap.md](roadmap.md) v0.1。
 
 ### P003: 关卡数据格式
 - JSON 文件

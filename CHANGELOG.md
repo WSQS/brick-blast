@@ -4,6 +4,8 @@ All notable changes to brick-blast will be documented in this file.
 
 ## [Unreleased]
 
+## [0.0.1] - 2026-07-14
+
 ### Added
 
 - Combo 系统 (D011)：连续击破砖块累积 combo，分数随 combo 缩放
@@ -20,6 +22,11 @@ All notable changes to brick-blast will be documented in this file.
 - **Paddle 移除 group 机制**: paddle 是唯一节点，不需要 group 查找。
   ball.gd 碰撞检测从 `collider.is_in_group("paddle")` 改为 `collider == parent.paddle`。
   删除 paddle.gd 的 `_ready()` group 注册和 paddle.tscn 的 `groups` 声明。
+- **main.gd 重构**: `_reset_ball()` 重命名为 `_reset_round()`；`_compute_stars()` 返回 int 而非 String；
+  提取 `_win`/`_lose` 重复代码为 `_end_game(text)`；魔法数字 `40.0` 提取为 `BALL_OFFSET` 常量。
+- **paddle.gd**: 鼠标跟随改为仅在鼠标实际移动时生效（避免键盘松开后挡板跳回鼠标位置）。
+- **brick.gd**: 移除未使用的 `get_rect()` 方法。
+- **ball.gd**: 移除死代码 `circle_overlaps_rect`（迁移到 test_collision.gd）；`_on_ball_lost` 调用加空指针守卫。
 
 ### Fixed
 
@@ -27,6 +34,7 @@ All notable changes to brick-blast will be documented in this file.
   `process_mode` 继承导致 paddle/ball 在暂停时仍运行。
   改为自定义 `paused` 变量，各节点显式检查 `parent.paused`，
   不依赖引擎全局暂停机制。
+- **暂停时仍可发射球**: `_input` 缺少 `not paused` 守卫，暂停时按 Space 会设置 `ball_stuck = false`。
 
 ### Architecture Decision: CharacterBody2D (2026-07-14)
 

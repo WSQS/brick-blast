@@ -45,8 +45,10 @@ brick-blast/
 ├── scene/          # .tscn scene files (main, menu, ball, brick, paddle)
 ├── script/         # .gd scripts
 ├── test/unit/      # GUT unit tests
-├── docs/           # Design decisions and analysis
+├── docs/           # Design decisions, roadmap, analysis
 ├── addons/gut/     # GUT testing framework
+├── .github/        # CI workflows, skills
+├── export_presets.cfg  # Windows/Linux/Android/Web export presets
 ├── project.godot   # Godot project config
 └── CHANGELOG.md    # Change history
 ```
@@ -67,6 +69,7 @@ cmd /c '"C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.window
 
 - [CHANGELOG.md](CHANGELOG.md) - change history
 - [docs/decisions.md](docs/decisions.md) - architecture decision records
+- [docs/roadmap.md](docs/roadmap.md) - version roadmap and feature plan
 - [docs/formal-elements-analysis.md](docs/formal-elements-analysis.md) - game design analysis
 - [copilot-instructions.md](copilot-instructions.md) - project conventions and gotchas
 
