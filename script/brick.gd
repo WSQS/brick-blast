@@ -14,8 +14,3 @@ var color: Color = Color("e94560"):
 func destroy() -> void:
 	destroyed.emit()
 	queue_free()
-
-
-func get_rect() -> Rect2:
-	var s: Vector2 = $CollisionShape2D.shape.size
-	return Rect2(global_position - s / 2.0, s)
