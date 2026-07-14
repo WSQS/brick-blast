@@ -37,7 +37,7 @@ func _physics_process(delta: float) -> void:
 			if collider.is_in_group("brick"):
 				velocity = velocity.bounce(collision.get_normal())
 				collider.destroy()
-			elif collider.is_in_group("paddle"):
+			elif parent and collider == parent.paddle:
 				velocity = bounce_off_paddle(global_position, collider.get_rect(), _speed)
 				_speed = minf(_speed * 1.03, MAX_SPEED)
 				velocity = velocity.normalized() * _speed

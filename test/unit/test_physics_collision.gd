@@ -28,8 +28,6 @@ func before_each() -> void:
 	# Groups from .tscn may not persist in test context — add explicitly
 	if not brick.is_in_group("brick"):
 		brick.add_to_group("brick")
-	if not paddle.is_in_group("paddle"):
-		paddle.add_to_group("paddle")
 
 
 func _on_ball_lost() -> void:
