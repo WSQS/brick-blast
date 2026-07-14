@@ -21,9 +21,10 @@ func test_pause_toggles_paused_flag() -> void:
 
 func test_pause_sets_scene_tree_paused() -> void:
 	main._toggle_pause()
-	assert_true(get_tree().paused, "SceneTree should be paused")
+	assert_true(main.paused, "paused flag should be true")
+	assert_false(get_tree().paused, "SceneTree.paused should NOT be used")
 	main._toggle_pause()
-	assert_false(get_tree().paused, "SceneTree should be unpaused")
+	assert_false(main.paused, "paused flag should be false")
 
 
 func test_pause_does_not_work_after_game_over() -> void:
@@ -49,3 +50,18 @@ func test_launch_does_not_work_while_paused() -> void:
 	# _input doesn't check paused for launch, but ball._physics_process
 	# checks ball_stuck which stays true
 	assert_true(main.ball_stuck, "Ball should still be stuck while paused")
+
+
+func test_paddle_does_not_move_while_paused() -> void:
+	var paddle: StaticBody2D = main.paddle
+	var x_before: float = paddle.position.x
+
+	# Pause the game
+	main._toggle_pause()
+	assert_true(main.paused, "Should be paused")
+
+	# Simulate movement by calling _physics_process directly
+	paddle._physics_process(0.016)
+
+	var x_after: float = paddle.position.x
+	assert_eq(x_before, x_after, "Paddle should not move while paused")

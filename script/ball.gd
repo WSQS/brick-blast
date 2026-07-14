@@ -18,9 +18,12 @@ func launch(direction: Vector2) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	# Skip physics when ball is stuck to paddle (D012)
 	var parent := get_parent()
+	# Skip physics when ball is stuck to paddle (D012)
 	if parent and parent.get("ball_stuck") == true:
+		return
+	# Skip physics when paused (D012)
+	if parent and parent.get("paused") == true:
 		return
 
 	var collision := move_and_collide(velocity * delta)

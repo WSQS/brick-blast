@@ -67,7 +67,6 @@ func _input(event: InputEvent) -> void:
 
 func _toggle_pause() -> void:
 	paused = !paused
-	get_tree().paused = paused
 	if paused:
 		message.text = "PAUSED"
 		message.show()

@@ -12,6 +12,8 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if get_parent().paused:
+		return
 	var target_x := position.x
 
 	# Keyboard input
