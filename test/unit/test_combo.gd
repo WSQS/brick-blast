@@ -67,25 +67,25 @@ func test_score_scales_with_combo() -> void:
 func test_one_star_for_clearing() -> void:
 	main.max_combo = 5
 	main.lives_lost_this_level = 1
-	assert_eq(main._compute_stars(), "*", "Should be 1 star for clearing with low combo")
+	assert_eq(main._compute_stars(), 1, "Should be 1 star for clearing with low combo")
 
 
 func test_two_stars_for_high_combo() -> void:
 	main.max_combo = 10
 	main.lives_lost_this_level = 1
-	assert_eq(main._compute_stars(), "**", "Should be 2 stars for combo >= 10")
+	assert_eq(main._compute_stars(), 2, "Should be 2 stars for combo >= 10")
 
 
 func test_three_stars_for_no_lives_lost() -> void:
 	main.max_combo = 10
 	main.lives_lost_this_level = 0
-	assert_eq(main._compute_stars(), "***", "Should be 3 stars for combo >= 10 and no lives lost")
+	assert_eq(main._compute_stars(), 3, "Should be 3 stars for combo >= 10 and no lives lost")
 
 
 func test_two_stars_for_no_lives_lost_low_combo() -> void:
 	main.max_combo = 3
 	main.lives_lost_this_level = 0
-	assert_eq(main._compute_stars(), "**", "Should be 2 stars for no lives lost even with low combo")
+	assert_eq(main._compute_stars(), 2, "Should be 2 stars for no lives lost even with low combo")
 
 
 # ---------------------------------------------------------------------------
@@ -104,5 +104,5 @@ func test_ball_unstuck_on_launch() -> void:
 
 func test_ball_restucks_on_reset() -> void:
 	main.ball_stuck = false
-	main._reset_ball()
+	main._reset_round()
 	assert_true(main.ball_stuck, "Ball should be stuck again after reset")

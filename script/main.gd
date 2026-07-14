@@ -17,6 +17,7 @@ const COLORS: Array[Color] = [
 ]
 
 const PADDLE_Y: float = 660.0
+const BALL_OFFSET: float = 40.0
 const START_LIVES: int = 3
 
 @export var brick_scene: PackedScene
@@ -50,15 +51,15 @@ func _ready() -> void:
 	paddle.bounds = playfield
 	ball.bounds = playfield
 	_spawn_bricks()
-	_reset_ball()
+	_reset_round()
 	_update_hud()
 
 
 func _input(event: InputEvent) -> void:
 	if game_over:
 		return
-	# Launch ball (D012)
-	if ball_stuck and (event.is_action_pressed("ui_accept") or (event is InputEventMouseButton and event.pressed)):
+	# Launch ball (D012) — only when not paused
+	if not paused and ball_stuck and (event.is_action_pressed("ui_accept") or (event is InputEventMouseButton and event.pressed)):
 		_launch_ball()
 	# Pause (D012)
 	if event.is_action_pressed("ui_cancel"):
@@ -83,7 +84,7 @@ func _launch_ball() -> void:
 func _process(_delta: float) -> void:
 	# Keep ball on paddle while stuck
 	if ball_stuck and not paused:
-		ball.position = Vector2(paddle.position.x, PADDLE_Y - 40.0)
+		ball.position = Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)
 
 
 func _compute_playfield() -> Rect2:
@@ -109,8 +110,8 @@ func _spawn_bricks() -> void:
 			bricks_left += 1
 
 
-func _reset_ball() -> void:
-	ball.position = Vector2(playfield.size.x / 2.0, PADDLE_Y - 40.0)
+func _reset_round() -> void:
+	ball.position = Vector2(playfield.size.x / 2.0, PADDLE_Y - BALL_OFFSET)
 	ball.velocity = Vector2.ZERO
 	ball_stuck = true
 	# Reset combo on ball loss (D011)
@@ -145,34 +146,34 @@ func _on_ball_lost() -> void:
 	if lives <= 0:
 		_lose()
 	else:
-		_reset_ball()
+		_reset_round()
 
 
 func _win() -> void:
-	game_over = true
-	var stars := _compute_stars()
-	message.text = "YOU WIN! %s" % stars
-	message.show()
-	restart_button.show()
-	menu_button.show()
+	var star_count := _compute_stars()
+	var star_str := ""
+	for i in star_count:
+		star_str += "*"
+	_end_game("YOU WIN! %s" % star_str)
 
 
-func _compute_stars() -> String:
+func _compute_stars() -> int:
 	# D013: 3-star rating
 	var count: int = 1  # 1 star for clearing
 	if max_combo >= 10:
 		count += 1
 	if lives_lost_this_level == 0:
 		count += 1
-	var s := ""
-	for i in count:
-		s += "*"
-	return s
+	return count
 
 
 func _lose() -> void:
+	_end_game("GAME OVER")
+
+
+func _end_game(text: String) -> void:
 	game_over = true
-	message.text = "GAME OVER"
+	message.text = text
 	message.show()
 	restart_button.show()
 	menu_button.show()
