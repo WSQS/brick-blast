@@ -33,6 +33,7 @@ const START_LIVES: int = 3
 var lives: int = START_LIVES
 var score: int = 0
 var bricks_left: int = 0
+var game_over: bool = false
 
 
 func _ready() -> void:
@@ -82,6 +83,8 @@ func _on_brick_destroyed() -> void:
 
 
 func _on_ball_lost() -> void:
+	if game_over:
+		return
 	lives -= 1
 	_update_hud()
 	if lives <= 0:
@@ -91,12 +94,14 @@ func _on_ball_lost() -> void:
 
 
 func _win() -> void:
+	game_over = true
 	message.text = "YOU WIN!"
 	message.show()
 	restart_button.show()
 
 
 func _lose() -> void:
+	game_over = true
 	message.text = "GAME OVER"
 	message.show()
 	restart_button.show()
