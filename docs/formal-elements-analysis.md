@@ -22,20 +22,33 @@ Legend: ✅ complete · ⚠️ has gaps · ❌ missing
 
 ## 2. Objectives
 
-**Status**: ⚠️
+**Status**: ⚠️ → 决策已定 (D010)，待实现
 
 **Current**: Clear all bricks = win. Lose all 3 lives = game over.
 
-Fullerton's objective types: Capture / Chase / Race / Alignment / Rescue / Escape / Forbidden Act / Construction / Exploration / Outwit.
+**Decision (D010)**: Construction（主）+ Forbidden Act（第一副）+ Outwit（后续副）
+- 主目标：清砖块（已有）
+- 第一副目标：挑战条件（连击为主，不绑死）+ 星级评价
+- 第二副目标（后续）：强化选择，星级影响选择数量/质量
+- 正向循环：玩得好 → 更多星级 → 更多强化 → 更强
 
-Brick Blast is currently pure **Construction** (elimination = reverse construction).
+Fullerton's objective types:
 
-**Gaps**:
-- Objective is binary (win/lose), no gradation (stars, score rank, time bonus)
-- No secondary objectives (e.g. "clear without losing a ball", "clear under 60s")
-- Mode choice (stages vs. roguelike) will fundamentally change objective structure
+- **Capture** — 获取或夺取特定物品（如打中关键砖块触发道具）
+- **Chase** — 追逐移动目标（打砖块不太适用，玩家是"接"不是"追"）
+- **Race** — 在限定时间内完成，或比对手更快（如限时模式）
+- **Alignment** — 将元素排列成特定图案（如俄罗斯方块、三消，与打砖块不搭）
+- **Rescue** — 拯救某物脱离危险（除非加叙事层，否则不自然）
+- **Escape** — 从困境中脱出（如砖块不断下压，必须在被压死前清除）
+- **Forbidden Act** — 不能做某事，做了就失败（如"不丢球通关"作为额外挑战）
+- **Construction** — 通过放置或移除元素达成目标（打砖块的核心：消除所有砖块）
+- **Exploration** — 发现隐藏内容（如隐藏砖块、秘密关卡入口）
+- **Outwit** — 通过策略而非纯操作取胜（如 Roguelike 的强化选择）
 
-**Decision needed**: See P001 in decisions.md
+**Remaining gaps**:
+- 连击系统尚未实现
+- 星级评价尚未实现
+- 强化选择系统尚未实现（Phase 2）
 
 ---
 

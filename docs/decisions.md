@@ -8,28 +8,37 @@ Newest and pending at the top.
 
 ## Pending Decisions
 
-### P001: 游戏模式选择
-- 闯关模式：固定关卡布局，通关解锁
-- Roguelike 模式：随机关卡 + 强化选择
-- 其他：Classic（无尽）/ Time Attack / Hardcore / Puzzle / Zen
-**Status**: 待讨论。需要先确定"想给玩家什么体验"（MDA 的 Aesthetics 层）。
-
 ### P002: 下一功能方向
-基于 Formal Elements 分析的三个薄弱点：
-- Resources → 道具系统
-- Conflict → 硬砖块（不同 HP）
-- Procedures → 球粘挡板（点击发射）
-**Status**: 待讨论。
+基于 Objectives 决策（D010），第一步实现挑战条件系统（Forbidden Act）。
+具体内容：连击为主的挑战条件 + 星级评价。
+**Status**: 待实现。
 
 ### P003: 关卡数据格式
 - JSON 文件
 - Godot Resource (.tres)
 - 二维数组/字符串
-**Status**: 需要先确定是否做闯关模式（P001）。
+**Status**: 需要先确定是否做闯关模式（取决于强化系统推进后是否需要多关卡）。
 
 ---
 
 ## Resolved Decisions
+
+### D010: Objectives — Construction + Forbidden Act，后续叠加 Outwit (2026-07-14)
+
+**Context**: 游戏目标当前是纯 Construction（清砖块），二元 win/lose，缺乏深度。需要确定副目标方向。
+**Options considered**:
+- A. Capture（金币/道具掉落）
+- B. Outwit（强化选择）
+- C. Forbidden Act（挑战条件 + 星级评价）
+**Decision**: 先做 C，在 C 的基础上叠加 B。
+**Rationale**:
+- C 是基础：将二元 win/lose 变成分层评价（星级），为后续所有系统提供"表现好坏"的度量
+- C → B 形成正循环：星级越高 → 强化选择越多/越好 → 下一关更强 → 继续追求高星
+- 挑战条件以连击为主，但不绑死，后续可调整（限时、不丢球等）
+- 参考 Breakout 71 的"表现好 → 更多选择"机制
+**Phases**:
+1. Phase 1: 连击系统 + 星级评价（Forbidden Act）
+2. Phase 2: 关卡间强化选择（Outwit），星级影响选择数量
 
 ### D009: Git 提交规范 — Angular Convention (2026-07-14)
 
