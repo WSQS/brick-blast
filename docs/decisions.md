@@ -23,6 +23,27 @@ Newest and pending at the top.
 
 ## Resolved Decisions
 
+### D011: Resources — Combo 系统（方案 A：碰挡板重置） (2026-07-14)
+
+**Context**: 当前资源只有 Lives 和无消费出口的 Score。Objectives 决策（D010）要求引入连击系统驱动星级评价。
+**Options considered**:
+- A. 砖块连击：每打一块砖 combo+1，碰挡板重置
+- B. 无失误连击：每打一块砖 combo+1，仅失球重置
+- C. 连续命中：每打一块砖 combo+1，碰墙/挡板不碰砖也重置
+**Decision**: 方案 A。
+**Rules**:
+- 球碰砖块 → combo += 1
+- 球碰挡板 → combo = 0（接球 = 一轮结束）
+- 球碰墙 → 不影响 combo
+- 失球 → combo = 0
+**Rationale**:
+- A 在接球环节引入 Dilemma："冒险多打一块砖 vs 安全接球"，同时解决 Conflict 缺口
+- B 太宽松，combo 没有张力
+- C 太严苛，弹墙是正常玩法，惩罚太随意；Breakout 71 用 C 但有大量道具补偿
+- combo 越高 → 分数倍率越高 → 星级越好 → 后续强化选择越多
+
+---
+
 ### D010: Objectives — Construction + Forbidden Act，后续叠加 Outwit (2026-07-14)
 
 **Context**: 游戏目标当前是纯 Construction（清砖块），二元 win/lose，缺乏深度。需要确定副目标方向。

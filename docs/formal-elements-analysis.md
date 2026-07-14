@@ -89,23 +89,24 @@ Menu → Start → Ball auto-launches → Play (move paddle, bounce ball, break 
 
 ## 5. Resources
 
-**Status**: ⚠️ (weakest element)
+**Status**: ⚠️ → 决策已定 (D011)，待实现
 
 **Current resources**:
 | Resource | Status | Notes |
 |----------|--------|-------|
 | Lives | ✅ | 3, decremented on ball loss |
 | Score | ⚠️ | Accumulates but has no consumption outlet — can't spend it |
+| Combo | ❌ 待实现 | D011: 每打一块砖 +1，碰挡板/失球重置 |
+| Stars | ❌ 待实现 | D010: 通关后根据 combo 等条件评定 1-3 星 |
+| Upgrade choices | ❌ Phase 2 | D010: 星级影响强化选择数量 |
 
-**Missing resource types** (from Fullerton's list):
-- Power-Ups: none yet
-- Currency: score is currently currency-less
-- Health: bricks have 1 HP, paddle/ball have no HP concept
-- Time: no timer or time-based mechanics
-- Inventory: none
-- Special Terrain: none
+**Combo rules (D011)**:
+- 球碰砖块 → combo += 1
+- 球碰挡板 → combo = 0
+- 球碰墙 → 不影响 combo
+- 失球 → combo = 0
 
-**This is the primary area for expansion.**
+**设计意图**: combo 在接球环节引入 Dilemma——"冒险多打一块砖 vs 安全接球"
 
 ---
 
