@@ -23,6 +23,11 @@ jobs:
       - name: Decode Android keystore
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > brick-blast.keystore
 
+      - name: Inject Android signing passwords
+        run: |
+          sed -i 's|password/keystore_release=""|password/keystore_release="${{ secrets.ANDROID_KEYSTORE_PASS }}"|' export_presets.cfg
+          sed -i 's|password/key_release=""|password/key_release="${{ secrets.ANDROID_KEY_PASS }}"|' export_presets.cfg
+
       - name: Export game
         id: export
         uses: firebelley/godot-export@v7.0.0
