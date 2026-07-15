@@ -36,8 +36,10 @@ func _on_choice_pressed(index: int) -> void:
 
 
 func _show_panel() -> void:
+	visible = true
 	overlay.show()
 
 
 func _hide_panel() -> void:
 	overlay.hide()
+	visible = false

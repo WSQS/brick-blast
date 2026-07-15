@@ -123,3 +123,31 @@ func test_overlay_visible_after_show_choices() -> void:
 	assert_false(overlay.visible, "Overlay should be hidden initially")
 	panel.show_choices()
 	assert_true(overlay.visible, "Overlay should be visible after show_choices")
+
+
+func test_win_full_flow_debug() -> void:
+	# Win the round
+	main.bricks_left = 1
+	main._on_brick_destroyed()
+	await wait_seconds(1.5)
+
+	var panel = main.get_node("UpgradePanel")
+	var overlay: ColorRect = panel.overlay
+
+	# Debug: print all relevant state
+	gut.p("=== DEBUG: After win ===")
+	gut.p("overlay.visible = %s" % overlay.visible)
+	gut.p("overlay.modulate = %s" % overlay.modulate)
+	gut.p("overlay.color = %s" % overlay.color)
+	gut.p("overlay.get_rect() = %s" % overlay.get_rect())
+	gut.p("panel.layer = %d" % panel.layer)
+	gut.p("panel.visible = %s" % panel.visible)
+	gut.p("panel.get_child_count() = %d" % panel.get_child_count())
+
+	# Check buttons
+	for i in 3:
+		var btn: Button = panel.buttons[i]
+		gut.p("button[%d].visible=%s text=%s" % [i, btn.visible, btn.text])
+		gut.p("button[%d].get_global_rect()=%s" % [i, btn.get_global_rect()])
+
+	assert_true(overlay.visible, "Overlay must be visible")
