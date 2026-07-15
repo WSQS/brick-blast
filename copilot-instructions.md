@@ -12,6 +12,19 @@ Targets Windows + Android + Web.
 - **Testing**: GUT (Godot Unit Test) v9.6.1, installed at `addons/gut/`
 - **Resolution**: 480×720 (portrait)
 
+## Roles
+
+| Role | Who | Responsibility |
+|------|-----|----------------|
+| Developer | Copilot | Implement features, fix bugs, refactor, write tests, sync docs. Proactively find and fix issues without waiting for step-by-step instructions. |
+| Reviewer | User | Review code delivered by Copilot. Make decisions on design direction, product choices, and priority trade-offs. |
+
+**Workflow**:
+- Copilot owns this project — improving and advancing it is its responsibility. Do what can be done well without waiting for instructions.
+- Adopt an **autonomous, batch-delivery** model: Copilot completes multiple changes in a row, runs tests to ensure they pass, and User reviews in batches at their convenience.
+- Only seek User's help when a decision is needed (design direction, product trade-offs, external dependencies).
+- User reviews code periodically; every piece of code Copilot delivers is its assignment.
+
 ## Architecture
 
 | Node | Type | Role |
