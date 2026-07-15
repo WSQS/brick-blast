@@ -12,7 +12,7 @@ All notable changes to brick-blast will be documented in this file.
 - 球粘挡板时额外球也跟随挡板移动
 - 新场景 `scene/upgrade_panel.tscn`：强化选择 UI
 - 新脚本 `script/upgrade.gd`（强化数据模型）、`script/upgrade_panel.gd`（UI 控制）
-- 72 个单元测试（含 32 个强化系统测试）
+- 73 个单元测试（含 33 个强化系统测试）
 
 ### Changed
 
@@ -24,6 +24,7 @@ All notable changes to brick-blast will be documented in this file.
 - 强化面板不可见：CanvasLayer.visible 需要与 overlay.visible 同时控制
 - 通关后球未停止：`_win()` 现在立即设置 `ball_stuck=true` + `velocity=ZERO`
 - 多球时丢一球扣命：改为有球在场时不扣命
+- 多球时主球丢失冻结所有球：`_on_ball_lost` 不再设 `ball_stuck=true`，额外球继续飞行
 - 球粘挡板时额外球不跟随：`_process` 中同步额外球位置
 - 强化面板打开时点击会发射球：`_input` 增加 `upgrade_panel.visible` 守卫
 - 穿透未在碰挡板时重置：`_on_paddle_hit` 恢复 `pierce_count`
