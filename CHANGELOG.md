@@ -6,16 +6,28 @@ All notable changes to brick-blast will be documented in this file.
 
 ### Added
 
-- 强化选择系统 (D014)：通关后弹出 3 选 1 强化面板，选择后重开同一关
-- 5 种强化：挡板加宽(+50%)、减速(-20%)、额外生命(+1)、多球(stub)、穿透(stub)
+- ��化选择系统 (D014)：通关后弹出 3 选 1 强化面板，选择后重开同一��
+- 5 种强化全部实现：挡板加宽(+50%)、减速(-20%)、额外生命(+1)、多球、穿透(穿过 3 块砖)
+- 多球规则：额外球与主球不互相碰撞；有球在场时不扣命，所有球掉光才扣命
+- 球粘挡板时额外球也跟随挡板移动
 - 新场景 `scene/upgrade_panel.tscn`：强化选择 UI
 - 新脚本 `script/upgrade.gd`（强化数据模型）、`script/upgrade_panel.gd`（UI 控制）
-- 12 个强化系统单元测试（面板显隐、通关流程、强化选择）
+- 72 个单元测试（含 32 个强化系统测试）
+
+### Changed
+
+- 球碰撞层从 layer 1 改为 layer 2（mask 1），球与球之间不再碰撞
+- 挡板加宽有上限：最多占屏幕宽度 80%（`minf(w * 1.5, playfield * 0.8)`）
 
 ### Fixed
 
 - 强化面板不可见：CanvasLayer.visible 需要与 overlay.visible 同时控制
 - 通关后球未停止：`_win()` 现在立即设置 `ball_stuck=true` + `velocity=ZERO`
+- 多球时丢一球扣命：改为有球在场时不扣命
+- 球粘挡板时额外球不跟随：`_process` 中同步额外球位置
+- 强化面板打开时点击会发射球：`_input` 增加 `upgrade_panel.visible` 守卫
+- 穿透未在碰挡板时重置：`_on_paddle_hit` 恢复 `pierce_count`
+- 挡板加宽仅更新 CollisionShape：同步 ColorRect 的 size 和 position
 
 ## [0.0.1] - 2026-07-14
 

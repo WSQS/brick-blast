@@ -78,7 +78,7 @@ Start-Process "C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.
 
 - Use tabs for indentation (Godot default)
 - Static helper methods prefixed with `calc_` / `bounce_` on `ball.gd`
-- Collision layer/mask: everything on layer 1, mask 1
+- Collision layer/mask: ball on layer 2 mask 1 (balls don't collide with each other); paddle/brick/wall on layer 1 mask 1
 - Scene scripts go in `script/`, scene files in `scene/`, tests in `test/unit/`
 - Update `CHANGELOG.md` for notable changes
 
@@ -135,7 +135,7 @@ When fixing a bug, follow this process:
 
 This ensures every bug fix is backed by a test that prevents regression. See the "groups lost on instantiation" fix as a reference example.
 
-## Roadmap (see brick-breaker-handoff.md)
+## Roadmap (see docs/roadmap.md)
 
-Current: minimal playable prototype (Classic mode, no power-ups)
-Next: power-ups (bomb, laser, multi-ball, double damage), multiple game modes
+Current: upgrade system with 5 power-ups (wide paddle, slow ball, extra life, multi-ball, pierce)
+Next: rarity system, star-rating influence on choices, level evolution direction

@@ -9,9 +9,9 @@ Newest and pending at the top.
 ## Pending Decisions
 
 ### P002: 强化选择系统细节
-D014 已确定单关卡无限模式方向。当前 3 个强化已实现（挡板加宽、减速、额外生命），多球和穿透待实现。
+D014 已确定单关卡无限模式方向。5 个强化全部实现（挡板加宽、减速、额外生命、多球、穿透）。
 剩余问题：稀有度机制、星级如何影响选择数量/质量。
-**Status**: 部分实现。详见 [roadmap.md](roadmap.md) v0.1。
+**Status**: 核心玩法已完成，详见 [roadmap.md](roadmap.md) v0.1。
 
 ### P003: 关卡数据格式
 - JSON 文件

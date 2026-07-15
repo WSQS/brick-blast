@@ -16,13 +16,13 @@ Legend: ✅ complete · ⚠️ has gaps · ❌ missing
 | Role | Operator (controls paddle) |
 | Interaction pattern | Player vs. system |
 
-**Gaps**: Opening experience lacks invitation — menu → start → ball auto-launches with no "are you ready?" moment.
+**Gaps**: Opening experience lacks invitation — menu → start → ball sticks to paddle (player must launch manually).
 
 ---
 
 ## 2. Objectives
 
-**Status**: ⚠️ → 决策已定 (D010)，待实现
+**Status**: ✅
 
 **Current**: Clear all bricks = win. Lose all 3 lives = game over.
 
@@ -46,19 +46,19 @@ Fullerton's objective types:
 - **Outwit** — 通过策略而非纯操作取胜（如 Roguelike 的强化选择）
 
 **Remaining gaps**:
-- 连击系统尚未实现
-- 星级评价尚未实现
-- 强化选择系统尚未实现（Phase 2）
+- 连击系统 ✅ 已实现 (D011)
+- 星级评价 ✅ 已实现 (D013)
+- 强化选择系统 ✅ 已实现 (D014)，5 种强化全部完成
 
 ---
 
 ## 3. Procedures
 
-**Status**: ⚠️ → 决策已定 (D012)，待实现
+**Status**: ✅
 
-**Decision (D012)**:
-1. **球粘挡板**（待实现）：球贴在挡板上跟随移动，点击/空格发射。与 combo 配套
-2. **暂停**（待实现）：Esc 暂停，最小化 UI
+**Decision (D012)** — all implemented:
+1. **球粘挡板** ✅：球贴在挡板上跟随移动，点击/空格发射
+2. **暂停** ✅：Esc 暂停，最小化 UI
 3. **关卡间过渡**：推迟到 Phase 2
 
 **Target flow**:
@@ -79,8 +79,10 @@ Menu → Start → Ball sticks to paddle → Click/Space to launch → Play (com
 - Ball bounces off walls, bricks, paddle
 - Paddle hit angle depends on contact position (center = straight up, edges = angled)
 - Bricks are one-hit destroy
-- 3 lives, lose one when ball falls below paddle
+- 3 lives, lose one only when ALL balls fall below paddle (multi-ball: extra balls don't cost lives)
 - Ball speed increases 3% per paddle hit (capped at 550)
+- Multi-ball: extra balls don't collide with each other (layer 2, mask 1)
+- Pierce: ball passes through up to N bricks without bouncing, resets on paddle hit
 
 **Gaps**:
 - No dynamic effect rules (e.g. "speed up after N bricks destroyed")
@@ -90,7 +92,7 @@ Menu → Start → Ball sticks to paddle → Click/Space to launch → Play (com
 
 ## 5. Resources
 
-**Status**: ⚠️ → 决策已定 (D011)，待实现
+**Status**: ✅
 
 **Current resources**:
 | Resource | Status | Notes |
@@ -99,7 +101,7 @@ Menu → Start → Ball sticks to paddle → Click/Space to launch → Play (com
 | Score | ✅ | Scales with combo: `10 * (1 + combo / 5)` |
 | Combo | ✅ | D011: 每打一块砖 +1，碰挡板/失球重置 |
 | Stars | ✅ | D013: 通关 1★, combo≥10 2★, 不丢球 3★ |
-| Upgrade choices | 🔧 WIP | D014: 通关后 3 选 1，3/5 已实现 |
+| Upgrade choices | ✅ | D014: 通关后 3 选 1，5/5 已实现（加宽/减速/额外生命/多球/穿透） |
 
 **Combo rules (D011)**:
 - 球碰砖块 → combo += 1
@@ -113,7 +115,7 @@ Menu → Start → Ball sticks to paddle → Click/Space to launch → Play (com
 
 ## 6. Conflict
 
-**Status**: ⚠️
+**Status**: ✅
 
 Fullerton's conflict sources: Obstacles / Opponents / Dilemmas.
 
@@ -122,14 +124,9 @@ Fullerton's conflict sources: Obstacles / Opponents / Dilemmas.
 |--------|--------|---------|
 | Obstacles | ✅ | Brick layout blocks ball path |
 | Opponents | N/A | Single-player, no AI |
-| Dilemmas | ❌ | No meaningful choices to weigh |
+| Dilemmas | ✅ | Combo risk/reward (D011) + upgrade choices (D014) |
 
-**Gap**: Player never faces a decision where they must trade off risk vs. reward. Every moment has one optimal action: "go catch the ball."
-
-**Potential dilemmas**:
-- Hard bricks: choose which brick to target first
-- Power-ups: risk positioning to catch a falling power-up vs. safely return ball
-- Speed management: aggressive play (faster ball = more points) vs. safe play
+**Resolved**: Combo creates dilemma ("冒险多打一块砖 vs 安全接球"); upgrade selection forces strategic trade-offs each round.
 
 ---
 
@@ -145,9 +142,9 @@ No issues identified.
 
 ## 8. Outcome
 
-**Status**: ⚠️ → 决策已定 (D013)，待实现
+**Status**: ✅
 
-**Decision (D013)**: 星级评价
+**Decision (D013)** — implemented: 星级评价
 - ⭐ 通关
 - ⭐⭐ 通关 + 最大 combo ≥ 10（playtest 调整）
 - ⭐⭐⭐ 通关 + 不丢球
@@ -159,10 +156,10 @@ No issues identified.
 | Element | Status | Decision |
 |---------|--------|----------|
 | Players | ✅ | No change needed |
-| Objectives | D010 | Construction + Forbidden Act → Outwit |
-| Procedures | D012 | Ball sticks to paddle + pause, level transition deferred |
-| Rules | ✅ | Combo rule added via D011, no other changes |
-| Resources | D011 | Combo system (方案 A: paddle reset) |
-| Conflict | ✅ | Solved by D011 (combo creates dilemma) |
+| Objectives | ✅ | D010: Construction + Forbidden Act → Outwit (all implemented) |
+| Procedures | ✅ | D012: Ball sticks + pause implemented, level transition deferred |
+| Rules | ✅ | Combo (D011), multi-ball, pierce rules all implemented |
+| Resources | ✅ | D011 combo + D014 upgrades (5/5) all implemented |
+| Conflict | ✅ | Solved by D011 (combo dilemma) + D014 (upgrade choices) |
 | Boundaries | ✅ | No change needed |
-| Outcome | D013 | 3-star rating: clear / combo≥10 / no lives lost |
+| Outcome | ✅ | D013: 3-star rating implemented |
