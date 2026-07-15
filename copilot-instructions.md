@@ -19,6 +19,8 @@ Targets Windows + Android + Web.
 | Ball | `CharacterBody2D` | `move_and_collide()` for CCD, velocity-based bouncing |
 | Brick | `StaticBody2D` | Destructible block, emits `destroyed` signal |
 | Paddle | `StaticBody2D` | Mouse/keyboard controlled, angle-based reflection |
+| UpgradePanel | `CanvasLayer` | 3-choice upgrade selection UI (layer=10) |
+| Upgrade | `Resource` (class_name) | Data model for power-up types |
 
 Collision is handled by the **physics engine** (`move_and_collide` returns immediate collision info). Pure math helpers (wall bounce, paddle angle) are static methods on `ball.gd` for unit testing.
 
@@ -39,6 +41,14 @@ In synchronous tests, `is_instance_valid(node)` returns `true` even after `destr
 ### 4. GDScript type inference fails on static method returns
 
 `var result := BallScript.calc_wall_bounce(...)` fails with "Cannot infer type". Use explicit types: `var result: Array = ...` or `var bounced: Vector2 = ...`.
+
+### 5. CanvasLayer.visible is independent of child Control.visible
+
+`CanvasLayer.visible = false` hides the entire layer. If you only call `child.show()`, the layer stays hidden. You must set **both** `canvas_layer.visible = true` and `child.visible = true` to show content.
+
+### 6. `.tscn` script binding must use `script = ExtResource()`
+
+Declaring `[ext_resource type="Script" ...]` is not enough — the root node must have `script = ExtResource("id")` to actually bind it. Without this, custom signals and methods won't exist at runtime.
 
 ## Running Tests
 

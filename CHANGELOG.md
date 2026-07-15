@@ -4,6 +4,19 @@ All notable changes to brick-blast will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- 强化选择系统 (D014)：通关后弹出 3 选 1 强化面板，选择后重开同一关
+- 5 种强化：挡板加宽(+50%)、减速(-20%)、额外生命(+1)、多球(stub)、穿透(stub)
+- 新场景 `scene/upgrade_panel.tscn`：强化选择 UI
+- 新脚本 `script/upgrade.gd`（强化数据模型）、`script/upgrade_panel.gd`（UI 控制）
+- 12 个强化系统单元测试（面板显隐、通关流程、强化选择）
+
+### Fixed
+
+- 强化面板不可见：CanvasLayer.visible 需要与 overlay.visible 同时控制
+- 通关后球未停止：`_win()` 现在立即设置 `ball_stuck=true` + `velocity=ZERO`
+
 ## [0.0.1] - 2026-07-14
 
 ### Added

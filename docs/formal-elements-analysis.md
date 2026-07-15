@@ -96,10 +96,10 @@ Menu → Start → Ball sticks to paddle → Click/Space to launch → Play (com
 | Resource | Status | Notes |
 |----------|--------|-------|
 | Lives | ✅ | 3, decremented on ball loss |
-| Score | ⚠️ | Accumulates but has no consumption outlet — can't spend it |
-| Combo | ❌ 待实现 | D011: 每打一块砖 +1，碰挡板/失球重置 |
-| Stars | ❌ 待实现 | D010: 通关后根据 combo 等条件评定 1-3 星 |
-| Upgrade choices | ❌ Phase 2 | D010: 星级影响强化选择数量 |
+| Score | ✅ | Scales with combo: `10 * (1 + combo / 5)` |
+| Combo | ✅ | D011: 每打一块砖 +1，碰挡板/失球重置 |
+| Stars | ✅ | D013: 通关 1★, combo≥10 2★, 不丢球 3★ |
+| Upgrade choices | 🔧 WIP | D014: 通关后 3 选 1，3/5 已实现 |
 
 **Combo rules (D011)**:
 - 球碰砖块 → combo += 1
