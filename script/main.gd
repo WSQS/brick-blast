@@ -175,11 +175,9 @@ func _on_paddle_hit() -> void:
 func _on_ball_lost() -> void:
 	if game_over:
 		return
-	# If extra balls are still in play, just reset main ball position — no life cost
+	# If extra balls are still in play, do nothing — let them keep flying.
+	# Only when ALL balls are gone do we cost a life and reset.
 	if extra_balls.size() > 0:
-		ball.position = Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)
-		ball.velocity = Vector2.ZERO
-		ball_stuck = true
 		return
 	lives -= 1
 	lives_lost_this_level += 1
