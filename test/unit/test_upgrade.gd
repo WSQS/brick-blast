@@ -201,21 +201,76 @@ func test_pierce_stays_zero_on_paddle_hit_without_upgrade() -> void:
 # ---------------------------------------------------------------------------
 
 func test_multi_ball_creates_extra_ball() -> void:
-	assert_eq(main.extra_balls.size(), 0, "No extra balls initially")
-	main._apply_upgrade(UpgradeScript.Type.MULTI_BALL)
+	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main._start_next_round()
 	assert_eq(main.extra_balls.size(), 1, "Should have 1 extra ball")
 
 func test_multi_ball_extra_is_valid_node() -> void:
-	main._apply_upgrade(UpgradeScript.Type.MULTI_BALL)
+	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main._start_next_round()
 	assert_true(is_instance_valid(main.extra_balls[0]), "Extra ball should be valid")
 
 func test_multi_ball_extra_has_velocity() -> void:
-	main._apply_upgrade(UpgradeScript.Type.MULTI_BALL)
+	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main._start_next_round()
+	main._launch_ball()
+	await wait_seconds(0.1)
 	var extra: CharacterBody2D = main.extra_balls[0]
-	assert_true(extra.velocity != Vector2.ZERO, "Extra ball should have velocity")
+	assert_true(extra.velocity != Vector2.ZERO, "Extra ball should have velocity after launch")
 
 func test_start_next_round_clears_extra_balls() -> void:
-	main._apply_upgrade(UpgradeScript.Type.MULTI_BALL)
-	assert_eq(main.extra_balls.size(), 1, "Should have 1 extra ball")
+	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
 	main._start_next_round()
-	assert_eq(main.extra_balls.size(), 0, "Extra balls should be cleared on new round")
+	assert_eq(main.extra_balls.size(), 1, "Should have 1 extra ball")
+	# Start another round — old extra balls cleared, new one spawned
+	main._start_next_round()
+	assert_eq(main.extra_balls.size(), 1, "Should have 1 fresh extra ball after new round")
+
+
+# ---------------------------------------------------------------------------
+# Bug reproduction tests
+# ---------------------------------------------------------------------------
+
+func test_multi_ball_not_destroyed_by_next_round() -> void:
+	# Multi-ball is now applied in _start_next_round, not _apply_upgrade
+	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main._start_next_round()
+	assert_eq(main.extra_balls.size(), 1, "Multi-ball should spawn in _start_next_round")
+
+
+func test_paddle_wide_updates_visual_rect() -> void:
+	var paddle = main.paddle
+	var color_rect: ColorRect = paddle.get_node_or_null("ColorRect")
+	assert_not_null(color_rect, "Paddle should have ColorRect")
+	var visual_w_before: float = color_rect.size.x
+	var collision_shape: CollisionShape2D = paddle.get_node("CollisionShape2D")
+	var collision_w_before: float = collision_shape.shape.size.x
+	main._apply_upgrade(UpgradeScript.Type.PADDLE_WIDE)
+	var collision_w_after: float = collision_shape.shape.size.x
+	var visual_w_after: float = color_rect.size.x
+	assert_eq(collision_w_after, collision_w_before * 1.5, "Collision shape should widen")
+	assert_eq(visual_w_after, visual_w_before * 1.5, "ColorRect should also widen — bug: visual not updated")
+
+
+func test_upgrade_panel_click_does_not_launch_ball() -> void:
+	# Win the round to show upgrade panel
+	main.bricks_left = 1
+	main._on_brick_destroyed()
+	await wait_seconds(1.5)
+	# Panel is shown, ball is stuck
+	assert_true(main.ball_stuck, "Ball should be stuck while panel is shown")
+	# Simulate a mouse click (as if clicking a button)
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	main._input(click)
+	assert_true(main.ball_stuck, "Ball should still be stuck — bug: click launches ball")
+
+
+# Helper
+func _make_upgrade(type: int) -> Upgrade:
+	var u := Upgrade.new()
+	u.id = type
+	u.display_name = "Test"
+	u.description = "Test"
+	return u

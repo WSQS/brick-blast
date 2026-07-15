@@ -69,6 +69,9 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if game_over:
 		return
+	# Don't process game input when upgrade panel is open
+	if upgrade_panel and upgrade_panel.visible:
+		return
 	# Launch ball (D012) — only when not paused
 	if not paused and ball_stuck and (event.is_action_pressed("ui_accept") or (event is InputEventMouseButton and event.pressed)):
 		_launch_ball()
@@ -227,19 +230,17 @@ func _apply_upgrade(id: int) -> void:
 		UpgradeScript.Type.PADDLE_WIDE:
 			var shape: RectangleShape2D = paddle.get_node("CollisionShape2D").shape
 			shape.size.x *= 1.5
+			# Sync visual ColorRect
+			if paddle.has_node("ColorRect"):
+				var cr: ColorRect = paddle.get_node("ColorRect")
+				cr.size.x *= 1.5
+				cr.position.x = -cr.size.x / 2.0
 		UpgradeScript.Type.SLOW_BALL:
 			ball._speed *= 0.8
 		UpgradeScript.Type.EXTRA_LIFE:
 			lives += 1
 		UpgradeScript.Type.MULTI_BALL:
-			if ball_scene:
-				var new_ball: CharacterBody2D = ball_scene.instantiate()
-				new_ball.bounds = playfield
-				new_ball._speed = ball._speed
-				new_ball.pierce_count = ball.pierce_count
-				add_child(new_ball)
-				extra_balls.append(new_ball)
-				_launch_extra_ball(new_ball)
+			pass  # Balls spawned in _start_next_round after scene reset
 		UpgradeScript.Type.PIERCE:
 			ball.pierce_count += 3
 
@@ -256,7 +257,24 @@ func _start_next_round() -> void:
 	_reset_round()
 	lives_lost_this_level = 0
 	max_combo = 0
+	# Spawn extra balls for multi-ball upgrade
+	var multi_count: int = upgrades.get(UpgradeScript.Type.MULTI_BALL, 0)
+	for i in multi_count:
+		_spawn_extra_ball()
 	_update_hud()
+
+
+func _spawn_extra_ball() -> void:
+	if not ball_scene:
+		return
+	var new_ball: CharacterBody2D = ball_scene.instantiate()
+	new_ball.bounds = playfield
+	new_ball._speed = ball._speed
+	new_ball.pierce_count = ball.pierce_count
+	add_child(new_ball)
+	extra_balls.append(new_ball)
+	# Position near paddle, will launch when main ball launches
+	new_ball.position = Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)
 
 
 func _update_hud() -> void:
