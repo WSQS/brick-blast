@@ -11,6 +11,9 @@ var main: Node2D
 func before_each() -> void:
 	main = MainScene.instantiate()
 	add_child_autofree(main)
+	# GUT viewport is tiny (64x64); set realistic playfield for physics tests
+	main.playfield = Rect2(0, 0, 480, 720)
+	main.ball.bounds = main.playfield
 
 
 func _get_overlay() -> ColorRect:
@@ -215,8 +218,10 @@ func test_multi_ball_extra_has_velocity() -> void:
 	main._start_next_round()
 	main._launch_ball()
 	await wait_seconds(0.1)
-	var extra: CharacterBody2D = main.extra_balls[0]
-	assert_true(extra.velocity != Vector2.ZERO, "Extra ball should have velocity after launch")
+	assert_gt(main.extra_balls.size(), 0, "Extra ball should still exist after launch")
+	if main.extra_balls.size() > 0:
+		var extra: CharacterBody2D = main.extra_balls[0]
+		assert_true(extra.velocity != Vector2.ZERO, "Extra ball should have velocity after launch")
 
 func test_start_next_round_clears_extra_balls() -> void:
 	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
@@ -309,6 +314,22 @@ func test_main_ball_lost_no_life_cost_with_extra_present() -> void:
 	assert_eq(main.lives, lives_before, "Losing main ball while extra alive = no life cost")
 
 
+func test_extra_ball_keeps_moving_after_main_lost() -> void:
+	# Bug: when main ball is lost with extra still alive, _on_ball_lost sets
+	# ball_stuck=true which freezes ALL balls. Extra ball should keep flying.
+	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main._start_next_round()
+	main.ball_stuck = false
+	var extra: CharacterBody2D = main.extra_balls[0]
+	var extra_vel_before: Vector2 = extra.velocity
+	# Main ball falls off — extra still in play
+	main.ball.global_position.y = main.playfield.end.y + 100
+	main.ball._physics_process(0.016)
+	# Extra ball should NOT be frozen
+	assert_false(main.ball_stuck, "ball_stuck should NOT be true while extra ball is alive")
+	assert_eq(extra.velocity, extra_vel_before, "Extra ball velocity should be unchanged")
+
+
 func test_all_balls_lost_costs_life() -> void:
 	# Only when ALL balls are gone should a life be lost
 	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
@@ -332,14 +353,17 @@ func test_paddle_wide_updates_visual_rect() -> void:
 	var paddle = main.paddle
 	var color_rect: ColorRect = paddle.get_node_or_null("ColorRect")
 	assert_not_null(color_rect, "Paddle should have ColorRect")
-	var visual_w_before: float = color_rect.size.x
 	var collision_shape: CollisionShape2D = paddle.get_node("CollisionShape2D")
-	var collision_w_before: float = collision_shape.shape.size.x
+	# Reset to known baseline to avoid shared resource state across tests
+	collision_shape.shape.size.x = 96.0
+	if paddle.has_node("ColorRect"):
+		var cr0: ColorRect = paddle.get_node("ColorRect")
+		cr0.size.x = 96.0
+		cr0.position.x = -48.0
 	main._apply_upgrade(UpgradeScript.Type.PADDLE_WIDE)
-	var collision_w_after: float = collision_shape.shape.size.x
-	var visual_w_after: float = color_rect.size.x
-	assert_almost_eq(collision_w_after, collision_w_before * 1.5, 0.01, "Collision shape should widen")
-	assert_almost_eq(visual_w_after, visual_w_before * 1.5, 0.01, "ColorRect should also widen")
+	# Both collision and visual should be 96 * 1.5 = 144 (well under 80% cap)
+	assert_almost_eq(collision_shape.shape.size.x, 144.0, 0.01, "Collision shape should widen")
+	assert_almost_eq(color_rect.size.x, 144.0, 0.01, "ColorRect should also widen")
 
 
 func test_paddle_wide_has_max_limit() -> void:
