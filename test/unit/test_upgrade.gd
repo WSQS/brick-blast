@@ -98,3 +98,28 @@ func test_selecting_upgrade_starts_next_round() -> void:
 
 	# Ball should be stuck
 	assert_true(main.ball_stuck, "Ball should be stuck for next round")
+
+
+func test_win_calls_show_choices_on_panel() -> void:
+	# Verify that the upgrade_panel node has the script with show_choices method
+	var panel = main.get_node("UpgradePanel")
+	assert_true(panel.has_method("show_choices"), "Panel should have show_choices method")
+	assert_true(panel.has_signal("upgrade_selected"), "Panel should have upgrade_selected signal")
+
+
+func test_panel_buttons_have_text_after_show_choices() -> void:
+	var panel = main.get_node("UpgradePanel")
+	panel.show_choices()
+	# All 3 buttons should have non-empty text
+	for i in 3:
+		var btn: Button = panel.buttons[i]
+		assert_true(btn.text.length() > 0, "Button %d should have text after show_choices" % i)
+		assert_not_null(btn.get_meta("upgrade"), "Button %d should have upgrade metadata" % i)
+
+
+func test_overlay_visible_after_show_choices() -> void:
+	var panel = main.get_node("UpgradePanel")
+	var overlay: ColorRect = panel.overlay
+	assert_false(overlay.visible, "Overlay should be hidden initially")
+	panel.show_choices()
+	assert_true(overlay.visible, "Overlay should be visible after show_choices")
