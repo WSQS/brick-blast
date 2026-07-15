@@ -161,6 +161,9 @@ func _on_ball_lost() -> void:
 
 func _win() -> void:
 	rounds_cleared += 1
+	# Stop ball immediately
+	ball_stuck = true
+	ball.velocity = Vector2.ZERO
 	var star_count := _compute_stars()
 	var star_str := ""
 	for i in star_count:
