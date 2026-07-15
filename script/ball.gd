@@ -8,10 +8,10 @@ const MAX_SPEED: float = 550.0
 const RADIUS: float = 8.0
 
 var _speed: float = SPEED
-var pierce_count: int = 0  # Piercing shots remaining (D014)
-var is_extra_ball: bool = false  # Extra balls are consumable, don't cost lives (D014)
+var pierce_count: int = 0
+var is_extra_ball: bool = false
+var is_active: bool = true
 
-# Playfield bounds (set by main on ready)
 var bounds: Rect2 = Rect2(0, 0, 480, 720)
 
 
@@ -19,46 +19,44 @@ func launch(direction: Vector2) -> void:
 	velocity = direction.normalized() * _speed
 
 
+func get_speed() -> float:
+	return _speed
+
+
+func set_speed(s: float) -> void:
+	_speed = s
+
+
 func _physics_process(delta: float) -> void:
-	var parent := get_parent()
-	# Skip physics when ball is stuck to paddle (D012)
-	if parent and parent.get("ball_stuck") == true:
+	if not is_active:
 		return
-	# Skip physics when paused (D012)
-	if parent and parent.get("paused") == true:
+	var parent := get_parent()
+	if parent == null or parent.get("ball_stuck") or parent.get("paused"):
 		return
 
 	var collision := move_and_collide(velocity * delta)
-
-	# Wall collisions (left / right / top) via bounds check
 	_handle_walls()
 
 	if collision:
 		var collider := collision.get_collider()
-		if collider:
-			if collider.is_in_group("brick"):
-				if pierce_count > 0:
-					pierce_count -= 1
-					# Pierce: destroy brick without bouncing
-				else:
-					velocity = velocity.bounce(collision.get_normal())
-				collider.destroy()
-			elif parent and collider == parent.paddle:
-				velocity = bounce_off_paddle(global_position, collider.get_rect(), _speed)
-				_speed = minf(_speed * 1.03, MAX_SPEED)
-				velocity = velocity.normalized() * _speed
-				# Notify main to reset combo (D011)
-				if parent and parent.has_method("_on_paddle_hit"):
-					parent._on_paddle_hit()
+		if collider and collider.is_in_group("brick"):
+			if pierce_count > 0:
+				pierce_count -= 1
+			else:
+				velocity = velocity.bounce(collision.get_normal())
+			collider.destroy()
+		elif collider == parent.paddle:
+			velocity = bounce_off_paddle(global_position, collider.get_rect(), _speed)
+			_speed = minf(_speed * 1.03, MAX_SPEED)
+			velocity = velocity.normalized() * _speed
+			parent._on_paddle_hit()
 
-	# Fell below paddle — notify main (main decides life cost based on remaining balls)
 	if global_position.y > bounds.end.y + 50:
-		var p := parent
-		if p and "extra_balls" in p and p.extra_balls.has(self):
-			p.extra_balls.erase(self)
+		if is_extra_ball:
+			parent.extra_balls.erase(self)
 			queue_free()
-		elif p and p.has_method("_on_ball_lost"):
-			p._on_ball_lost()
+		else:
+			parent._on_ball_lost()
 
 
 func _handle_walls() -> void:
