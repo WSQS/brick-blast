@@ -1,6 +1,8 @@
 extends GutTest
 ## Tests for upgrade system (D014).
 
+const UpgradeScript = preload("res://script/upgrade.gd")
+
 const MainScene: PackedScene = preload("res://scene/main.tscn")
 
 var main: Node2D
@@ -151,3 +153,46 @@ func test_win_full_flow_debug() -> void:
 		gut.p("button[%d].get_global_rect()=%s" % [i, btn.get_global_rect()])
 
 	assert_true(overlay.visible, "Overlay must be visible")
+
+
+# ---------------------------------------------------------------------------
+# Piercing upgrade tests (D014)
+# ---------------------------------------------------------------------------
+
+func test_pierce_upgrade_adds_pierce_count() -> void:
+	assert_eq(main.ball.pierce_count, 0, "Ball should start with 0 pierce")
+	main._apply_upgrade(UpgradeScript.Type.PIERCE)
+	assert_eq(main.ball.pierce_count, 3, "Ball should have 3 pierce after upgrade")
+
+func test_pierce_upgrade_stacks() -> void:
+	main._apply_upgrade(UpgradeScript.Type.PIERCE)
+	main._apply_upgrade(UpgradeScript.Type.PIERCE)
+	assert_eq(main.ball.pierce_count, 6, "Pierce should stack to 6")
+
+func test_pierce_zero_means_normal_bounce() -> void:
+	assert_eq(main.ball.pierce_count, 0, "No pierce by default")
+
+
+# ---------------------------------------------------------------------------
+# Multi-ball upgrade tests (D014)
+# ---------------------------------------------------------------------------
+
+func test_multi_ball_creates_extra_ball() -> void:
+	assert_eq(main.extra_balls.size(), 0, "No extra balls initially")
+	main._apply_upgrade(UpgradeScript.Type.MULTI_BALL)
+	assert_eq(main.extra_balls.size(), 1, "Should have 1 extra ball")
+
+func test_multi_ball_extra_is_valid_node() -> void:
+	main._apply_upgrade(UpgradeScript.Type.MULTI_BALL)
+	assert_true(is_instance_valid(main.extra_balls[0]), "Extra ball should be valid")
+
+func test_multi_ball_extra_has_velocity() -> void:
+	main._apply_upgrade(UpgradeScript.Type.MULTI_BALL)
+	var extra: CharacterBody2D = main.extra_balls[0]
+	assert_true(extra.velocity != Vector2.ZERO, "Extra ball should have velocity")
+
+func test_start_next_round_clears_extra_balls() -> void:
+	main._apply_upgrade(UpgradeScript.Type.MULTI_BALL)
+	assert_eq(main.extra_balls.size(), 1, "Should have 1 extra ball")
+	main._start_next_round()
+	assert_eq(main.extra_balls.size(), 0, "Extra balls should be cleared on new round")
