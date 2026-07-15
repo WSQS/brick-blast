@@ -222,9 +222,25 @@ func test_start_next_round_clears_extra_balls() -> void:
 	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	assert_eq(main.extra_balls.size(), 1, "Should have 1 extra ball")
-	# Start another round — old extra balls cleared, new one spawned
+	# Start another round — old extra balls cleared, new one spawned (persistent)
 	main._start_next_round()
-	assert_eq(main.extra_balls.size(), 1, "Should have 1 fresh extra ball after new round")
+	assert_eq(main.extra_balls.size(), 1, "Extra ball persists across rounds")
+
+
+func test_extra_ball_follows_paddle_while_stuck() -> void:
+	# Bug: when ball_stuck, only main ball follows paddle — extra stays at spawn
+	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main._start_next_round()
+	assert_true(main.ball_stuck, "Ball should be stuck after round start")
+	var extra: CharacterBody2D = main.extra_balls[0]
+	# Move paddle to a new position
+	main.paddle.position.x = 300.0
+	# Run _process to sync ball positions
+	main._process(0.016)
+	# Both balls should be at paddle x
+	var expected_x: float = main.paddle.position.x
+	assert_eq(round(main.ball.position.x), round(expected_x), "Main ball follows paddle")
+	assert_eq(round(extra.position.x), round(expected_x), "Extra ball should also follow paddle while stuck")
 
 
 # ---------------------------------------------------------------------------
@@ -238,7 +254,81 @@ func test_multi_ball_not_destroyed_by_next_round() -> void:
 	assert_eq(main.extra_balls.size(), 1, "Multi-ball should spawn in _start_next_round")
 
 
+# ---------------------------------------------------------------------------
+# Multi-ball design rules (D014):
+# 1. Extra balls don't cost lives when lost (only main ball does)
+# 2. Extra balls persist — respawned every round as long as upgrade is owned
+# 3. Losing a ball (main or extra) doesn't reduce ball count next round
+# ---------------------------------------------------------------------------
+
+func test_multi_ball_persists_across_rounds() -> void:
+	# Select multi-ball once
+	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main._start_next_round()
+	assert_eq(main.extra_balls.size(), 1, "Should have 1 extra ball in first round")
+	# Next round — multi-ball should respawn (it's persistent, not consumable)
+	main._start_next_round()
+	assert_eq(main.extra_balls.size(), 1, "Extra ball should persist across rounds")
+
+func test_multi_ball_persists_after_losing_extra_ball() -> void:
+	# Select multi-ball, lose the extra ball, next round should still have it
+	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main._start_next_round()
+	main.ball_stuck = false
+	var extra: CharacterBody2D = main.extra_balls[0]
+	# Simulate extra ball falling off
+	extra.global_position.y = main.playfield.end.y + 100
+	extra._physics_process(0.016)
+	assert_eq(main.extra_balls.size(), 0, "Extra ball removed after falling")
+	# Next round — extra ball should come back
+	main._start_next_round()
+	assert_eq(main.extra_balls.size(), 1, "Extra ball should respawn next round")
+
+func test_extra_ball_lost_does_not_cost_life() -> void:
+	# Set up: have an extra ball, ball not stuck
+	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main._start_next_round()
+	main.ball_stuck = false  # Unstick so physics runs
+	var extra: CharacterBody2D = main.extra_balls[0]
+	var lives_before: int = main.lives
+	# Simulate extra ball falling off — other ball still in play, no life cost
+	extra.global_position.y = main.playfield.end.y + 100
+	extra._physics_process(0.016)
+	assert_eq(main.lives, lives_before, "Losing one ball while another remains = no life cost")
+
+
+func test_main_ball_lost_no_life_cost_with_extra_present() -> void:
+	# Two balls in play: main ball lost but extra still alive → no life cost
+	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main._start_next_round()
+	main.ball_stuck = false
+	var lives_before: int = main.lives
+	# Main ball falls off — but extra ball still in play
+	main.ball.global_position.y = main.playfield.end.y + 100
+	main.ball._physics_process(0.016)
+	assert_eq(main.lives, lives_before, "Losing main ball while extra alive = no life cost")
+
+
+func test_all_balls_lost_costs_life() -> void:
+	# Only when ALL balls are gone should a life be lost
+	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main._start_next_round()
+	main.ball_stuck = false
+	var lives_before: int = main.lives
+	# Lose extra ball first
+	var extra: CharacterBody2D = main.extra_balls[0]
+	extra.global_position.y = main.playfield.end.y + 100
+	extra._physics_process(0.016)
+	assert_eq(main.lives, lives_before, "Losing extra: main still alive, no life cost")
+	# Now lose main ball too — all balls gone → life cost
+	main.ball.global_position.y = main.playfield.end.y + 100
+	main.ball._physics_process(0.016)
+	assert_eq(main.lives, lives_before - 1, "All balls gone → lose a life")
+
+
 func test_paddle_wide_updates_visual_rect() -> void:
+	# Ensure playfield is wide enough for paddle to widen (test env may be small)
+	main.playfield = Rect2(0, 0, 480, 720)
 	var paddle = main.paddle
 	var color_rect: ColorRect = paddle.get_node_or_null("ColorRect")
 	assert_not_null(color_rect, "Paddle should have ColorRect")
@@ -248,8 +338,20 @@ func test_paddle_wide_updates_visual_rect() -> void:
 	main._apply_upgrade(UpgradeScript.Type.PADDLE_WIDE)
 	var collision_w_after: float = collision_shape.shape.size.x
 	var visual_w_after: float = color_rect.size.x
-	assert_eq(collision_w_after, collision_w_before * 1.5, "Collision shape should widen")
-	assert_eq(visual_w_after, visual_w_before * 1.5, "ColorRect should also widen — bug: visual not updated")
+	assert_almost_eq(collision_w_after, collision_w_before * 1.5, 0.01, "Collision shape should widen")
+	assert_almost_eq(visual_w_after, visual_w_before * 1.5, 0.01, "ColorRect should also widen")
+
+
+func test_paddle_wide_has_max_limit() -> void:
+	# Selecting PADDLE_WIDE many times should cap at screen width
+	main.playfield = Rect2(0, 0, 480, 720)
+	var collision_shape: CollisionShape2D = main.paddle.get_node("CollisionShape2D")
+	# Apply 10 times — way more than needed to exceed screen
+	for i in 10:
+		main._apply_upgrade(UpgradeScript.Type.PADDLE_WIDE)
+	var final_w: float = collision_shape.shape.size.x
+	assert_true(final_w <= main.playfield.size.x,
+		"Paddle width (%f) should not exceed screen width (%f)" % [final_w, main.playfield.size.x])
 
 
 func test_upgrade_panel_click_does_not_launch_ball() -> void:

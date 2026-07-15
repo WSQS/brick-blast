@@ -9,6 +9,7 @@ const RADIUS: float = 8.0
 
 var _speed: float = SPEED
 var pierce_count: int = 0  # Piercing shots remaining (D014)
+var is_extra_ball: bool = false  # Extra balls are consumable, don't cost lives (D014)
 
 # Playfield bounds (set by main on ready)
 var bounds: Rect2 = Rect2(0, 0, 480, 720)
@@ -50,10 +51,14 @@ func _physics_process(delta: float) -> void:
 				if parent and parent.has_method("_on_paddle_hit"):
 					parent._on_paddle_hit()
 
-	# Fell below paddle — notify main
+	# Fell below paddle — notify main (main decides life cost based on remaining balls)
 	if global_position.y > bounds.end.y + 50:
-		if parent and parent.has_method("_on_ball_lost"):
-			parent._on_ball_lost()
+		var p := parent
+		if p and "extra_balls" in p and p.extra_balls.has(self):
+			p.extra_balls.erase(self)
+			queue_free()
+		elif p and p.has_method("_on_ball_lost"):
+			p._on_ball_lost()
 
 
 func _handle_walls() -> void:

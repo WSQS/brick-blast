@@ -111,6 +111,10 @@ func _process(_delta: float) -> void:
 	# Keep ball on paddle while stuck
 	if ball_stuck and not paused:
 		ball.position = Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)
+		# Extra balls also follow paddle while stuck (D014)
+		for extra in extra_balls:
+			if is_instance_valid(extra):
+				extra.position = Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)
 
 
 func _compute_playfield() -> Rect2:
@@ -171,6 +175,12 @@ func _on_paddle_hit() -> void:
 func _on_ball_lost() -> void:
 	if game_over:
 		return
+	# If extra balls are still in play, just reset main ball position — no life cost
+	if extra_balls.size() > 0:
+		ball.position = Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)
+		ball.velocity = Vector2.ZERO
+		ball_stuck = true
+		return
 	lives -= 1
 	lives_lost_this_level += 1
 	_update_hud()
@@ -229,11 +239,14 @@ func _apply_upgrade(id: int) -> void:
 	match id:
 		UpgradeScript.Type.PADDLE_WIDE:
 			var shape: RectangleShape2D = paddle.get_node("CollisionShape2D").shape
-			shape.size.x *= 1.5
+			# Cap at 80% of screen width to avoid covering entire playfield
+			var max_w: float = playfield.size.x * 0.8
+			var new_w: float = minf(shape.size.x * 1.5, max_w)
+			shape.size.x = new_w
 			# Sync visual ColorRect
 			if paddle.has_node("ColorRect"):
 				var cr: ColorRect = paddle.get_node("ColorRect")
-				cr.size.x *= 1.5
+				cr.size.x = new_w
 				cr.position.x = -cr.size.x / 2.0
 		UpgradeScript.Type.SLOW_BALL:
 			ball._speed *= 0.8
@@ -257,7 +270,7 @@ func _start_next_round() -> void:
 	_reset_round()
 	lives_lost_this_level = 0
 	max_combo = 0
-	# Spawn extra balls for multi-ball upgrade
+	# Spawn extra balls for multi-ball upgrade (persistent across rounds)
 	var multi_count: int = upgrades.get(UpgradeScript.Type.MULTI_BALL, 0)
 	for i in multi_count:
 		_spawn_extra_ball()
@@ -271,6 +284,7 @@ func _spawn_extra_ball() -> void:
 	new_ball.bounds = playfield
 	new_ball._speed = ball._speed
 	new_ball.pierce_count = ball.pierce_count
+	new_ball.is_extra_ball = true
 	add_child(new_ball)
 	extra_balls.append(new_ball)
 	# Position near paddle, will launch when main ball launches

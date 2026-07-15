@@ -8,7 +8,7 @@ A classic brick-breaker game built with [Godot 4.7](https://godotengine.org).
 - **Combo system**: consecutive brick destructions build combo, scaling score
 - **Ball stick**: ball waits on paddle until launch (Space / click)
 - **Star rating**: 1-3 stars based on combo performance and lives lost
-- **Upgrade system** (WIP): choose 1 of 3 upgrades after clearing all bricks
+- **Upgrade system**: choose 1 of 3 upgrades after clearing all bricks (5 types: wide paddle, slow ball, extra life, multi-ball, pierce)
 - **Pause / resume**: Esc to toggle
 - **Main menu**: title screen with Start / Quit
 
