@@ -23,6 +23,7 @@ const BALL_OFFSET: float = 40.0
 const START_LIVES: int = 3
 
 @export var brick_scene: PackedScene
+@export var ball_scene: PackedScene
 
 @onready var playfield: Rect2 = _compute_playfield()
 @onready var ball: CharacterBody2D = $Ball
@@ -52,6 +53,7 @@ var ball_stuck: bool = true
 # Upgrade state (D014)
 var upgrades: Dictionary = {}  # UpgradeScript.Type -> count
 var rounds_cleared: int = 0
+var extra_balls: Array[CharacterBody2D] = []  # Multi-ball upgrade (D014)
 
 
 func _ready() -> void:
@@ -88,6 +90,18 @@ func _launch_ball() -> void:
 	ball_stuck = false
 	var angle: float = randf_range(-PI / 4.0, PI / 4.0) - PI / 2.0
 	ball.launch(Vector2(cos(angle), sin(angle)))
+	# Launch any extra balls with different angles (D014)
+	for extra in extra_balls:
+		if is_instance_valid(extra):
+			var ext_angle: float = randf_range(-PI / 4.0, PI / 4.0) - PI / 2.0
+			extra.launch(Vector2(cos(ext_angle), sin(ext_angle)))
+
+
+func _launch_extra_ball(extra: CharacterBody2D) -> void:
+	# Position at paddle and launch immediately
+	extra.position = Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)
+	var angle: float = randf_range(-PI / 4.0, PI / 4.0) - PI / 2.0
+	extra.launch(Vector2(cos(angle), sin(angle)))
 
 
 func _process(_delta: float) -> void:
@@ -213,12 +227,24 @@ func _apply_upgrade(id: int) -> void:
 		UpgradeScript.Type.EXTRA_LIFE:
 			lives += 1
 		UpgradeScript.Type.MULTI_BALL:
-			pass  # Phase 3
+			if ball_scene:
+				var new_ball: CharacterBody2D = ball_scene.instantiate()
+				new_ball.bounds = playfield
+				new_ball._speed = ball._speed
+				new_ball.pierce_count = ball.pierce_count
+				add_child(new_ball)
+				extra_balls.append(new_ball)
+				_launch_extra_ball(new_ball)
 		UpgradeScript.Type.PIERCE:
-			pass  # Phase 3
+			ball.pierce_count += 3
 
 
 func _start_next_round() -> void:
+	# Clear extra balls from previous round
+	for extra in extra_balls:
+		if is_instance_valid(extra):
+			extra.queue_free()
+	extra_balls.clear()
 	# Reset per-round state but keep upgrades
 	bricks_left = 0
 	_spawn_bricks()

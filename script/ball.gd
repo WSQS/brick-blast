@@ -8,6 +8,7 @@ const MAX_SPEED: float = 550.0
 const RADIUS: float = 8.0
 
 var _speed: float = SPEED
+var pierce_count: int = 0  # Piercing shots remaining (D014)
 
 # Playfield bounds (set by main on ready)
 var bounds: Rect2 = Rect2(0, 0, 480, 720)
@@ -35,7 +36,11 @@ func _physics_process(delta: float) -> void:
 		var collider := collision.get_collider()
 		if collider:
 			if collider.is_in_group("brick"):
-				velocity = velocity.bounce(collision.get_normal())
+				if pierce_count > 0:
+					pierce_count -= 1
+					# Pierce: destroy brick without bouncing
+				else:
+					velocity = velocity.bounce(collision.get_normal())
 				collider.destroy()
 			elif parent and collider == parent.paddle:
 				velocity = bounce_off_paddle(global_position, collider.get_rect(), _speed)
