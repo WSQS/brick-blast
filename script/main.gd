@@ -157,6 +157,11 @@ func _on_brick_destroyed() -> void:
 func _on_paddle_hit() -> void:
 	# Combo reset on paddle contact (D011)
 	combo = 0
+	# Pierce reset on paddle contact — each round is a fresh start
+	if upgrades.get(UpgradeScript.Type.PIERCE, 0) > 0:
+		ball.pierce_count = upgrades[UpgradeScript.Type.PIERCE] * 3
+	else:
+		ball.pierce_count = 0
 	_update_hud()
 
 

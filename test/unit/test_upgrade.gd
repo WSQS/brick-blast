@@ -172,6 +172,29 @@ func test_pierce_upgrade_stacks() -> void:
 func test_pierce_zero_means_normal_bounce() -> void:
 	assert_eq(main.ball.pierce_count, 0, "No pierce by default")
 
+func test_pierce_resets_on_paddle_hit() -> void:
+	# Register upgrade in upgrades dict (simulates _on_upgrade_selected)
+	main.upgrades[UpgradeScript.Type.PIERCE] = 1
+	main._apply_upgrade(UpgradeScript.Type.PIERCE)
+	assert_eq(main.ball.pierce_count, 3, "Should have 3 pierce after upgrade")
+	# Consume 2 pierce charges
+	main.ball.pierce_count = 1
+	main._on_paddle_hit()
+	# Should be restored to full (1 upgrade * 3 = 3)
+	assert_eq(main.ball.pierce_count, 3, "Pierce should reset to full on paddle hit")
+
+func test_pierce_resets_on_paddle_hit_with_multiple_upgrades() -> void:
+	main.upgrades[UpgradeScript.Type.PIERCE] = 2
+	main._apply_upgrade(UpgradeScript.Type.PIERCE)
+	main._apply_upgrade(UpgradeScript.Type.PIERCE)
+	main.ball.pierce_count = 1
+	main._on_paddle_hit()
+	assert_eq(main.ball.pierce_count, 6, "Pierce should reset to 6 (2 upgrades * 3)")
+
+func test_pierce_stays_zero_on_paddle_hit_without_upgrade() -> void:
+	main._on_paddle_hit()
+	assert_eq(main.ball.pierce_count, 0, "Pierce should remain 0 without upgrade")
+
 
 # ---------------------------------------------------------------------------
 # Multi-ball upgrade tests (D014)
