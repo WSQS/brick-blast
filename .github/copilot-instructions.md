@@ -97,6 +97,7 @@ Start-Process "C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.
 ## Code Conventions
 
 - Use tabs for indentation (Godot default)
+- **Formatting**: `gdformat` runs automatically via pre-commit hook (`hooks/pre-commit`). First-time setup: `sh hooks/install.sh`
 - Static helper methods prefixed with `calc_` / `bounce_` on `ball.gd`
 - Collision layer/mask: ball on layer 2 mask 1 (balls don't collide with each other); paddle/brick/wall on layer 1 mask 1
 - Scene scripts go in `script/`, scene files in `scene/`, tests in `test/unit/`

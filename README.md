@@ -54,6 +54,18 @@ brick-blast/
 └── CHANGELOG.md    # Change history
 ```
 
+## Code Formatting
+
+GDScript files are auto-formatted with [gdformat](https://github.com/Scony/godot-gdscript-toolkit) via a pre-commit hook.
+
+```bash
+# First-time setup (after cloning)
+sh hooks/install.sh
+
+# Format manually anytime
+gdformat script/ test/unit/
+```
+
 ## Running Tests
 
 ```bash
