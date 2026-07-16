@@ -64,6 +64,7 @@ func _ready() -> void:
 	for child in get_children():
 		if child is CharacterBody2D:
 			child.bounds = playfield
+			_connect_ball_signals(child)
 			balls.append(child)
 			break
 	_spawn_bricks()
@@ -273,8 +274,15 @@ func _spawn_ball() -> void:
 	if balls.size() > 0 and is_instance_valid(balls[0]):
 		new_ball.speed = balls[0].speed
 	add_child(new_ball)
+	_connect_ball_signals(new_ball)
 	balls.append(new_ball)
 	new_ball.position = Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)
+
+
+## Connects hit_paddle and lost signals for a ball.
+func _connect_ball_signals(b: CharacterBody2D) -> void:
+	b.hit_paddle.connect(_on_paddle_hit)
+	b.lost.connect(_on_ball_lost)
 
 
 func _update_hud() -> void:

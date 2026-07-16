@@ -12,6 +12,11 @@ var pierce_count: int = 0
 
 var bounds: Rect2 = Rect2(0, 0, 480, 720)
 
+## Emitted when the ball hits the paddle. Parameter: this ball.
+signal hit_paddle(ball: CharacterBody2D)
+## Emitted when the ball falls below the playfield. Parameter: this ball.
+signal lost(ball: CharacterBody2D)
+
 
 func launch(direction: Vector2) -> void:
 	velocity = direction.normalized() * speed
@@ -37,10 +42,10 @@ func _physics_process(delta: float) -> void:
 			velocity = bounce_off_paddle(global_position, collider.get_rect(), speed)
 			speed = minf(speed * 1.03, MAX_SPEED)
 			velocity = velocity.normalized() * speed
-			parent.call("_on_paddle_hit", self)
+			hit_paddle.emit(self)
 
 	if global_position.y > bounds.end.y + 50:
-		parent.call("_on_ball_lost", self)
+		lost.emit(self)
 
 
 func _handle_walls() -> void:
