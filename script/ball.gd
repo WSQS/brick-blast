@@ -20,7 +20,7 @@ signal lost(ball: CharacterBody2D)
 
 
 func launch(direction: Vector2) -> void:
-	velocity = direction.normalized() * speed
+	velocity = direction * speed
 
 
 func _physics_process(delta: float) -> void:
@@ -83,6 +83,10 @@ static func calc_wall_bounce(pos: Vector2, vel: Vector2, radius: float, playfiel
 	if pos.y - radius < playfield.position.y:
 		new_pos.y = playfield.position.y + radius
 		new_vel.y = absf(vel.y)
+
+	if pos.y + radius > playfield.end.y:
+		new_pos.y = playfield.end.y - radius
+		new_vel.y = -absf(vel.y)
 
 	return [new_pos, new_vel]
 
