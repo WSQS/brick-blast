@@ -200,6 +200,7 @@ func _on_ball_lost(lost_ball: CharacterBody2D) -> void:
 		_game_over()
 		_update_hud()
 	else:
+		_spawn_ball()
 		_reset_round()
 		state = State.READY
 
