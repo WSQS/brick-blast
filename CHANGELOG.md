@@ -6,7 +6,24 @@ All notable changes to brick-blast will be documented in this file.
 
 ### Added
 
-- Upgrade selection system (D014): post-clear 3-choice upgrade panel, restart same level after selection
+- State machine: `enum State { READY, PLAYING, PAUSED, ROUND_CLEAR, GAME_OVER }` replaces three independent bools (`game_over`, `paused`, `ball_stuck`), eliminating impossible state combinations
+- `is_playing()` / `is_paused()` query methods on `main.gd` for child nodes to check game state
+- Ball signals `hit_paddle(ball)` and `lost(ball)` — ball no longer calls parent methods directly
+- `LOSE_MARGIN` constant on `ball.gd` (replaces magic number `50`)
+- `BUTTON_MIN_SIZE` constant on `upgrade_panel.gd`
+- Type annotation on `upgrade_selected` signal (`upgrade: Upgrade`)
+
+### Changed
+
+- Ball `_speed` private variable → `speed` public variable; removed `get_speed()` / `set_speed()` methods
+- Ball no longer uses `parent.call()` to invoke main's methods — emits signals instead, main connects them
+- Upgrade panel buttons now created dynamically in `_create_buttons()` instead of hardcoded in `.tscn`
+- Ball spawning unified: all balls (including the first) are dynamically created via `_spawn_ball()`, no scene-placed Ball node
+- `_start_next_round()` simplified: clears all balls uniformly, no longer special-cases the first ball
+
+### Upgrade selection system (D014)
+
+- Upgrade selection system: post-clear 3-choice upgrade panel, restart same level after selection
 - 5 upgrades fully implemented: wide paddle (+50%), slow ball (-20%), extra life (+1), multi-ball, pierce (pass through 3 bricks)
 - Multi-ball rules: all balls have equal status; no life cost while any ball remains, life lost only when all balls are gone
 - Extra balls follow paddle while stuck to it
@@ -14,19 +31,14 @@ All notable changes to brick-blast will be documented in this file.
 - New scripts `script/upgrade.gd` (upgrade data model), `script/upgrade_panel.gd` (UI controller)
 - 73 unit tests (including 33 upgrade system tests)
 
-### Changed
-
-- Ball collision layer changed from layer 1 to layer 2 (mask 1), balls no longer collide with each other
-- Paddle widening capped: max 80% of screen width (`minf(w * 1.5, playfield * 0.8)`)
-
-### Fixed
+### Fixed (upgrade system)
 
 - Upgrade panel invisible: CanvasLayer.visible must be toggled together with overlay.visible
-- Ball not stopped on win: `_win()` now immediately sets `ball_stuck=true` + `velocity=ZERO`
+- Ball not stopped on win: `_win()` now immediately sets `state = ROUND_CLEAR` + `velocity=ZERO`
 - Losing a ball cost a life during multi-ball: changed to no life cost while balls remain
-- Main ball loss froze all balls during multi-ball: `_on_ball_lost` no longer sets `ball_stuck=true`, extra balls continue moving
+- Main ball loss froze all balls during multi-ball: `_on_ball_lost` no longer resets state, extra balls continue moving
 - Extra balls didn't follow paddle while stuck: `_process` now syncs extra ball positions
-- Clicking during upgrade panel launched ball: `_input` now checks `upgrade_panel.visible` guard
+- Clicking during upgrade panel launched ball: `_input` now checks `state == ROUND_CLEAR` guard
 - Pierce not reset on paddle hit: `_on_paddle_hit` now restores `pierce_count`
 - Paddle widening only updated CollisionShape: now syncs ColorRect size and position too
 

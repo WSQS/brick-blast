@@ -29,13 +29,15 @@ Targets Windows + Android + Web.
 
 | Node | Type | Role |
 |------|------|------|
-| Ball | `CharacterBody2D` | `move_and_collide()` for CCD, velocity-based bouncing |
+| Ball | `CharacterBody2D` | `move_and_collide()` for CCD, velocity-based bouncing. Emits `hit_paddle` / `lost` signals |
 | Brick | `StaticBody2D` | Destructible block, emits `destroyed` signal |
 | Paddle | `StaticBody2D` | Mouse/keyboard controlled, angle-based reflection |
-| UpgradePanel | `CanvasLayer` | 3-choice upgrade selection UI (layer=10) |
+| UpgradePanel | `CanvasLayer` | 3-choice upgrade selection UI (layer=10), buttons created dynamically |
 | Upgrade | `Resource` (class_name) | Data model for power-up types |
 
 Collision is handled by the **physics engine** (`move_and_collide` returns immediate collision info). Pure math helpers (wall bounce, paddle angle) are static methods on `ball.gd` for unit testing.
+
+Game state is managed by a **State enum** on `main.gd`: `READY` (ball stuck to paddle) → `PLAYING` (ball in motion) → `PAUSED` / `ROUND_CLEAR` / `GAME_OVER`. Child nodes query state via `is_playing()` / `is_paused()` methods.
 
 ## Critical Godot Gotchas (learned the hard way)
 

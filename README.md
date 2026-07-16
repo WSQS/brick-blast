@@ -72,7 +72,7 @@ cmd /c '"C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.window
 - [docs/decisions.md](docs/decisions.md) - architecture decision records
 - [docs/roadmap.md](docs/roadmap.md) - version roadmap and feature plan
 - [docs/formal-elements-analysis.md](docs/formal-elements-analysis.md) - game design analysis
-- [copilot-instructions.md](copilot-instructions.md) - project conventions and gotchas
+- [.github/copilot-instructions.md](.github/copilot-instructions.md) - project conventions and gotchas
 
 ## License
 

@@ -113,17 +113,18 @@ The following directions have not been decided yet, listed for future discussion
 
 Known tech debt, not tied to versions, resolved opportunistically during related feature development:
 
-### main.gd God Object
+### main.gd God Object — Partially Addressed
 
-- **Problem**: main.gd handles 7 responsibilities (brick spawning, ball reset, input, pause, score, win/lose, HUD)
-- **Suggestion**: Refactor during upgrade system development — new UI logic will force decomposition
+- **Problem**: main.gd handles many responsibilities (brick spawning, ball spawning, input, pause, score, win/lose, HUD)
+- **Progress**: State enum replaced 3 independent bools (`game_over`, `paused`, `ball_stuck`); ball decoupled via signals; ball spawning unified to dynamic creation
+- **Remaining**: main.gd still owns multiple responsibilities; further decomposition possible
 - **Key file**: [script/main.gd](../script/main.gd)
 
-### Ball Responsibility Overreach
+### Ball Responsibility Overreach — ✅ Resolved
 
-- **Problem**: ball.gd's `_physics_process` contains game rules (brick destruction, combo reset, ball acceleration)
-- **Ideal**: Ball should only handle physics bouncing, emit signals to main for rule processing
-- **Key file**: [script/ball.gd](../script/ball.gd) — `_physics_process` lines 37-48
+- **Problem**: ball.gd's `_physics_process` contained game rules (brick destruction, combo reset, ball acceleration) and used `parent.call()` to invoke main's methods
+- **Resolution**: Ball now emits `hit_paddle` and `lost` signals; main connects them. Ball no longer knows about main's game rules.
+- **Key file**: [script/ball.gd](../script/ball.gd)
 
 ### Inconsistent Wall Collision Mechanism
 
