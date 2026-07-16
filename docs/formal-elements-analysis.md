@@ -45,7 +45,7 @@ Fullerton's objective types:
 - **Exploration** — 发现隐藏内容（如隐藏砖块、秘密关卡入口）
 - **Outwit** — 通过策略而非纯操作取胜（如 Roguelike 的强化选择）
 
-**Remaining gaps**:
+**Implemented systems**:
 - 连击系统 ✅ 已实现 (D011)
 - 星级评价 ✅ 已实现 (D013)
 - 强化选择系统 ✅ 已实现 (D014)，5 种强化全部完成

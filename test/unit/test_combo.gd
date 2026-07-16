@@ -30,20 +30,20 @@ func test_combo_resets_on_paddle_hit() -> void:
 	main._on_brick_destroyed()
 	main._on_brick_destroyed()
 	assert_eq(main.combo, 2, "Combo should be 2")
-	main._on_paddle_hit()
+	main._on_paddle_hit(main.balls[0])
 	assert_eq(main.combo, 0, "Combo should reset to 0 on paddle hit")
 
 
 func test_combo_resets_on_ball_lost() -> void:
 	main.combo = 5
-	main._on_ball_lost()
+	main._on_ball_lost(main.balls[0])
 	assert_eq(main.combo, 0, "Combo should reset to 0 on ball lost")
 
 
 func test_max_combo_tracked() -> void:
 	for i in 5:
 		main._on_brick_destroyed()
-	main._on_paddle_hit()
+	main._on_paddle_hit(main.balls[0])
 	for i in 3:
 		main._on_brick_destroyed()
 	assert_eq(main.max_combo, 5, "Max combo should be 5 even after reset")

@@ -30,7 +30,7 @@ func test_pause_sets_scene_tree_paused() -> void:
 func test_pause_does_not_work_after_game_over() -> void:
 	# Force game over
 	main.lives = 1
-	main._on_ball_lost()  # lives -> 0, triggers _lose()
+	main._on_ball_lost(main.balls[0])  # lives -> 0, triggers _game_over()
 	assert_true(main.game_over, "Should be game over")
 
 	# Simulate Esc press during game over — _input should return early

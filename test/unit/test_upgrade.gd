@@ -13,7 +13,12 @@ func before_each() -> void:
 	add_child_autofree(main)
 	# GUT viewport is tiny (64x64); set realistic playfield for physics tests
 	main.playfield = Rect2(0, 0, 480, 720)
-	main.ball.bounds = main.playfield
+	for b in main.balls:
+		b.bounds = main.playfield
+
+
+func _get_ball() -> CharacterBody2D:
+	return main.balls[0]
 
 
 func _get_overlay() -> ColorRect:
@@ -40,12 +45,13 @@ func test_clearing_bricks_shows_round_clear_message() -> void:
 
 
 func test_ball_stops_on_win() -> void:
+	var ball := _get_ball()
 	main.ball_stuck = false
-	main.ball.velocity = Vector2(100, 100)
+	ball.velocity = Vector2(100, 100)
 	main.bricks_left = 1
 	main._on_brick_destroyed()
 	assert_true(main.ball_stuck, "Ball should be stuck after win")
-	assert_eq(main.ball.velocity, Vector2.ZERO, "Ball velocity should be zero after win")
+	assert_eq(ball.velocity, Vector2.ZERO, "Ball velocity should be zero after win")
 
 
 func test_clearing_bricks_increments_rounds_cleared() -> void:
@@ -163,38 +169,44 @@ func test_win_full_flow_debug() -> void:
 # ---------------------------------------------------------------------------
 
 func test_pierce_upgrade_adds_pierce_count() -> void:
-	assert_eq(main.ball.pierce_count, 0, "Ball should start with 0 pierce")
+	var ball := _get_ball()
+	assert_eq(ball.pierce_count, 0, "Ball should start with 0 pierce")
 	main.upgrades[UpgradeScript.Type.PIERCE] = 1
-	main._sync_pierce_count()
-	assert_eq(main.ball.pierce_count, 3, "Ball should have 3 pierce after upgrade")
+	main._sync_pierce_count(ball)
+	assert_eq(ball.pierce_count, 3, "Ball should have 3 pierce after upgrade")
 
 func test_pierce_upgrade_stacks() -> void:
+	var ball := _get_ball()
 	main.upgrades[UpgradeScript.Type.PIERCE] = 2
-	main._sync_pierce_count()
-	assert_eq(main.ball.pierce_count, 6, "Pierce should stack to 6")
+	main._sync_pierce_count(ball)
+	assert_eq(ball.pierce_count, 6, "Pierce should stack to 6")
 
 func test_pierce_zero_means_normal_bounce() -> void:
-	assert_eq(main.ball.pierce_count, 0, "No pierce by default")
+	var ball := _get_ball()
+	assert_eq(ball.pierce_count, 0, "No pierce by default")
 
 func test_pierce_resets_on_paddle_hit() -> void:
+	var ball := _get_ball()
 	main.upgrades[UpgradeScript.Type.PIERCE] = 1
-	main._sync_pierce_count()
-	assert_eq(main.ball.pierce_count, 3, "Should have 3 pierce after upgrade")
+	main._sync_pierce_count(ball)
+	assert_eq(ball.pierce_count, 3, "Should have 3 pierce after upgrade")
 	# Consume 2 pierce charges
-	main.ball.pierce_count = 1
-	main._on_paddle_hit()
-	assert_eq(main.ball.pierce_count, 3, "Pierce should reset to full on paddle hit")
+	ball.pierce_count = 1
+	main._on_paddle_hit(ball)
+	assert_eq(ball.pierce_count, 3, "Pierce should reset to full on paddle hit")
 
 func test_pierce_resets_on_paddle_hit_with_multiple_upgrades() -> void:
+	var ball := _get_ball()
 	main.upgrades[UpgradeScript.Type.PIERCE] = 2
-	main._sync_pierce_count()
-	main.ball.pierce_count = 1
-	main._on_paddle_hit()
-	assert_eq(main.ball.pierce_count, 6, "Pierce should reset to 6 (2 upgrades * 3)")
+	main._sync_pierce_count(ball)
+	ball.pierce_count = 1
+	main._on_paddle_hit(ball)
+	assert_eq(ball.pierce_count, 6, "Pierce should reset to 6 (2 upgrades * 3)")
 
 func test_pierce_stays_zero_on_paddle_hit_without_upgrade() -> void:
-	main._on_paddle_hit()
-	assert_eq(main.ball.pierce_count, 0, "Pierce should remain 0 without upgrade")
+	var ball := _get_ball()
+	main._on_paddle_hit(ball)
+	assert_eq(ball.pierce_count, 0, "Pierce should remain 0 without upgrade")
 
 
 # ---------------------------------------------------------------------------
@@ -204,45 +216,46 @@ func test_pierce_stays_zero_on_paddle_hit_without_upgrade() -> void:
 func test_multi_ball_creates_extra_ball() -> void:
 	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
 	main._start_next_round()
-	assert_eq(main.extra_balls.size(), 1, "Should have 1 extra ball")
+	# 1 original + 1 from multi-ball = 2 total
+	assert_eq(main.balls.size(), 2, "Should have 2 balls (1 original + 1 extra)")
 
 func test_multi_ball_extra_is_valid_node() -> void:
 	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
 	main._start_next_round()
-	assert_true(is_instance_valid(main.extra_balls[0]), "Extra ball should be valid")
+	assert_true(is_instance_valid(main.balls[1]), "Extra ball should be valid")
 
 func test_multi_ball_extra_has_velocity() -> void:
 	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	main._launch_ball()
 	await wait_seconds(0.1)
-	assert_gt(main.extra_balls.size(), 0, "Extra ball should still exist after launch")
-	if main.extra_balls.size() > 0:
-		var extra: CharacterBody2D = main.extra_balls[0]
+	assert_gt(main.balls.size(), 1, "Extra ball should still exist after launch")
+	if main.balls.size() > 1:
+		var extra: CharacterBody2D = main.balls[1]
 		assert_true(extra.velocity != Vector2.ZERO, "Extra ball should have velocity after launch")
 
 func test_start_next_round_clears_extra_balls() -> void:
 	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
 	main._start_next_round()
-	assert_eq(main.extra_balls.size(), 1, "Should have 1 extra ball")
+	assert_eq(main.balls.size(), 2, "Should have 2 balls")
 	# Start another round — old extra balls cleared, new one spawned (persistent)
 	main._start_next_round()
-	assert_eq(main.extra_balls.size(), 1, "Extra ball persists across rounds")
+	assert_eq(main.balls.size(), 2, "Extra ball persists across rounds")
 
 
 func test_extra_ball_follows_paddle_while_stuck() -> void:
-	# Bug: when ball_stuck, only main ball follows paddle — extra stays at spawn
 	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	assert_true(main.ball_stuck, "Ball should be stuck after round start")
-	var extra: CharacterBody2D = main.extra_balls[0]
+	var extra: CharacterBody2D = main.balls[1]
 	# Move paddle to a new position
 	main.paddle.position.x = 300.0
 	# Run _process to sync ball positions
 	main._process(0.016)
 	# Both balls should be at paddle x
 	var expected_x: float = main.paddle.position.x
-	assert_eq(round(main.ball.position.x), round(expected_x), "Main ball follows paddle")
+	var ball0: CharacterBody2D = main.balls[0]
+	assert_eq(round(ball0.position.x), round(expected_x), "First ball follows paddle")
 	assert_eq(round(extra.position.x), round(expected_x), "Extra ball should also follow paddle while stuck")
 
 
@@ -251,97 +264,92 @@ func test_extra_ball_follows_paddle_while_stuck() -> void:
 # ---------------------------------------------------------------------------
 
 func test_multi_ball_not_destroyed_by_next_round() -> void:
-	# Multi-ball is now applied in _start_next_round, not _apply_upgrade
 	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
 	main._start_next_round()
-	assert_eq(main.extra_balls.size(), 1, "Multi-ball should spawn in _start_next_round")
+	assert_eq(main.balls.size(), 2, "Multi-ball should spawn in _start_next_round")
 
 
 # ---------------------------------------------------------------------------
 # Multi-ball design rules (D014):
-# 1. Extra balls don't cost lives when lost (only main ball does)
+# 1. All balls are equal — losing any ball while others remain = no life cost
 # 2. Extra balls persist — respawned every round as long as upgrade is owned
-# 3. Losing a ball (main or extra) doesn't reduce ball count next round
+# 3. Losing a ball doesn't reduce ball count next round
 # ---------------------------------------------------------------------------
 
 func test_multi_ball_persists_across_rounds() -> void:
-	# Select multi-ball once
 	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
 	main._start_next_round()
-	assert_eq(main.extra_balls.size(), 1, "Should have 1 extra ball in first round")
-	# Next round — multi-ball should respawn (it's persistent, not consumable)
+	assert_eq(main.balls.size(), 2, "Should have 2 balls in first round")
 	main._start_next_round()
-	assert_eq(main.extra_balls.size(), 1, "Extra ball should persist across rounds")
+	assert_eq(main.balls.size(), 2, "Extra ball should persist across rounds")
 
 func test_multi_ball_persists_after_losing_extra_ball() -> void:
-	# Select multi-ball, lose the extra ball, next round should still have it
 	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	main.ball_stuck = false
-	var extra: CharacterBody2D = main.extra_balls[0]
-	# Simulate extra ball falling off
+	var extra: CharacterBody2D = main.balls[1]
+	extra.force_update_transform()
 	extra.global_position.y = main.playfield.end.y + 100
 	extra._physics_process(0.016)
-	assert_eq(main.extra_balls.size(), 0, "Extra ball removed after falling")
+	assert_eq(main.balls.size(), 1, "Extra ball removed after falling")
 	# Next round — extra ball should come back
 	main._start_next_round()
-	assert_eq(main.extra_balls.size(), 1, "Extra ball should respawn next round")
+	assert_eq(main.balls.size(), 2, "Extra ball should respawn next round")
 
-func test_extra_ball_lost_does_not_cost_life() -> void:
-	# Set up: have an extra ball, ball not stuck
+func test_ball_lost_does_not_cost_life_with_others_present() -> void:
 	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
 	main._start_next_round()
-	main.ball_stuck = false  # Unstick so physics runs
-	var extra: CharacterBody2D = main.extra_balls[0]
+	main.ball_stuck = false
+	var extra: CharacterBody2D = main.balls[1]
 	var lives_before: int = main.lives
-	# Simulate extra ball falling off — other ball still in play, no life cost
+	extra.force_update_transform()
 	extra.global_position.y = main.playfield.end.y + 100
 	extra._physics_process(0.016)
 	assert_eq(main.lives, lives_before, "Losing one ball while another remains = no life cost")
 
 
-func test_main_ball_lost_no_life_cost_with_extra_present() -> void:
-	# Two balls in play: main ball lost but extra still alive → no life cost
+func test_first_ball_lost_no_life_cost_with_others_present() -> void:
 	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	main.ball_stuck = false
 	var lives_before: int = main.lives
-	# Main ball falls off — but extra ball still in play
-	main.ball.global_position.y = main.playfield.end.y + 100
-	main.ball._physics_process(0.016)
-	assert_eq(main.lives, lives_before, "Losing main ball while extra alive = no life cost")
+	var ball0: CharacterBody2D = main.balls[0]
+	ball0.force_update_transform()
+	ball0.global_position.y = main.playfield.end.y + 100
+	ball0._physics_process(0.016)
+	assert_eq(main.lives, lives_before, "Losing first ball while another alive = no life cost")
 
 
-func test_extra_ball_keeps_moving_after_main_lost() -> void:
-	# Bug: when main ball is lost with extra still alive, _on_ball_lost sets
-	# ball_stuck=true which freezes ALL balls. Extra ball should keep flying.
+func test_other_ball_keeps_moving_after_one_lost() -> void:
 	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	main.ball_stuck = false
-	var extra: CharacterBody2D = main.extra_balls[0]
+	var ball0: CharacterBody2D = main.balls[0]
+	var extra: CharacterBody2D = main.balls[1]
 	var extra_vel_before: Vector2 = extra.velocity
-	# Main ball falls off — extra still in play
-	main.ball.global_position.y = main.playfield.end.y + 100
-	main.ball._physics_process(0.016)
-	# Extra ball should NOT be frozen
-	assert_false(main.ball_stuck, "ball_stuck should NOT be true while extra ball is alive")
-	assert_eq(extra.velocity, extra_vel_before, "Extra ball velocity should be unchanged")
+	ball0.force_update_transform()
+	ball0.global_position.y = main.playfield.end.y + 100
+	ball0._physics_process(0.016)
+	assert_false(main.ball_stuck, "ball_stuck should NOT be true while another ball is alive")
+	assert_eq(extra.velocity, extra_vel_before, "Remaining ball velocity should be unchanged")
 
 
 func test_all_balls_lost_costs_life() -> void:
-	# Only when ALL balls are gone should a life be lost
 	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	main.ball_stuck = false
 	var lives_before: int = main.lives
-	# Lose extra ball first
-	var extra: CharacterBody2D = main.extra_balls[0]
-	extra.global_position.y = main.playfield.end.y + 100
-	extra._physics_process(0.016)
-	assert_eq(main.lives, lives_before, "Losing extra: main still alive, no life cost")
-	# Now lose main ball too — all balls gone → life cost
-	main.ball.global_position.y = main.playfield.end.y + 100
-	main.ball._physics_process(0.016)
+	# Lose one ball first
+	var ball0: CharacterBody2D = main.balls[0]
+	ball0.force_update_transform()
+	ball0.global_position.y = main.playfield.end.y + 100
+	ball0._physics_process(0.016)
+	assert_eq(main.lives, lives_before, "Losing one: another still alive, no life cost")
+	# Now lose the last ball — all balls gone → life cost
+	var last_ball: CharacterBody2D = main.balls[0]
+	last_ball.force_update_transform()
+	last_ball.global_position.y = main.playfield.end.y + 100
+	last_ball._physics_process(0.016)
 	assert_eq(main.lives, lives_before - 1, "All balls gone → lose a life")
 
 

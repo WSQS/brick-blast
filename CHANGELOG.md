@@ -6,9 +6,9 @@ All notable changes to brick-blast will be documented in this file.
 
 ### Added
 
-- ��化选择系统 (D014)：通关后弹出 3 选 1 强化面板，选择后重开同一��
+- 强化选择系统 (D014)：通关后弹出 3 选 1 强化面板，选择后重开同一关
 - 5 种强化全部实现：挡板加宽(+50%)、减速(-20%)、额外生命(+1)、多球、穿透(穿过 3 块砖)
-- 多球规则：额外球与主球不互相碰撞；有球在场时不扣命，所有球掉光才扣命
+- 多球规则：所有球地位平等；有球在场时不扣命，所有球掉光才扣命
 - 球粘挡板时额外球也跟随挡板移动
 - 新场景 `scene/upgrade_panel.tscn`：强化选择 UI
 - 新脚本 `script/upgrade.gd`（强化数据模型）、`script/upgrade_panel.gd`（UI 控制）

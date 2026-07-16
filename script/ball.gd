@@ -9,8 +9,6 @@ const RADIUS: float = 8.0
 
 var _speed: float = SPEED
 var pierce_count: int = 0
-var is_extra_ball: bool = false
-var is_active: bool = true
 
 var bounds: Rect2 = Rect2(0, 0, 480, 720)
 
@@ -28,8 +26,6 @@ func set_speed(s: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if not is_active:
-		return
 	var parent := get_parent()
 	if parent == null or parent.get("ball_stuck") or parent.get("paused"):
 		return
@@ -49,14 +45,10 @@ func _physics_process(delta: float) -> void:
 			velocity = bounce_off_paddle(global_position, collider.get_rect(), _speed)
 			_speed = minf(_speed * 1.03, MAX_SPEED)
 			velocity = velocity.normalized() * _speed
-			parent._on_paddle_hit()
+			parent._on_paddle_hit(self)
 
 	if global_position.y > bounds.end.y + 50:
-		if is_extra_ball:
-			parent.extra_balls.erase(self)
-			queue_free()
-		else:
-			parent._on_ball_lost()
+		parent._on_ball_lost(self)
 
 
 func _handle_walls() -> void:

@@ -30,7 +30,6 @@ const STAR_COMBO_THRESHOLD: int = 10
 @export var ball_scene: PackedScene
 
 @onready var playfield: Rect2 = _compute_playfield()
-@onready var ball: CharacterBody2D = $Ball
 @onready var paddle: StaticBody2D = $Paddle
 @onready var bricks: Node2D = $Bricks
 @onready var score_label: Label = $HUD/ScoreLabel
@@ -54,14 +53,19 @@ var ball_stuck: bool = true
 
 var upgrades: Dictionary = {}  # UpgradeScript.Type -> stack count
 var rounds_cleared: int = 0
-var extra_balls: Array[CharacterBody2D] = []
+var balls: Array[CharacterBody2D] = []
 
 
 func _ready() -> void:
 	paddle.bounds = playfield
-	ball.bounds = playfield
 	if upgrade_panel and upgrade_panel.has_signal("upgrade_selected"):
 		upgrade_panel.upgrade_selected.connect(_on_upgrade_selected)
+	# Collect the scene-placed ball into the unified balls array
+	for child in get_children():
+		if child is CharacterBody2D:
+			child.bounds = playfield
+			balls.append(child)
+			break
 	_spawn_bricks()
 	_reset_round()
 	_update_hud()
@@ -88,11 +92,10 @@ func _toggle_pause() -> void:
 
 func _launch_ball() -> void:
 	ball_stuck = false
-	_sync_pierce_count()
-	ball.launch(_random_launch_dir())
-	for extra in extra_balls:
-		if is_instance_valid(extra):
-			extra.launch(_random_launch_dir())
+	for b in balls:
+		if is_instance_valid(b):
+			_sync_pierce_count(b)
+			b.launch(_random_launch_dir())
 
 
 func _random_launch_dir() -> Vector2:
@@ -104,10 +107,9 @@ func _process(_delta: float) -> void:
 	if not (ball_stuck and not paused):
 		return
 	var stick_pos := Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)
-	ball.position = stick_pos
-	for extra in extra_balls:
-		if is_instance_valid(extra):
-			extra.position = stick_pos
+	for b in balls:
+		if is_instance_valid(b):
+			b.position = stick_pos
 
 
 func _compute_playfield() -> Rect2:
@@ -137,9 +139,10 @@ func _spawn_bricks() -> void:
 
 
 func _reset_round() -> void:
-	ball.is_active = true
-	ball.position = Vector2(playfield.size.x / 2.0, PADDLE_Y - BALL_OFFSET)
-	ball.velocity = Vector2.ZERO
+	for b in balls:
+		if is_instance_valid(b):
+			b.position = Vector2(playfield.size.x / 2.0, PADDLE_Y - BALL_OFFSET)
+			b.velocity = Vector2.ZERO
 	ball_stuck = true
 	combo = 0
 	_update_hud()
@@ -155,24 +158,24 @@ func _on_brick_destroyed() -> void:
 		_win()
 
 
-func _on_paddle_hit() -> void:
+func _on_paddle_hit(hit_ball: CharacterBody2D) -> void:
 	combo = 0
-	_sync_pierce_count()
+	_sync_pierce_count(hit_ball)
 	_update_hud()
 
 
-## Sets ball.pierce_count from upgrades (called on launch and paddle hit)
-func _sync_pierce_count() -> void:
-	ball.pierce_count = upgrades.get(UpgradeScript.Type.PIERCE, 0) * 3
+## Sets pierce_count on a specific ball from the upgrade stack.
+func _sync_pierce_count(target: CharacterBody2D) -> void:
+	target.pierce_count = upgrades.get(UpgradeScript.Type.PIERCE, 0) * 3
 
 
-func _on_ball_lost() -> void:
+func _on_ball_lost(lost_ball: CharacterBody2D) -> void:
 	if game_over:
 		return
-	# Extra balls still alive — deactivate main ball. Only when all balls
-	# are gone do we cost a life and reset.
-	if extra_balls.size() > 0:
-		ball.is_active = false
+	balls.erase(lost_ball)
+	lost_ball.queue_free()
+	# Still have balls in play — no life lost
+	if balls.size() > 0:
 		return
 	lives -= 1
 	lives_lost_this_level += 1
@@ -196,7 +199,9 @@ func _win() -> void:
 		return
 	rounds_cleared += 1
 	ball_stuck = true
-	ball.velocity = Vector2.ZERO
+	for b in balls:
+		if is_instance_valid(b):
+			b.velocity = Vector2.ZERO
 	var stars := "*".repeat(_compute_stars())
 	message.text = "ROUND CLEAR! %s" % stars
 	message.show()
@@ -232,7 +237,9 @@ func _apply_upgrade(id: int) -> void:
 				cr.size.x = new_w
 				cr.position.x = -new_w / 2.0
 		UpgradeScript.Type.SLOW_BALL:
-			ball.set_speed(ball.get_speed() * 0.8)
+			for b in balls:
+				if is_instance_valid(b):
+					b.set_speed(b.get_speed() * 0.8)
 		UpgradeScript.Type.EXTRA_LIFE:
 			lives += 1
 		UpgradeScript.Type.MULTI_BALL:
@@ -242,30 +249,31 @@ func _apply_upgrade(id: int) -> void:
 
 
 func _start_next_round() -> void:
-	for extra in extra_balls:
-		if is_instance_valid(extra):
-			extra.queue_free()
-	extra_balls.clear()
+	# Remove all balls except the first (scene-placed) one
+	for i in range(balls.size() - 1, 0, -1):
+		if is_instance_valid(balls[i]):
+			balls[i].queue_free()
+		balls.remove_at(i)
 	_spawn_bricks()
 	_reset_round()
 	lives_lost_this_level = 0
 	max_combo = 0
 	var multi_count: int = upgrades.get(UpgradeScript.Type.MULTI_BALL, 0)
 	for i in multi_count:
-		_spawn_extra_ball()
+		_spawn_ball()
 	_update_hud()
 
 
-func _spawn_extra_ball() -> void:
+func _spawn_ball() -> void:
 	if not ball_scene:
 		return
 	var new_ball: CharacterBody2D = ball_scene.instantiate()
 	new_ball.bounds = playfield
-	new_ball.set_speed(ball.get_speed())
-	new_ball.pierce_count = ball.pierce_count
-	new_ball.is_extra_ball = true
+	# Inherit speed from the first ball
+	if balls.size() > 0 and is_instance_valid(balls[0]):
+		new_ball.set_speed(balls[0].get_speed())
 	add_child(new_ball)
-	extra_balls.append(new_ball)
+	balls.append(new_ball)
 	new_ball.position = Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)
 
 
