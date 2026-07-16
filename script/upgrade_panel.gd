@@ -1,7 +1,7 @@
 extends CanvasLayer
 ## UpgradePanel — 3-choice upgrade selection UI shown after clearing all bricks.
 
-signal upgrade_selected(upgrade)
+signal upgrade_selected(upgrade: Upgrade)
 
 const CHOICE_COUNT: int = 3
 
