@@ -27,3 +27,12 @@ func test_lives_do_not_decrease_after_game_over() -> void:
 	main._on_ball_lost(ball)
 
 	assert_eq(main.lives, 0, "Lives should stay at 0 after game over, not go negative")
+
+
+## Reproduces: after losing last ball (with lives remaining),
+## no new ball is spawned — balls array is empty, game is stuck.
+func test_ball_spawned_after_losing_last_ball() -> void:
+	main.lives = 3
+	var ball: CharacterBody2D = main.balls[0]
+	main._on_ball_lost(ball)
+	assert_gt(main.balls.size(), 0, "A new ball should be spawned after losing the last ball")
