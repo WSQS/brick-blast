@@ -26,29 +26,29 @@ Legend: ✅ complete · ⚠️ has gaps · ❌ missing
 
 **Current**: Clear all bricks = win. Lose all 3 lives = game over.
 
-**Decision (D010)**: Construction（主）+ Forbidden Act（第一副）+ Outwit（后续副）
-- 主目标：清砖块（已有）
-- 第一副目标：挑战条件（连击为主，不绑死）+ 星级评价
-- 第二副目标（后续）：强化选择，星级影响选择数量/质量
-- 正向循环：玩得好 → 更多星级 → 更多强化 → 更强
+**Decision (D010)**: Construction (primary) + Forbidden Act (first secondary) + Outwit (later secondary)
+- Primary objective: clear bricks (existing)
+- First secondary: challenge conditions (primarily combo, not locked) + star rating
+- Second secondary (later): upgrade selection, stars affect choice quantity/quality
+- Positive loop: play well → more stars → more upgrades → stronger
 
 Fullerton's objective types:
 
-- **Capture** — 获取或夺取特定物品（如打中关键砖块触发道具）
-- **Chase** — 追逐移动目标（打砖块不太适用，玩家是"接"不是"追"）
-- **Race** — 在限定时间内完成，或比对手更快（如限时模式）
-- **Alignment** — 将元素排列成特定图案（如俄罗斯方块、三消，与打砖块不搭）
-- **Rescue** — 拯救某物脱离危险（除非加叙事层，否则不自然）
-- **Escape** — 从困境中脱出（如砖块不断下压，必须在被压死前清除）
-- **Forbidden Act** — 不能做某事，做了就失败（如"不丢球通关"作为额外挑战）
-- **Construction** — 通过放置或移除元素达成目标（打砖块的核心：消除所有砖块）
-- **Exploration** — 发现隐藏内容（如隐藏砖块、秘密关卡入口）
-- **Outwit** — 通过策略而非纯操作取胜（如 Roguelike 的强化选择）
+- **Capture** — acquire or seize specific items (e.g., hitting key brick triggers power-up)
+- **Chase** — pursue a moving target (not very applicable to brick-breaker, player "catches" not "chases")
+- **Race** — complete within time limit, or faster than opponent (e.g., time-limited mode)
+- **Alignment** — arrange elements into specific patterns (e.g., Tetris, match-3, doesn't fit brick-breaker)
+- **Rescue** — save something from danger (unless adding a narrative layer, feels unnatural)
+- **Escape** — break free from a predicament (e.g., bricks pressing down, must clear before being crushed)
+- **Forbidden Act** — must not do something, doing so means failure (e.g., "clear without losing a ball" as extra challenge)
+- **Construction** — achieve goal by placing or removing elements (core of brick-breaker: eliminate all bricks)
+- **Exploration** — discover hidden content (e.g., hidden bricks, secret level entrances)
+- **Outwit** — win through strategy rather than pure execution (e.g., Roguelike upgrade selection)
 
 **Implemented systems**:
-- 连击系统 ✅ 已实现 (D011)
-- 星级评价 ✅ 已实现 (D013)
-- 强化选择系统 ✅ 已实现 (D014)，5 种强化全部完成
+- Combo system ✅ implemented (D011)
+- Star rating ✅ implemented (D013)
+- Upgrade selection system ✅ implemented (D014), all 5 upgrades complete
 
 ---
 
@@ -57,9 +57,9 @@ Fullerton's objective types:
 **Status**: ✅
 
 **Decision (D012)** — all implemented:
-1. **球粘挡板** ✅：球贴在挡板上跟随移动，点击/空格发射
-2. **暂停** ✅：Esc 暂停，最小化 UI
-3. **关卡间过渡**：推迟到 Phase 2
+1. **Ball sticks to paddle** ✅: ball attaches to paddle and follows, click/Space to launch
+2. **Pause** ✅: Esc to pause, minimal UI
+3. **Level transition**: deferred to Phase 2
 
 **Target flow**:
 ```
@@ -99,17 +99,17 @@ Menu → Start → Ball sticks to paddle → Click/Space to launch → Play (com
 |----------|--------|-------|
 | Lives | ✅ | 3, decremented on ball loss |
 | Score | ✅ | Scales with combo: `10 * (1 + combo / 5)` |
-| Combo | ✅ | D011: 每打一块砖 +1，碰挡板/失球重置 |
-| Stars | ✅ | D013: 通关 1★, combo≥10 2★, 不丢球 3★ |
-| Upgrade choices | ✅ | D014: 通关后 3 选 1，5/5 已实现（加宽/减速/额外生命/多球/穿透） |
+| Combo | ✅ | D011: +1 per brick hit, reset on paddle hit / ball loss |
+| Stars | ✅ | D013: clear = 1★, combo≥10 = 2★, no lives lost = 3★ |
+| Upgrade choices | ✅ | D014: 3-choice post-clear, 5/5 implemented (wide/slow/life/multi/pierce) |
 
 **Combo rules (D011)**:
-- 球碰砖块 → combo += 1
-- 球碰挡板 → combo = 0
-- 球碰墙 → 不影响 combo
-- 失球 → combo = 0
+- Ball hits brick → combo += 1
+- Ball hits paddle → combo = 0
+- Ball hits wall → combo unaffected
+- Ball lost → combo = 0
 
-**设计意图**: combo 在接球环节引入 Dilemma——"冒险多打一块砖 vs 安全接球"
+**Design intent**: combo introduces a Dilemma at the catch moment — "risk one more brick vs safe catch"
 
 ---
 
@@ -126,7 +126,7 @@ Fullerton's conflict sources: Obstacles / Opponents / Dilemmas.
 | Opponents | N/A | Single-player, no AI |
 | Dilemmas | ✅ | Combo risk/reward (D011) + upgrade choices (D014) |
 
-**Resolved**: Combo creates dilemma ("冒险多打一块砖 vs 安全接球"); upgrade selection forces strategic trade-offs each round.
+**Resolved**: Combo creates dilemma ("risk one more brick vs safe catch"); upgrade selection forces strategic trade-offs each round.
 
 ---
 
@@ -144,10 +144,10 @@ No issues identified.
 
 **Status**: ✅
 
-**Decision (D013)** — implemented: 星级评价
-- ⭐ 通关
-- ⭐⭐ 通关 + 最大 combo ≥ 10（playtest 调整）
-- ⭐⭐⭐ 通关 + 不丢球
+**Decision (D013)** — implemented: Star rating
+- ⭐ Clear level
+- ⭐⭐ Clear level + max combo ≥ 10 (adjust after playtest)
+- ⭐⭐⭐ Clear level + no lives lost
 
 ---
 

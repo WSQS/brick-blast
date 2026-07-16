@@ -87,6 +87,11 @@ cmd /c '"C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.window
 Start-Process "C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.windows.opt.tools.64.exe" -ArgumentList "--editor", "C:\Users\wsqsy\Documents\game\brick-blast\project.godot"
 ```
 
+## Language Convention
+
+- **All project content must be in English.** This includes code, comments, commit messages, PR titles/bodies, documentation (`docs/`, `README.md`), `CHANGELOG.md`, and any other project files.
+- No Chinese or mixed-language content in any committed file.
+
 ## Code Conventions
 
 - Use tabs for indentation (Godot default)
