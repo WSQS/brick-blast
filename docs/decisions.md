@@ -17,7 +17,7 @@ Remaining questions: rarity mechanism, how star rating affects choice quantity/q
 - JSON files
 - Godot Resource (.tres)
 - 2D array / string
-**Status**: Need to first decide whether to do a level-based campaign (depends on whether the upgrade system progression requires multiple levels).
+**Status**: Deferred. D014 established single-level infinite mode, so multi-level data format is not needed yet. Revisit when level evolution direction is decided (see roadmap.md).
 
 ---
 

@@ -1,7 +1,7 @@
 extends GutTest
 ## Tests for upgrade system (D014).
 
-const UpgradeScript = preload("res://script/upgrade.gd")
+const Upgrade = preload("res://script/upgrade.gd")
 
 const MainScene: PackedScene = preload("res://scene/main.tscn")
 
@@ -171,13 +171,13 @@ func test_win_full_flow_debug() -> void:
 func test_pierce_upgrade_adds_pierce_count() -> void:
 	var ball := _get_ball()
 	assert_eq(ball.pierce_count, 0, "Ball should start with 0 pierce")
-	main.upgrades[UpgradeScript.Type.PIERCE] = 1
+	main.upgrades[Upgrade.Type.PIERCE] = 1
 	main._sync_pierce_count(ball)
 	assert_eq(ball.pierce_count, 3, "Ball should have 3 pierce after upgrade")
 
 func test_pierce_upgrade_stacks() -> void:
 	var ball := _get_ball()
-	main.upgrades[UpgradeScript.Type.PIERCE] = 2
+	main.upgrades[Upgrade.Type.PIERCE] = 2
 	main._sync_pierce_count(ball)
 	assert_eq(ball.pierce_count, 6, "Pierce should stack to 6")
 
@@ -187,7 +187,7 @@ func test_pierce_zero_means_normal_bounce() -> void:
 
 func test_pierce_resets_on_paddle_hit() -> void:
 	var ball := _get_ball()
-	main.upgrades[UpgradeScript.Type.PIERCE] = 1
+	main.upgrades[Upgrade.Type.PIERCE] = 1
 	main._sync_pierce_count(ball)
 	assert_eq(ball.pierce_count, 3, "Should have 3 pierce after upgrade")
 	# Consume 2 pierce charges
@@ -197,7 +197,7 @@ func test_pierce_resets_on_paddle_hit() -> void:
 
 func test_pierce_resets_on_paddle_hit_with_multiple_upgrades() -> void:
 	var ball := _get_ball()
-	main.upgrades[UpgradeScript.Type.PIERCE] = 2
+	main.upgrades[Upgrade.Type.PIERCE] = 2
 	main._sync_pierce_count(ball)
 	ball.pierce_count = 1
 	main._on_paddle_hit(ball)
@@ -214,18 +214,18 @@ func test_pierce_stays_zero_on_paddle_hit_without_upgrade() -> void:
 # ---------------------------------------------------------------------------
 
 func test_multi_ball_creates_extra_ball() -> void:
-	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	# 1 original + 1 from multi-ball = 2 total
 	assert_eq(main.balls.size(), 2, "Should have 2 balls (1 original + 1 extra)")
 
 func test_multi_ball_extra_is_valid_node() -> void:
-	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	assert_true(is_instance_valid(main.balls[1]), "Extra ball should be valid")
 
 func test_multi_ball_extra_has_velocity() -> void:
-	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	main._launch_ball()
 	await wait_seconds(0.1)
@@ -235,7 +235,7 @@ func test_multi_ball_extra_has_velocity() -> void:
 		assert_true(extra.velocity != Vector2.ZERO, "Extra ball should have velocity after launch")
 
 func test_start_next_round_clears_extra_balls() -> void:
-	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	assert_eq(main.balls.size(), 2, "Should have 2 balls")
 	# Start another round — old extra balls cleared, new one spawned (persistent)
@@ -244,7 +244,7 @@ func test_start_next_round_clears_extra_balls() -> void:
 
 
 func test_extra_ball_follows_paddle_while_stuck() -> void:
-	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	assert_true(main.ball_stuck, "Ball should be stuck after round start")
 	var extra: CharacterBody2D = main.balls[1]
@@ -264,7 +264,7 @@ func test_extra_ball_follows_paddle_while_stuck() -> void:
 # ---------------------------------------------------------------------------
 
 func test_multi_ball_not_destroyed_by_next_round() -> void:
-	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	assert_eq(main.balls.size(), 2, "Multi-ball should spawn in _start_next_round")
 
@@ -277,14 +277,14 @@ func test_multi_ball_not_destroyed_by_next_round() -> void:
 # ---------------------------------------------------------------------------
 
 func test_multi_ball_persists_across_rounds() -> void:
-	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	assert_eq(main.balls.size(), 2, "Should have 2 balls in first round")
 	main._start_next_round()
 	assert_eq(main.balls.size(), 2, "Extra ball should persist across rounds")
 
 func test_multi_ball_persists_after_losing_extra_ball() -> void:
-	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	main.ball_stuck = false
 	var extra: CharacterBody2D = main.balls[1]
@@ -297,7 +297,7 @@ func test_multi_ball_persists_after_losing_extra_ball() -> void:
 	assert_eq(main.balls.size(), 2, "Extra ball should respawn next round")
 
 func test_ball_lost_does_not_cost_life_with_others_present() -> void:
-	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	main.ball_stuck = false
 	var extra: CharacterBody2D = main.balls[1]
@@ -309,7 +309,7 @@ func test_ball_lost_does_not_cost_life_with_others_present() -> void:
 
 
 func test_first_ball_lost_no_life_cost_with_others_present() -> void:
-	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	main.ball_stuck = false
 	var lives_before: int = main.lives
@@ -321,7 +321,7 @@ func test_first_ball_lost_no_life_cost_with_others_present() -> void:
 
 
 func test_other_ball_keeps_moving_after_one_lost() -> void:
-	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	main.ball_stuck = false
 	var ball0: CharacterBody2D = main.balls[0]
@@ -335,7 +335,7 @@ func test_other_ball_keeps_moving_after_one_lost() -> void:
 
 
 func test_all_balls_lost_costs_life() -> void:
-	main.upgrades[UpgradeScript.Type.MULTI_BALL] = 1
+	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	main.ball_stuck = false
 	var lives_before: int = main.lives
@@ -366,7 +366,7 @@ func test_paddle_wide_updates_visual_rect() -> void:
 		var cr0: ColorRect = paddle.get_node("ColorRect")
 		cr0.size.x = 96.0
 		cr0.position.x = -48.0
-	main._apply_upgrade(UpgradeScript.Type.PADDLE_WIDE)
+	main._apply_upgrade(Upgrade.Type.PADDLE_WIDE)
 	# Both collision and visual should be 96 * 1.5 = 144 (well under 80% cap)
 	assert_almost_eq(collision_shape.shape.size.x, 144.0, 0.01, "Collision shape should widen")
 	assert_almost_eq(color_rect.size.x, 144.0, 0.01, "ColorRect should also widen")
@@ -378,7 +378,7 @@ func test_paddle_wide_has_max_limit() -> void:
 	var collision_shape: CollisionShape2D = main.paddle.get_node("CollisionShape2D")
 	# Apply 10 times — way more than needed to exceed screen
 	for i in 10:
-		main._apply_upgrade(UpgradeScript.Type.PADDLE_WIDE)
+		main._apply_upgrade(Upgrade.Type.PADDLE_WIDE)
 	var final_w: float = collision_shape.shape.size.x
 	assert_true(final_w <= main.playfield.size.x,
 		"Paddle width (%f) should not exceed screen width (%f)" % [final_w, main.playfield.size.x])

@@ -26,7 +26,7 @@ func set_speed(s: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	var parent := get_parent()
+	var parent: Node = get_parent()
 	if parent == null or parent.get("ball_stuck") or parent.get("paused"):
 		return
 
@@ -41,14 +41,14 @@ func _physics_process(delta: float) -> void:
 			else:
 				velocity = velocity.bounce(collision.get_normal())
 			collider.destroy()
-		elif collider == parent.paddle:
+		elif collider == parent.get("paddle"):
 			velocity = bounce_off_paddle(global_position, collider.get_rect(), _speed)
 			_speed = minf(_speed * 1.03, MAX_SPEED)
 			velocity = velocity.normalized() * _speed
-			parent._on_paddle_hit(self)
+			parent.call("_on_paddle_hit", self)
 
 	if global_position.y > bounds.end.y + 50:
-		parent._on_ball_lost(self)
+		parent.call("_on_ball_lost", self)
 
 
 func _handle_walls() -> void:

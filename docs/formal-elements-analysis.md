@@ -22,15 +22,15 @@ Legend: ✅ complete · ⚠️ has gaps · ❌ missing
 
 ## 2. Objectives
 
-**Status**: ✅
+**Status**: ⚠️ (core implemented, star-upgrade link deferred)
 
 **Current**: Clear all bricks = win. Lose all 3 lives = game over.
 
 **Decision (D010)**: Construction (primary) + Forbidden Act (first secondary) + Outwit (later secondary)
-- Primary objective: clear bricks (existing)
-- First secondary: challenge conditions (primarily combo, not locked) + star rating
-- Second secondary (later): upgrade selection, stars affect choice quantity/quality
-- Positive loop: play well → more stars → more upgrades → stronger
+- Primary objective: clear bricks (existing) ✅
+- First secondary: challenge conditions (primarily combo) + star rating ✅ implemented (D011, D013)
+- Second secondary: upgrade selection ✅ implemented (D014) — **but** star rating affecting upgrade choice quantity/quality is still TODO (see roadmap.md v0.1)
+- Positive loop: play well → more stars → more upgrades → stronger (partially implemented)
 
 Fullerton's objective types:
 
@@ -156,7 +156,7 @@ No issues identified.
 | Element | Status | Decision |
 |---------|--------|----------|
 | Players | ✅ | No change needed |
-| Objectives | ✅ | D010: Construction + Forbidden Act → Outwit (all implemented) |
+| Objectives | ⚠️ | D010: Construction + Forbidden Act → Outwit (core implemented, star-upgrade link TODO) |
 | Procedures | ✅ | D012: Ball sticks + pause implemented, level transition deferred |
 | Rules | ✅ | Combo (D011), multi-ball, pierce rules all implemented |
 | Resources | ✅ | D011 combo + D014 upgrades (5/5) all implemented |

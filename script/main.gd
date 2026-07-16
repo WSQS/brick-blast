@@ -1,7 +1,7 @@
 extends Node2D
 ## Main — orchestrates the game: spawns bricks, manages score, win/lose state.
 
-const UpgradeScript = preload("res://script/upgrade.gd")
+## Upgrade types are accessed via the global Upgrade class (class_name Upgrade).
 
 # Brick grid
 const COLS: int = 8
@@ -51,7 +51,7 @@ var lives_lost_this_level: int = 0
 
 var ball_stuck: bool = true
 
-var upgrades: Dictionary = {}  # UpgradeScript.Type -> stack count
+var upgrades: Dictionary = {}  # Upgrade.Type -> stack count
 var rounds_cleared: int = 0
 var balls: Array[CharacterBody2D] = []
 
@@ -166,7 +166,7 @@ func _on_paddle_hit(hit_ball: CharacterBody2D) -> void:
 
 ## Sets pierce_count on a specific ball from the upgrade stack.
 func _sync_pierce_count(target: CharacterBody2D) -> void:
-	target.pierce_count = upgrades.get(UpgradeScript.Type.PIERCE, 0) * 3
+	target.pierce_count = upgrades.get(Upgrade.Type.PIERCE, 0) * 3
 
 
 func _on_ball_lost(lost_ball: CharacterBody2D) -> void:
@@ -227,7 +227,7 @@ func _on_upgrade_selected(upgrade) -> void:
 
 func _apply_upgrade(id: int) -> void:
 	match id:
-		UpgradeScript.Type.PADDLE_WIDE:
+		Upgrade.Type.PADDLE_WIDE:
 			var shape: RectangleShape2D = paddle.get_node("CollisionShape2D").shape
 			var max_w: float = playfield.size.x * PADDLE_MAX_WIDTH_RATIO
 			var new_w: float = minf(shape.size.x * PADDLE_WIDE_FACTOR, max_w)
@@ -236,15 +236,15 @@ func _apply_upgrade(id: int) -> void:
 				var cr: ColorRect = paddle.get_node("ColorRect")
 				cr.size.x = new_w
 				cr.position.x = -new_w / 2.0
-		UpgradeScript.Type.SLOW_BALL:
+		Upgrade.Type.SLOW_BALL:
 			for b in balls:
 				if is_instance_valid(b):
 					b.set_speed(b.get_speed() * 0.8)
-		UpgradeScript.Type.EXTRA_LIFE:
+		Upgrade.Type.EXTRA_LIFE:
 			lives += 1
-		UpgradeScript.Type.MULTI_BALL:
+		Upgrade.Type.MULTI_BALL:
 			pass  # extra balls spawned in _start_next_round
-		UpgradeScript.Type.PIERCE:
+		Upgrade.Type.PIERCE:
 			pass  # pierce_count synced on launch / paddle hit
 
 
@@ -258,7 +258,7 @@ func _start_next_round() -> void:
 	_reset_round()
 	lives_lost_this_level = 0
 	max_combo = 0
-	var multi_count: int = upgrades.get(UpgradeScript.Type.MULTI_BALL, 0)
+	var multi_count: int = upgrades.get(Upgrade.Type.MULTI_BALL, 0)
 	for i in multi_count:
 		_spawn_ball()
 	_update_hud()
