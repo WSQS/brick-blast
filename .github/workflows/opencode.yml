@@ -8,6 +8,10 @@ on:
   pull_request_review:
     types: [submitted]
 
+concurrency:
+  group: opencode-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: true
+
 jobs:
   opencode:
     if: |
@@ -16,12 +20,14 @@ jobs:
       github.actor != 'github-actions[bot]' &&
       github.event.pull_request.user.type != 'Bot' &&
       (
-        (github.event_name == 'issue_comment' || github.event_name == 'pull_request_review_comment') &&
-        (contains(github.event.comment.body, '/oc') || contains(github.event.comment.body, '/opencode'))
-      ) ||
-      (
-        github.event_name == 'pull_request_review' &&
-        (contains(github.event.review.body, '/oc') || contains(github.event.review.body, '/opencode'))
+        (
+          (github.event_name == 'issue_comment' || github.event_name == 'pull_request_review_comment') &&
+          (contains(github.event.comment.body, '/oc') || contains(github.event.comment.body, '/opencode'))
+        ) ||
+        (
+          github.event_name == 'pull_request_review' &&
+          (contains(github.event.review.body, '/oc') || contains(github.event.review.body, '/opencode'))
+        )
       )
     runs-on: ubuntu-latest
     permissions:
@@ -39,5 +45,7 @@ jobs:
         uses: anomalyco/opencode/github@latest
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           model: ns-deepseek/deepseek-v4-pro
+          use_github_token: true

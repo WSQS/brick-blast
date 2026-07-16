@@ -2,7 +2,7 @@ name: opencode-pr-metadata
 
 on:
   pull_request:
-    types: [opened, edited, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review]
 
 concurrency:
   group: opencode-pr-metadata-${{ github.event.pull_request.number }}
