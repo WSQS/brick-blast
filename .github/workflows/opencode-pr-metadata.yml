@@ -41,7 +41,8 @@ jobs:
           model: ns-deepseek/deepseek-v4-pro
           use_github_token: true
           prompt: |
-            You are maintaining the metadata of this pull request.
+            You are maintaining the metadata of this pull request for a Godot 4.7
+            brick-breaker game written in GDScript.
 
             PR number: #${{ github.event.pull_request.number }}
             Repository: ${{ github.repository }}
@@ -49,26 +50,33 @@ jobs:
 
             Task:
             1. Inspect the PR title, body, commits, and diff.
-            2. Rewrite the PR title to be clear, concise, and useful for reviewers.
-            3. Rewrite the PR body using this structure:
+            2. Rewrite the PR title following Angular commit convention:
+               `type(scope): lowercase subject` (e.g. `feat(ball): add multi-ball`).
+               Keep under 72 characters.
+            3. Rewrite the PR body in the SAME language as the commits and existing
+               PR body (Chinese if commits are in Chinese, English otherwise).
+               Use this structure:
 
                ## Summary
-               - Briefly explain what changed.
+               - Briefly explain what changed and why.
 
                ## Changes
-               - List the main implementation changes.
+               - Group by feature/area, list the main implementation changes.
 
                ## Testing
-               - Describe tests, checks, or say "Not run" if no evidence is found.
+               - If GUT unit tests exist in the diff, mention test count and coverage.
+               - Otherwise say "Not run".
 
                ## Notes for Reviewers
-               - Mention risk areas, migration notes, or anything reviewers should focus on.
+               - Highlight risk areas, edge cases, or breaking changes.
+               - If none, omit this section.
 
             Rules:
+            - Base title and body strictly on the diff and commit messages.
+              Do not fabricate features or tests that don't exist.
             - Do not modify source code.
             - Do not create commits.
             - Do not open a new PR.
             - Do not post a normal review comment unless updating the title/body fails.
             - Actually update the current PR title and body using the GitHub API or gh CLI.
-            - Keep the title under 72 characters when possible.
             - Preserve important information from the existing PR body.
