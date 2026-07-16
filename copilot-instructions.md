@@ -72,6 +72,12 @@ Start-Process "C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.
 - Scene scripts go in `script/`, scene files in `scene/`, tests in `test/unit/`
 - Update `CHANGELOG.md` for notable changes
 
+## Git Merge Convention
+
+- **Always use `--merge` (not `--squash`)** when merging PRs.
+- Preserve the full commit history and the merge commit.
+- Example: `gh pr merge <N> --merge --delete-branch`
+
 ## Git Commit Convention (Angular)
 
 Follow the [Angular commit convention](https://github.com/angular/angular/blob/main/CONTRIBUTING.md#commit). Format:
