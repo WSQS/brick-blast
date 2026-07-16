@@ -256,8 +256,7 @@ func _apply_upgrade(id: int) -> void:
 func _start_next_round() -> void:
 	# Clear all balls, then respawn fresh
 	for b in balls:
-		if is_instance_valid(b):
-			b.queue_free()
+		b.queue_free()
 	balls.clear()
 	_spawn_ball()
 	_spawn_bricks()
