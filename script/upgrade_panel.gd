@@ -4,23 +4,30 @@ extends CanvasLayer
 signal upgrade_selected(upgrade: Upgrade)
 
 const CHOICE_COUNT: int = 3
+const BUTTON_MIN_SIZE: Vector2 = Vector2(280, 60)
 
 @onready var overlay: ColorRect = $Overlay
-@onready var buttons: Array[Button] = [
-	$Overlay/CenterContainer/VBoxContainer/Choice0,
-	$Overlay/CenterContainer/VBoxContainer/Choice1,
-	$Overlay/CenterContainer/VBoxContainer/Choice2,
-]
+@onready var vbox: VBoxContainer = $Overlay/CenterContainer/VBoxContainer
+
+var buttons: Array[Button] = []
 
 
 func _ready() -> void:
-	for i in buttons.size():
-		buttons[i].pressed.connect(_on_choice_pressed.bind(i))
+	_create_buttons()
 	_hide_panel()
 
 
+func _create_buttons() -> void:
+	for i in CHOICE_COUNT:
+		var btn: Button = Button.new()
+		btn.custom_minimum_size = BUTTON_MIN_SIZE
+		btn.pressed.connect(_on_choice_pressed.bind(i))
+		vbox.add_child(btn)
+		buttons.append(btn)
+
+
 func show_choices() -> void:
-	var choices: Array = Upgrade.random_choices(CHOICE_COUNT)
+	var choices: Array = Upgrade.random_choices(buttons.size())
 	for i in choices.size():
 		buttons[i].text = "%s\n%s" % [choices[i].display_name, choices[i].description]
 		buttons[i].set_meta("upgrade", choices[i])

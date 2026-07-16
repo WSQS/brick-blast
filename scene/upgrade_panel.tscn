@@ -28,15 +28,3 @@ alignment = 1
 [node name="Title" type="Label" parent="Overlay/CenterContainer/VBoxContainer"]
 horizontal_alignment = 1
 text = "Choose an Upgrade"
-
-[node name="Choice0" type="Button" parent="Overlay/CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(280, 60)
-text = "Choice 0"
-
-[node name="Choice1" type="Button" parent="Overlay/CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(280, 60)
-text = "Choice 1"
-
-[node name="Choice2" type="Button" parent="Overlay/CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(280, 60)
-text = "Choice 2"
