@@ -238,7 +238,7 @@ func _on_upgrade_selected(upgrade: Upgrade) -> void:
 	_start_next_round()
 
 
-func _apply_upgrade(id: int) -> void:
+func _apply_upgrade(id: Upgrade.Type) -> void:
 	match id:
 		Upgrade.Type.PADDLE_WIDE:
 			var shape: RectangleShape2D = paddle.get_node("CollisionShape2D").shape
