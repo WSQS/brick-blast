@@ -61,6 +61,7 @@ func _handle_walls() -> void:
 # Pure collision math — testable without physics engine
 # ---------------------------------------------------------------------------
 
+
 ## Returns [new_pos, new_vel] after wall collision.
 static func calc_wall_bounce(pos: Vector2, vel: Vector2, radius: float, playfield: Rect2) -> Array:
 	var new_pos := pos

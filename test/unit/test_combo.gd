@@ -15,6 +15,7 @@ func before_each() -> void:
 # Combo system (D011)
 # ---------------------------------------------------------------------------
 
+
 func test_combo_starts_at_zero() -> void:
 	assert_eq(main.combo, 0, "Combo should start at 0")
 
@@ -64,6 +65,7 @@ func test_score_scales_with_combo() -> void:
 # Star rating (D013)
 # ---------------------------------------------------------------------------
 
+
 func test_one_star_for_clearing() -> void:
 	main.max_combo = 5
 	main.lives_lost_this_level = 1
@@ -91,6 +93,7 @@ func test_two_stars_for_no_lives_lost_low_combo() -> void:
 # ---------------------------------------------------------------------------
 # Ball stick (D012)
 # ---------------------------------------------------------------------------
+
 
 func test_ball_starts_stuck() -> void:
 	assert_eq(main.state, main.State.READY, "Ball should be stuck (READY) at start")

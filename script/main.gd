@@ -70,7 +70,10 @@ func _input(event: InputEvent) -> void:
 	if state == State.GAME_OVER or state == State.ROUND_CLEAR:
 		return
 	if state == State.READY:
-		if event.is_action_pressed("ui_accept") or (event is InputEventMouseButton and event.pressed):
+		if (
+			event.is_action_pressed("ui_accept")
+			or (event is InputEventMouseButton and event.pressed)
+		):
 			_launch_ball()
 	if event.is_action_pressed("ui_cancel"):
 		_toggle_pause()
@@ -292,9 +295,6 @@ func _spawn_ball() -> void:
 	_connect_ball_signals(new_ball)
 	balls.append(new_ball)
 	new_ball.position = Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)
-
-
-
 
 
 func _update_hud() -> void:

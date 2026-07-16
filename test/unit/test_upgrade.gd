@@ -167,6 +167,7 @@ func test_win_full_flow_debug() -> void:
 # Piercing upgrade tests (D014)
 # ---------------------------------------------------------------------------
 
+
 func test_pierce_upgrade_adds_pierce_count() -> void:
 	var ball := _get_ball()
 	assert_eq(ball.pierce_count, 0, "Ball should start with 0 pierce")
@@ -174,15 +175,18 @@ func test_pierce_upgrade_adds_pierce_count() -> void:
 	main._sync_pierce_count(ball)
 	assert_eq(ball.pierce_count, 3, "Ball should have 3 pierce after upgrade")
 
+
 func test_pierce_upgrade_stacks() -> void:
 	var ball := _get_ball()
 	main.upgrades[Upgrade.Type.PIERCE] = 2
 	main._sync_pierce_count(ball)
 	assert_eq(ball.pierce_count, 6, "Pierce should stack to 6")
 
+
 func test_pierce_zero_means_normal_bounce() -> void:
 	var ball := _get_ball()
 	assert_eq(ball.pierce_count, 0, "No pierce by default")
+
 
 func test_pierce_resets_on_paddle_hit() -> void:
 	var ball := _get_ball()
@@ -194,6 +198,7 @@ func test_pierce_resets_on_paddle_hit() -> void:
 	main._on_paddle_hit(ball)
 	assert_eq(ball.pierce_count, 3, "Pierce should reset to full on paddle hit")
 
+
 func test_pierce_resets_on_paddle_hit_with_multiple_upgrades() -> void:
 	var ball := _get_ball()
 	main.upgrades[Upgrade.Type.PIERCE] = 2
@@ -201,6 +206,7 @@ func test_pierce_resets_on_paddle_hit_with_multiple_upgrades() -> void:
 	ball.pierce_count = 1
 	main._on_paddle_hit(ball)
 	assert_eq(ball.pierce_count, 6, "Pierce should reset to 6 (2 upgrades * 3)")
+
 
 func test_pierce_stays_zero_on_paddle_hit_without_upgrade() -> void:
 	var ball := _get_ball()
@@ -212,16 +218,19 @@ func test_pierce_stays_zero_on_paddle_hit_without_upgrade() -> void:
 # Multi-ball upgrade tests (D014)
 # ---------------------------------------------------------------------------
 
+
 func test_multi_ball_creates_extra_ball() -> void:
 	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	# 1 original + 1 from multi-ball = 2 total
 	assert_eq(main.balls.size(), 2, "Should have 2 balls (1 original + 1 extra)")
 
+
 func test_multi_ball_extra_is_valid_node() -> void:
 	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	assert_true(is_instance_valid(main.balls[1]), "Extra ball should be valid")
+
 
 func test_multi_ball_extra_has_velocity() -> void:
 	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
@@ -232,6 +241,7 @@ func test_multi_ball_extra_has_velocity() -> void:
 	if main.balls.size() > 1:
 		var extra: CharacterBody2D = main.balls[1]
 		assert_true(extra.velocity != Vector2.ZERO, "Extra ball should have velocity after launch")
+
 
 func test_start_next_round_clears_extra_balls() -> void:
 	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
@@ -255,12 +265,17 @@ func test_extra_ball_follows_paddle_while_stuck() -> void:
 	var expected_x: float = main.paddle.position.x
 	var ball0: CharacterBody2D = main.balls[0]
 	assert_eq(round(ball0.position.x), round(expected_x), "First ball follows paddle")
-	assert_eq(round(extra.position.x), round(expected_x), "Extra ball should also follow paddle while stuck")
+	assert_eq(
+		round(extra.position.x),
+		round(expected_x),
+		"Extra ball should also follow paddle while stuck"
+	)
 
 
 # ---------------------------------------------------------------------------
 # Bug reproduction tests
 # ---------------------------------------------------------------------------
+
 
 func test_multi_ball_not_destroyed_by_next_round() -> void:
 	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
@@ -275,12 +290,14 @@ func test_multi_ball_not_destroyed_by_next_round() -> void:
 # 3. Losing a ball doesn't reduce ball count next round
 # ---------------------------------------------------------------------------
 
+
 func test_multi_ball_persists_across_rounds() -> void:
 	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
 	assert_eq(main.balls.size(), 2, "Should have 2 balls in first round")
 	main._start_next_round()
 	assert_eq(main.balls.size(), 2, "Extra ball should persist across rounds")
+
 
 func test_multi_ball_persists_after_losing_extra_ball() -> void:
 	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
@@ -294,6 +311,7 @@ func test_multi_ball_persists_after_losing_extra_ball() -> void:
 	# Next round — extra ball should come back
 	main._start_next_round()
 	assert_eq(main.balls.size(), 2, "Extra ball should respawn next round")
+
 
 func test_ball_lost_does_not_cost_life_with_others_present() -> void:
 	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
@@ -379,8 +397,10 @@ func test_paddle_wide_has_max_limit() -> void:
 	for i in 10:
 		main._apply_upgrade(Upgrade.Type.PADDLE_WIDE)
 	var final_w: float = collision_shape.shape.size.x
-	assert_true(final_w <= main.playfield.size.x,
-		"Paddle width (%f) should not exceed screen width (%f)" % [final_w, main.playfield.size.x])
+	assert_true(
+		final_w <= main.playfield.size.x,
+		"Paddle width (%f) should not exceed screen width (%f)" % [final_w, main.playfield.size.x]
+	)
 
 
 func test_upgrade_panel_click_does_not_launch_ball() -> void:
@@ -389,13 +409,19 @@ func test_upgrade_panel_click_does_not_launch_ball() -> void:
 	main._on_brick_destroyed()
 	await wait_seconds(1.5)
 	# Panel is shown, state is ROUND_CLEAR
-	assert_eq(main.state, main.State.ROUND_CLEAR, "State should be ROUND_CLEAR while panel is shown")
+	assert_eq(
+		main.state, main.State.ROUND_CLEAR, "State should be ROUND_CLEAR while panel is shown"
+	)
 	# Simulate a mouse click (as if clicking a button)
 	var click := InputEventMouseButton.new()
 	click.button_index = MOUSE_BUTTON_LEFT
 	click.pressed = true
 	main._input(click)
-	assert_eq(main.state, main.State.ROUND_CLEAR, "State should still be ROUND_CLEAR — click must not launch ball")
+	assert_eq(
+		main.state,
+		main.State.ROUND_CLEAR,
+		"State should still be ROUND_CLEAR — click must not launch ball"
+	)
 
 
 # Helper
