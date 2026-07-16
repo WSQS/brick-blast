@@ -98,8 +98,10 @@ Start-Process "C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.
 ## Git Merge Convention
 
 - **Always use `--merge` (not `--squash`)** when merging PRs.
+- **Use `merge` (not `rebase`)** when resolving conflicts with the base branch.
 - Preserve the full commit history and the merge commit.
 - Example: `gh pr merge <N> --merge --delete-branch`
+- Example: `git merge origin/master` (not `git rebase`)
 
 ## Git Commit Convention (Angular)
 
