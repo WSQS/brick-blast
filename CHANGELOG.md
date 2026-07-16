@@ -4,6 +4,8 @@ All notable changes to brick-blast will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-07-16
+
 ### Added
 
 - State machine: `enum State { READY, PLAYING, PAUSED, ROUND_CLEAR, GAME_OVER }` replaces three independent bools (`game_over`, `paused`, `ball_stuck`), eliminating impossible state combinations
@@ -29,7 +31,7 @@ All notable changes to brick-blast will be documented in this file.
 - Extra balls follow paddle while stuck to it
 - New scene `scene/upgrade_panel.tscn`: upgrade selection UI
 - New scripts `script/upgrade.gd` (upgrade data model), `script/upgrade_panel.gd` (UI controller)
-- 75 unit tests (including 33 upgrade system tests)
+- 77 unit tests (including 33 upgrade system tests)
 
 ### Changed (code review refactoring)
 
