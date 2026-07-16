@@ -1,5 +1,19 @@
 # Agent Instructions
 
+## Critical: Git and Branch Rules
+
+**Do NOT run any git commands.** Do not create branches, switch branches, commit, or push.
+
+The opencode infrastructure automatically:
+1. Creates a working branch for you
+2. Commits your file changes
+3. Pushes the branch
+4. Opens a pull request
+
+If you switch branches yourself, opencode detects the mismatch and **skips PR creation entirely**. Your work will be lost.
+
+Just create and edit files. Let opencode handle the rest.
+
 ## Code Review Mode
 
 When asked to "review" a pull request (including bare `/oc` or `/oc review`), follow this structured review workflow using the GitHub MCP tools.
