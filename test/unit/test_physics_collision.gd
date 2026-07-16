@@ -54,6 +54,7 @@ func _move_until_collision(steps: int, step_vec: Vector2) -> KinematicCollision2
 # Ball-brick collision
 # ---------------------------------------------------------------------------
 
+
 func test_ball_destroys_brick_from_top() -> void:
 	brick.position = Vector2(200, 200)
 	ball.position = Vector2(200, 180)
@@ -91,6 +92,7 @@ func test_ball_bounces_off_brick_left_edge() -> void:
 # Ball-paddle collision
 # ---------------------------------------------------------------------------
 
+
 func test_ball_bounces_up_off_paddle_center() -> void:
 	paddle.position = Vector2(200, 600)
 	ball.position = Vector2(200, 580)
@@ -103,9 +105,13 @@ func test_ball_bounces_up_off_paddle_center() -> void:
 		var collider = col.get_collider()
 		assert_eq(collider, paddle, "Collider should be the paddle")
 		# Simulate the paddle bounce (angle-based, not normal-based)
-		var bounced: Vector2 = ball.bounce_off_paddle(ball.global_position, paddle.get_rect(), 320.0)
+		var bounced: Vector2 = ball.bounce_off_paddle(
+			ball.global_position, paddle.get_rect(), 320.0
+		)
 		assert_true(bounced.y < 0, "Should bounce up after center paddle hit")
-		assert_almost_eq(bounced.x, 0.0, 5.0, "Center hit should produce near-zero horizontal velocity")
+		assert_almost_eq(
+			bounced.x, 0.0, 5.0, "Center hit should produce near-zero horizontal velocity"
+		)
 
 
 func test_ball_bounces_right_off_paddle_right_edge() -> void:
@@ -117,7 +123,9 @@ func test_ball_bounces_right_off_paddle_right_edge() -> void:
 
 	assert_not_null(col, "Should detect collision with paddle")
 	if col:
-		var bounced: Vector2 = ball.bounce_off_paddle(ball.global_position, paddle.get_rect(), 320.0)
+		var bounced: Vector2 = ball.bounce_off_paddle(
+			ball.global_position, paddle.get_rect(), 320.0
+		)
 		assert_true(bounced.y < 0, "Should bounce up")
 		assert_true(bounced.x > 0, "Right-edge hit should push ball right")
 
@@ -127,6 +135,7 @@ func test_ball_bounces_right_off_paddle_right_edge() -> void:
 # These tests call ball._physics_process directly to verify the actual
 # game code bounces the ball, not just the math.
 # ---------------------------------------------------------------------------
+
 
 ## Drives ball._physics_process for N frames, stepping the physics server
 ## between each call so move_and_collide sees updated body positions.
@@ -146,9 +155,17 @@ func test_ball_bounces_up_after_hitting_brick_top() -> void:
 	var pos_before := ball.position.y
 	_simulate_physics_process(20, 1.0 / 60.0)
 
-	gut.p("Ball: pos_before_y=%s pos_after_y=%s velocity=%s" % [pos_before, ball.position.y, ball.velocity])
+	gut.p(
+		(
+			"Ball: pos_before_y=%s pos_after_y=%s velocity=%s"
+			% [pos_before, ball.position.y, ball.velocity]
+		)
+	)
 	# After hitting brick from top, ball should have bounced UP (negative y velocity)
-	assert_true(ball.velocity.y < 0, "Ball velocity.y should be negative (bounced up), got %s" % ball.velocity.y)
+	assert_true(
+		ball.velocity.y < 0,
+		"Ball velocity.y should be negative (bounced up), got %s" % ball.velocity.y
+	)
 	# Ball should have moved upward after bounce (position decreased after reaching brick)
 	assert_true(ball.position.y < pos_before + 20, "Ball should not be stuck at/past the brick")
 
@@ -161,8 +178,16 @@ func test_ball_bounces_left_after_hitting_brick_right_edge() -> void:
 	var pos_before := ball.position.x
 	_simulate_physics_process(20, 1.0 / 60.0)
 
-	gut.p("Ball: pos_before_x=%s pos_after_x=%s velocity=%s" % [pos_before, ball.position.x, ball.velocity])
-	assert_true(ball.velocity.x < 0, "Ball velocity.x should be negative (bounced left), got %s" % ball.velocity.x)
+	gut.p(
+		(
+			"Ball: pos_before_x=%s pos_after_x=%s velocity=%s"
+			% [pos_before, ball.position.x, ball.velocity]
+		)
+	)
+	assert_true(
+		ball.velocity.x < 0,
+		"Ball velocity.x should be negative (bounced left), got %s" % ball.velocity.x
+	)
 
 
 func test_ball_does_not_stick_to_brick() -> void:
@@ -173,12 +198,16 @@ func test_ball_does_not_stick_to_brick() -> void:
 	_simulate_physics_process(30, 1.0 / 60.0)
 
 	# Ball should be moving away from brick, not stuck at same position
-	assert_true(ball.velocity.length() > 100.0, "Ball should still be moving after bounce, velocity=%s" % ball.velocity)
+	assert_true(
+		ball.velocity.length() > 100.0,
+		"Ball should still be moving after bounce, velocity=%s" % ball.velocity
+	)
 
 
 # ---------------------------------------------------------------------------
 # Bug reproduction: groups lost at runtime (caused ball to not bounce)
 # ---------------------------------------------------------------------------
+
 
 func test_brick_has_brick_group_after_instantiation() -> void:
 	# .tscn groups don't persist through instantiate() + add_child().
@@ -189,7 +218,9 @@ func test_brick_has_brick_group_after_instantiation() -> void:
 	assert_false(b.is_in_group("brick"), "Brick should NOT have 'brick' group from .tscn alone")
 	# The fix: explicitly add to group (as main.gd _spawn_bricks does)
 	b.add_to_group("brick")
-	assert_true(b.is_in_group("brick"), "Brick should be in 'brick' group after explicit add_to_group")
+	assert_true(
+		b.is_in_group("brick"), "Brick should be in 'brick' group after explicit add_to_group"
+	)
 
 
 func test_brick_collision_handler_triggers_on_brick_group() -> void:
@@ -210,3 +241,104 @@ func test_brick_collision_handler_triggers_on_brick_group() -> void:
 	watch_signals(brick)
 	# If brick still exists, destroy was already called (queue_free deferred)
 	# The key assertion is that ball bounced, proving the group check worked
+
+
+# ---------------------------------------------------------------------------
+# Bug reproduction: ball stuck under paddle (paddle moved over ball)
+# ---------------------------------------------------------------------------
+
+
+## Reproduces: player slides paddle fast, paddle ends up above the ball.
+## Ball collides with paddle from below, but bounce_off_paddle always
+## returns upward velocity — ball gets stuck bouncing against paddle
+## underside forever.
+func test_ball_not_stuck_when_paddle_above_ball() -> void:
+	paddle.position = Vector2(200, 400)
+	# Ball is BELOW the paddle, moving upward
+	ball.position = Vector2(200, 420)
+	ball.launch(Vector2(0, -1))
+
+	_simulate_physics_process(20, 1.0 / 60.0)
+
+	# Ball should NOT be stuck — it should either pass through or bounce
+	# downward. The key: it must not have upward velocity from paddle bounce.
+	assert_false(
+		_hit_paddle_from_below(ball, paddle),
+		"Ball should not bounce upward when hit from below paddle"
+	)
+	# Ball should be moving away (downward or passed through), not stuck
+	assert_true(
+		ball.velocity.y >= 0 or ball.position.y > paddle.position.y,
+		(
+			"Ball should not be stuck under paddle, velocity=%s pos.y=%s"
+			% [ball.velocity, ball.position.y]
+		)
+	)
+
+
+## Checks if the ball has an upward velocity while below the paddle center
+## — the signature of the "stuck under paddle" bug.
+func _hit_paddle_from_below(b: CharacterBody2D, p: StaticBody2D) -> bool:
+	return b.velocity.y < 0 and b.position.y > p.position.y
+
+
+# ---------------------------------------------------------------------------
+# Bug reproduction: brick destroyed signal fires twice (multi-ball scenario)
+# ---------------------------------------------------------------------------
+
+
+## Reproduces: two balls hit the same brick in the same frame.
+## queue_free() is deferred, so the brick still exists when the second
+## ball calls destroy() — the destroyed signal fires twice.
+func test_brick_destroyed_signal_does_not_fire_twice() -> void:
+	brick.position = Vector2(200, 200)
+	if not brick.is_in_group("brick"):
+		brick.add_to_group("brick")
+
+	watch_signals(brick)
+
+	# Simulate two balls hitting the same brick in the same frame
+	brick.destroy()
+	brick.destroy()
+
+	var emit_count: int = get_signal_emit_count(brick, "destroyed")
+	assert_eq(emit_count, 1, "destroyed should fire only once, got %d" % emit_count)
+
+
+# ---------------------------------------------------------------------------
+# Bug reproduction: pierce ball loses distance when hitting a brick
+# ---------------------------------------------------------------------------
+
+
+## Reproduces: when pierce_count > 0, move_and_collide stops the ball at the
+## brick edge and discards the remaining movement distance. The ball
+## "stutters" through bricks instead of flowing smoothly.
+## Fix: add collision.get_remainder() to global_position on pierce.
+func test_pierce_ball_does_not_lose_distance() -> void:
+	brick.position = Vector2(200, 200)
+	if not brick.is_in_group("brick"):
+		brick.add_to_group("brick")
+
+	# Ball above brick, moving down, with pierce
+	ball.position = Vector2(200, 180)
+	ball.pierce_count = 5
+	ball.launch(Vector2(0, 1))
+	ball.speed = 320.0
+
+	var pos_before := ball.position.y
+	# One physics step — ball should pass through the brick
+	_simulate_physics_process(1, 1.0 / 60.0)
+
+	var expected_distance := 320.0 / 60.0
+	var actual_distance := ball.position.y - pos_before
+	# Ball should have traveled approximately the full frame distance
+	# (not stopped at the brick edge)
+	assert_almost_eq(
+		actual_distance,
+		expected_distance,
+		5.0,
+		(
+			"Pierce ball should travel full frame distance (%f), got %f"
+			% [expected_distance, actual_distance]
+		)
+	)

@@ -8,166 +8,178 @@ Newest and pending at the top.
 
 ## Pending Decisions
 
-### P002: 强化选择系统细节
-基于 Objectives 决策（D010），挑战条件系统（combo + 星级评价）已完成。
-下一步为强化选择系统（Outwit）。
-具体内容：强化池、稀有度、星级如何影响选择数量/质量。
-**Status**: 待实现。详见 [roadmap.md](roadmap.md) v0.1。
+### P002: Upgrade Selection System Details
+D014 established the single-level infinite mode direction. All 5 upgrades are implemented (wide paddle, slow ball, extra life, multi-ball, pierce).
+Remaining questions: rarity mechanism, how star rating affects choice quantity/quality.
+**Status**: Core gameplay complete, see [roadmap.md](roadmap.md) v0.1.
 
-### P003: 关卡数据格式
-- JSON 文件
+### P003: Level Data Format
+- JSON files
 - Godot Resource (.tres)
-- 二维数组/字符串
-**Status**: 需要先确定是否做闯关模式（取决于强化系统推进后是否需要多关卡）。
+- 2D array / string
+**Status**: Deferred. D014 established single-level infinite mode, so multi-level data format is not needed yet. Revisit when level evolution direction is decided (see roadmap.md).
 
 ---
 
 ## Resolved Decisions
 
-### D013: Outcome — 星级评价框架 (2026-07-14)
+### D014: Upgrade Selection System — Single-Level Infinite Mode (2026-07-14)
 
-**Context**: 当前为二元 win/lose，D010 决定了星级评价但未定标准。
+**Context**: The upgrade selection system needs a "next level" to be meaningful. Multi-level (P003) is undecided, but upgrade gameplay can be validated within a single level first.
+
+**Decision**: Single-level infinite mode — clear level → choose upgrade → restart same level with upgrade state. No difficulty scaling for now, first validate whether upgrades are fun.
+
+**Initial upgrades** (5):
+- Wide paddle (+50%), slow ball (-20%), extra life (+1), multi-ball (+1 ball), pierce (pass through bricks without bouncing, limited to N bricks)
+
+**Trigger**: 3-choice panel appears after each level clear.
+
+**Rationale**: Single-level upgrades bypass the P003 decision dependency, enabling quick validation of Outwit gameplay. Once confirmed fun, decide on multi-level / dynamic level direction.
+
+### D013: Outcome — Star Rating Framework (2026-07-14)
+
+**Context**: Current outcome is binary win/lose. D010 decided on star rating but didn't define criteria.
 **Decision**:
-- ⭐ 通关
-- ⭐⭐ 通关 + 最大 combo ≥ 阈值（初始 10，playtest 调整）
-- ⭐⭐⭐ 通关 + 不丢球
-**Rationale**: 星级 = combo 表现 + 完美度。具体数值不绑死，playtest 后调整。
+- ⭐ Clear level
+- ⭐⭐ Clear level + max combo ≥ threshold (initial: 10, adjust after playtest)
+- ⭐⭐⭐ Clear level + no lives lost
+**Rationale**: Stars = combo performance + perfection. Specific values not locked, adjust after playtest.
 
 ---
 
-### D012: Procedures — 球粘挡板 + 暂停，关卡过渡推迟 (2026-07-14)
+### D012: Procedures — Ball Sticks to Paddle + Pause, Level Transition Deferred (2026-07-14)
 
-**Context**: 当前球自动发射，玩家缺乏掌控感；无暂停功能；无关卡间过渡。
+**Context**: Ball auto-launches, player lacks control; no pause; no level transition.
 **Decisions**:
-1. 球粘挡板（做）：球贴在挡板上跟随移动，点击/空格发射。与 combo 系统配套——玩家可选择起始位置和发射时机，combo 归因于技能而非随机
-2. 暂停（做，最小化）：Esc 键暂停，显示 Pause + 继续按钮 + 菜单按钮。移��端手指离开自动暂停
-3. 关卡间过渡（推迟到 Phase 2）：等强化系统启动时再设计
-**Priority**: 球粘挡板 + combo 系统一起做；暂停顺手加；关卡过渡推迟
+1. Ball sticks to paddle (do): ball attaches to paddle and follows it, launch with click/Space. Pairs with combo system — player chooses starting position and launch timing, making combo skill-based rather than random
+2. Pause (do, minimal): Esc to pause, show Pause + Resume button + Menu button. Mobile auto-pause when finger leaves screen
+3. Level transition (defer to Phase 2): design when upgrade system starts
+**Priority**: Ball sticks + combo system together; pause added alongside; level transition deferred
 
 ---
 
-### D011: Resources — Combo 系统（方案 A：碰挡板重置） (2026-07-14)
+### D011: Resources — Combo System (Option A: Reset on Paddle Hit) (2026-07-14)
 
-**Context**: 当前资源只有 Lives 和无消费出口的 Score。Objectives 决策（D010）要求引入连击系统驱动星级评价。
+**Context**: Current resources are only Lives and Score (with no spending outlet). Objectives decision (D010) requires a combo system to drive star rating.
 **Options considered**:
-- A. 砖块连击：每打一块砖 combo+1，碰挡板重置
-- B. 无失误连击：每打一块砖 combo+1，仅失球重置
-- C. 连续命中：每打一块砖 combo+1，碰墙/挡板不碰砖也重置
-**Decision**: 方案 A。
+- A. Brick combo: +1 per brick hit, reset on paddle hit
+- B. No-miss combo: +1 per brick hit, reset only on ball loss
+- C. Consecutive hits: +1 per brick hit, reset on wall/paddle without brick hit
+**Decision**: Option A.
 **Rules**:
-- 球碰砖块 → combo += 1
-- 球碰挡板 → combo = 0（接球 = 一轮结束）
-- 球碰墙 → 不影响 combo
-- 失球 → combo = 0
+- Ball hits brick → combo += 1
+- Ball hits paddle → combo = 0 (catching = end of round)
+- Ball hits wall → combo unaffected
+- Ball lost → combo = 0
 **Rationale**:
-- A 在接球环节引入 Dilemma："冒险多打一块砖 vs 安全接球"，同时解决 Conflict 缺口
-- B 太宽松，combo 没有张力
-- C 太严苛，弹墙是正常玩法，惩罚太随意；Breakout 71 用 C 但有大量道具补偿
-- combo 越高 → 分数倍率越高 → 星级越好 → 后续强化选择越多
+- A introduces a Dilemma at the catch moment: "risk one more brick vs safe catch", also resolves Conflict gap
+- B too lenient, combo lacks tension
+- C too harsh, wall bouncing is normal gameplay, punishment feels arbitrary; Breakout 71 uses C but has many power-ups to compensate
+- Higher combo → higher score multiplier → better stars → more upgrade choices
 
 ---
 
-### D010: Objectives — Construction + Forbidden Act，后续叠加 Outwit (2026-07-14)
+### D010: Objectives — Construction + Forbidden Act, Outwit Layered Later (2026-07-14)
 
-**Context**: 游戏目标当前是纯 Construction（清砖块），二元 win/lose，缺乏深度。需要确定副目标方向。
+**Context**: Game objective is pure Construction (clear bricks), binary win/lose, lacks depth. Need to determine secondary objective direction.
 **Options considered**:
-- A. Capture（金币/道具掉落）
-- B. Outwit（强化选择）
-- C. Forbidden Act（挑战条件 + 星级评价）
-**Decision**: 先做 C，在 C 的基础上叠加 B。
+- A. Capture (coins / power-up drops)
+- B. Outwit (upgrade selection)
+- C. Forbidden Act (challenge conditions + star rating)
+**Decision**: Do C first, then layer B on top.
 **Rationale**:
-- C 是基础：将二元 win/lose 变成分层评价（星级），为后续所有系统提供"表现好坏"的度量
-- C → B 形成正循环：星级越高 → 强化选择越多/越好 → 下一关更强 → 继续追求高星
-- 挑战条件以连击为主，但不绑死，后续可调整（限时、不丢球等）
-- 参考 Breakout 71 的"表现好 → 更多选择"机制
+- C is foundational: turns binary win/lose into tiered rating (stars), providing a "performance metric" for all subsequent systems
+- C → B creates a positive loop: higher stars → more/better upgrades → stronger next level → continue pursuing high stars
+- Challenge conditions primarily combo-based but not locked, can adjust later (time limit, no lives lost, etc.)
+- References Breakout 71's "perform well → more choices" mechanic
 **Phases**:
-1. Phase 1: 连击系统 + 星级评价（Forbidden Act）
-2. Phase 2: 关卡间强化选择（Outwit），星级影响选择数量
+1. Phase 1: Combo system + star rating (Forbidden Act)
+2. Phase 2: Inter-level upgrade selection (Outwit), stars affect choice quantity
 
-### D009: Git 提交规范 — Angular Convention (2026-07-14)
+### D009: Git Commit Convention — Angular Convention (2026-07-14)
 
-**Context**: 提交历史需要规范化。
-**Decision**: 使用 Angular commit convention（type(scope): subject）。
+**Context**: Commit history needs standardization.
+**Decision**: Use Angular commit convention (type(scope): subject).
 **Types**: feat / fix / refactor / test / docs / style / chore
-**Rationale**: 行业标准，结构清晰，便于追踪变更类型。
+**Rationale**: Industry standard, clear structure, easy to track change types.
 
 ---
 
-### D008: 暂不添加大量设计文档 (2026-07-14)
+### D008: No Large-Scale Design Docs for Now (2026-07-14)
 
-**Context**: 检索结果建议建立完整的 docs/ 目录结构（vision.md, pillars.md, core-loop.md 等）。
-**Decision**: 不一次性创建所有文档，按需添加。
-**Rationale**: 避免过早建设。当前已有 copilot-instructions.md 和 CHANGELOG.md，后续在必要节点添加对应文档。
-
----
-
-### D007: 设计方法论 — Playcentric Design + Formal Elements (2026-07-14)
-
-**Context**: 作为程序员转游戏设计，需要系统化的设计方法。
-**Decision**: 采用 Fullerton《Game Design Workshop》的 Playcentric Design 作为主流程，用 Formal Elements (Ch 3) 框架定期审视设计。
-**Rationale**: Playcentric 强调"设定体验目标 → 原型 → 测试 → 迭代"，与当前小步快跑开发方式一致。
-**Status**: 已用 Formal Elements 分析当前游戏，识别出三个薄弱点：
-1. Resources 过于稀少（只有 Lives 和 Score，Score 无消费出口）
-2. Conflict/Dilemmas 不足（玩家没有需要权衡的决策）
-3. Procedures 缺少过渡（球自动发射，无掌控感）
+**Context**: Search results suggested building a full docs/ directory structure (vision.md, pillars.md, core-loop.md, etc.).
+**Decision**: Don't create all docs at once, add as needed.
+**Rationale**: Avoid premature documentation. Currently have copilot-instructions.md and CHANGELOG.md, add corresponding docs at necessary milestones.
 
 ---
 
-### D006: 游戏入口 — 主菜单 (2026-07-14)
+### D007: Design Methodology — Playcentric Design + Formal Elements (2026-07-14)
 
-**Context**: 游��缺少完整的循环（打开就直接进游戏，打完只能 Restart）。
-**Decision**: 添加主菜单场景 (menu.tscn) 作为游戏入口，包含 Start / Quit 按钮。
-**Rationale**: 建立完整循环 Menu → Playing → Game Over/Win → Menu/Restart。为后续多模式选择做铺垫。
+**Context**: As a programmer transitioning to game design, need a systematic design approach.
+**Decision**: Adopt Fullerton's *Game Design Workshop* Playcentric Design as the main process, use Formal Elements (Ch 3) framework for periodic design review.
+**Rationale**: Playcentric emphasizes "set experience goals → prototype → test → iterate", aligning with the current small-step iterative development approach.
+**Status**: Used Formal Elements to analyze the current game, identified three weak points:
+1. Resources too sparse (only Lives and Score, Score has no spending outlet)
+2. Insufficient Conflict/Dilemmas (player has no decisions to weigh)
+3. Procedures lack transitions (ball auto-launches, no sense of control)
 
 ---
 
-### D005: 测试策略 — GUT + 纯函数 + 物理集成 (2026-07-14)
+### D006: Game Entry — Main Menu (2026-07-14)
 
-**Context**: 需要验证碰撞逻辑正确性。
+**Context**: Game lacks a complete loop (opens directly into game, can only Restart after finishing).
+**Decision**: Add main menu scene (menu.tscn) as game entry, with Start / Quit buttons.
+**Rationale**: Establishes complete loop Menu → Playing → Game Over/Win → Menu/Restart. Prepares for future multi-mode selection.
+
+---
+
+### D005: Testing Strategy — GUT + Pure Functions + Physics Integration (2026-07-14)
+
+**Context**: Need to verify collision logic correctness.
 **Decision**:
-- 纯函数测试：墙壁/挡板/重叠检测的数学逻辑（不依赖物理引擎）
-- 物理集成测试：force_update_transform + move_and_collide 验证真实碰撞行为
-- Bug fix workflow：先写失败测试复现 bug，再修复
-**Rationale**: 两层测试覆盖——数学正确性 + 物理引擎交互正确性。
-**Key findings**: GUT 不步进 PhysicsServer2D；.tscn groups 在 instantiate() 后丢失；queue_free 是延迟的。
+- Pure function tests: wall/paddle/overlap detection math logic (no physics engine dependency)
+- Physics integration tests: force_update_transform + move_and_collide to verify real collision behavior
+- Bug fix workflow: write failing test to reproduce bug first, then fix
+**Rationale**: Two-layer test coverage — math correctness + physics engine interaction correctness.
+**Key findings**: GUT doesn't step PhysicsServer2D; .tscn groups lost after instantiate(); queue_free is deferred.
 
 ---
 
-### D004: 碰撞数学提取为纯静态方法 (2026-07-14)
+### D004: Collision Math Extracted as Pure Static Methods (2026-07-14)
 
-**Context**: 需要对碰撞逻辑进行单元测试，但物理引擎行为在 GUT 测试环境中难以驱动。
-**Decision**: 将碰撞数学（墙壁反弹、砖块反弹、挡板角度、圆-矩形重叠）提取为 ball.gd 的 static func。
-**Rationale**: 纯函数不依赖物理引擎，可以直接单元测试。物理集成测试单独验证 move_and_collide 行为。
+**Context**: Need to unit test collision logic, but physics engine behavior is hard to drive in GUT test environment.
+**Decision**: Extract collision math (wall bounce, brick bounce, paddle angle, circle-rect overlap) as static funcs on ball.gd.
+**Rationale**: Pure functions don't depend on physics engine, can be directly unit tested. Physics integration tests separately verify move_and_collide behavior.
 
 ---
 
-### D003: 物理方案 — CharacterBody2D + move_and_collide (2026-07-14)
+### D003: Physics Approach — CharacterBody2D + move_and_collide (2026-07-14)
 
-**Context**: Ball 最初使用 Area2D + 手动 position 移动。Area2D 的碰撞检测（get_overlapping_areas / intersect_shape）由 PhysicsServer2D 在物理步进开始时更新，永远滞后一帧。高速球穿砖。
+**Context**: Ball originally used Area2D + manual position movement. Area2D collision detection (get_overlapping_areas / intersect_shape) is updated by PhysicsServer2D at physics step start, always one frame behind. High-speed ball tunneled through bricks.
 **Options considered**:
-1. Area2D + 手动碰撞检测 — 滞后一帧，穿砖
-2. RigidBody2D — 物理引擎驱动，反弹角度不可控
-3. CharacterBody2D + move_and_collide — CCD，碰撞即时返回，速度可控
-**Decision**: CharacterBody2D。
+1. Area2D + manual collision detection — one frame behind, tunneling
+2. RigidBody2D — physics engine driven, bounce angle uncontrollable
+3. CharacterBody2D + move_and_collide — CCD, collision returned immediately, velocity controllable
+**Decision**: CharacterBody2D.
 **Rationale**:
-- 打砖块反弹是规则驱动的，不是物理模拟
-- 挡板角度反弹需要精确控制（命中位置 → 出射角）
-- 后续道具（穿透、粘球、弧线）更容易实现
-- move_and_collide 自带 CCD，不会穿模
-- 参考项目 Brick Blast 使用自建物理（等价路线）
+- Breakout bouncing is rule-driven, not physics simulation
+- Paddle angle reflection needs precise control (hit position → exit angle)
+- Future power-ups (pierce, sticky ball, curve) easier to implement
+- move_and_collide has built-in CCD, no tunneling
+- Reference project Brick Blast uses custom physics (equivalent approach)
 
 ---
 
-### D002: 引擎选择 — Godot 4.7 (2026-07-14)
+### D002: Engine Choice — Godot 4.7 (2026-07-14)
 
-**Context**: 需要选择游戏引擎，目标平台 Windows + Android + Web。
-**Decision**: 使用 Godot 4.7（Steam 版），GL Compatibility 渲染器。
-**Rationale**: 已有 godot-little-games 的 Godot 经验；GL Compatibility 支持全平台；免费开源。
+**Context**: Need to choose a game engine, target platforms Windows + Android + Web.
+**Decision**: Use Godot 4.7 (Steam version), GL Compatibility renderer.
+**Rationale**: Existing Godot experience from godot-little-games; GL Compatibility supports all platforms; free and open source.
 
 ---
 
-### D001: 项目定位 — 真正的游戏项目 (2026-07-14)
+### D001: Project Positioning — A Real Game Project (2026-07-14)
 
-**Context**: 区别于 godot-little-games（玩法实验室），创建一个有完整玩法循环的游戏。
-**Decision**: 以打砖块为主题，参考 Brick Blast (Kotlin/Android, F-Droid)。
-**Rationale**: 打砖块机制简单清晰，适合作为第一个完整游戏项目。核心循环明确：控制挡板 → 反弹球 → 消除砖块。
+**Context**: Distinct from godot-little-games (a gameplay lab), create a game with a complete gameplay loop.
+**Decision**: Brick-breaker theme, referencing Brick Blast (Kotlin/Android, F-Droid).
+**Rationale**: Brick-breaker mechanics are simple and clear, suitable as a first complete game project. Core loop is clear: control paddle → bounce ball → destroy bricks.

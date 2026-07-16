@@ -1,115 +1,143 @@
 # Roadmap
 
-版本规划与功能路线。按版本号为主线，主题为辅。不估时间，只列已确定部分。
+Version planning and feature roadmap. Organized by version number, with themes as secondary. No time estimates, only confirmed items.
 
 ---
 
 ## v0.0.1 ✅ (2026-07-14)
 
-**主题：MVP — 可玩的核心循环**
+**Theme: MVP — Playable Core Loop**
 
-### 玩法
+### Gameplay
 
-- 核心循环：发球 → 弹球 → 打砖块 → 通关/失败 → 重开/返回菜单
-- Combo 系统 (D011)：连续击破累积 combo，碰挡板/失球重置，分数随 combo 缩放
-- 球粘挡板 (D012)：球开局粘在挡板上，按 Space/点击发射
-- 星级评价 (D013)：⭐ 通关 · ⭐⭐ combo≥10 · ⭐⭐⭐ 不丢球
-- 暂停 (D012)：Esc 暂停/恢复，自定义 `paused` 变量（不用 `get_tree().paused`）
+- Core loop: launch → bounce → break bricks → clear/fail → restart/return to menu
+- Combo system (D011): consecutive breaks accumulate combo, reset on paddle hit / ball loss, score scales with combo
+- Ball sticks to paddle (D012): ball starts stuck to paddle, launch with Space/click
+- Star rating (D013): ⭐ clear · ⭐⭐ combo≥10 · ⭐⭐⭐ no lives lost
+- Pause (D012): Esc to pause/resume, custom `paused` variable (not `get_tree().paused`)
 
-### 工程
+### Engineering
 
-- GUT v9.6.1 测试框架，40 个单元测试
-- CharacterBody2D + move_and_collide（CCD 防穿砖）
-- 主菜单 → 游戏 → 结束 完整场景循环
-- CI/CD：GitHub Actions 自动构建 Windows/Linux/Android/Web，tag 触发 draft release
-- 40/40 测试通过
-
----
-
-## v0.1 — 强化选择系统 (Outwit)
-
-**主题：Roguelike 式成长循环（D010 规划的第二步）**
-
-**设计意图** (D010)：星级评价 → 强化选择 → 更强 → 继续追求高星 = 正循环
-
-### 功能范围
-
-- 通关后弹出 3 选 1 强化选择面板
-- 强化效果影响下一关的初始状态
-- 星级影响强化选项的数量/质量（D010 决策）
-
-### 候选强化（需 playtest 验证）
-
-| 强化 | 效果 | 类型 |
-|------|------|------|
-| 多球 | 额外发射 1 个球 | 进攻 |
-| 穿透 | 球穿过砖块不反弹（限 N 块） | 进攻 |
-| 挡板加宽 | 挡板宽度 +50% | 防御 |
-| 减速 | 球速 -20% | 防御 |
-| 额外生命 | +1 life | 防御 |
-
-### 待决策
-
-- **P002**：强化的具体池子、稀有度、星级如何影响选择
-- 强化是持久（整局有效）还是临时（仅下一关）？
-- 是否需要多关卡才能体现强化价值？（依赖 P003）
-
-### 前置条件
-
-- 需要先确定是否做多关卡（P003），否则强化选择无"下一关"可应用
+- GUT v9.6.1 test framework, 40 unit tests
+- CharacterBody2D + move_and_collide (CCD prevents tunneling)
+- Full scene loop: main menu → game → end
+- CI/CD: GitHub Actions auto-build Windows/Linux/Android/Web, tag triggers draft release
+- 40/40 tests passing (total now 75, see v0.1)
 
 ---
 
-## 待定领域
+## v0.1 — Upgrade Selection System (Outwit) 🔧 In Progress
 
-以下方向尚未决策，列出供后续讨论：
+**Theme: Roguelike-style growth loop (second step of D010 plan)**
 
-### 多关卡 (P003)
+**Design intent** (D010): star rating → upgrade selection → stronger → continue pursuing high stars = positive loop
 
-- **问题**：当前只有一关，强化选择需要"下一关"才有意义
-- **待定**：关卡数据格式（JSON / .tres / 数组）
-- **依赖**：强化系统（v0.1）的推进会暴露实际需求
+### Completed
 
-### 特殊砖块
+- ✅ Upgrade selection UI (`scene/upgrade_panel.tscn`)
+- ✅ Upgrade data model (`script/upgrade.gd`, 5 types)
+- ✅ Clear level → show stars → pop up 3-choice → apply upgrade → restart same level
+- ✅ All 5 upgrades implemented: wide paddle, slow ball, extra life, multi-ball, pierce
+- ✅ Multi-ball rules: extra balls don't collide with each other; no life cost while balls remain
+- ✅ 33 upgrade system unit tests (75 total)
 
-- 候选：硬砖（多击）、爆炸砖（连锁）、道具砖（掉落强化）
-- **状态**：未决策，等强化系统确定后讨论
+### TODO
 
-### 音效与美术
+- [ ] Star rating affects upgrade choice quantity/quality
 
-- 当前无音效、无美术资源（纯色块）
-- **状态**：v1.0 前必须完成，但优先级在玩法之后
+### Candidate Upgrades (need playtest validation)
+
+| Upgrade | Effect | Type |
+|---------|--------|------|
+| Multi-ball | Spawn 1 extra ball | Offense |
+| Pierce | Ball passes through bricks without bouncing (limit N) | Offense |
+| Wide paddle | Paddle width +50% | Defense |
+| Slow ball | Ball speed -20% | Defense |
+| Extra life | +1 life | Defense |
+
+### Pending Decisions
+
+- **P002**: Specific upgrade pool, rarity, how stars affect choices
+- All upgrades are permanent (last entire run), no longer a pending decision
+- Level direction: static multi-level vs dynamic levels (see "Level Evolution Direction" below)
+
+### Level Evolution Direction
+
+v0.1 doesn't commit to a single level approach — both paths can serve as upgrade carriers:
+
+| Direction | Description | Upgrade Fit |
+|-----------|-------------|-------------|
+| **Static multi-level** | Fixed layouts, switch to next level after clearing | Upgrades affect next level's starting state |
+| **Dynamic levels** | Bricks change during play (fall/regenerate/advance/split) | Upgrades provide countermeasures, each run is different → choices more meaningful |
+
+The two are not mutually exclusive and can be combined. Need playtest to determine which direction is more fun.
+
+Dynamic level candidate mechanics:
+
+| Mechanic | Effect | Urgency Source |
+|----------|--------|----------------|
+| Brick descent | Entire grid shifts down one row every N seconds | Reaching bottom = failure |
+| Brick regeneration | Destroyed bricks respawn on timer | Must clear quickly |
+| Brick advance | New bricks continuously added from top | Never fully clearable, pursue high score |
+| Brick split | Destroying one creates two smaller ones | Board becomes increasingly complex |
+
+### Prerequisites
+
+- No hard prerequisites — single-level upgrades (infinite mode) can validate gameplay first
 
 ---
 
-## 架构债务
+## Open Areas
 
-记录已知的技术债，不绑定版本，在相关功能开发时顺手解决：
+The following directions have not been decided yet, listed for future discussion:
 
-### main.gd God Object
+### Multi-Level (P003)
 
-- **问题**：main.gd 承担 7 个职责（砖块生成、球复位、输入、暂停、分数、胜负、HUD）
-- **建议**：在强化系统开发时重构——新增的 UI 逻辑会倒逼拆分
-- **关键文件**：[script/main.gd](../script/main.gd)
+- **Problem**: Currently only one level, upgrade selection needs a "next level" to be meaningful
+- **TBD**: Level data format (JSON / .tres / array)
+- **Dependency**: Upgrade system (v0.1) progress will expose actual needs
 
-### Ball 职责越界
+### Special Bricks
 
-- **问题**：ball.gd 的 `_physics_process` 包含游戏规则（砖块销毁、combo 重置、球加速）
-- **理想**：ball 只管物理反弹，发信号给 main 处理规则
-- **关键文件**：[script/ball.gd](../script/ball.gd) — `_physics_process` 第 37-48 行
+- Candidates: hard bricks (multi-hit), explosive bricks (chain reaction), power-up bricks (drop upgrades)
+- **Status**: Undecided, wait for upgrade system to settle first
 
-### 墙壁碰撞机制不统一
+### Audio & Art
 
-- **问题**：墙壁用手动 bounds 检查，砖块/挡板用物理引擎
-- **优先级**：低，当前能正常工作
+- Currently no audio, no art assets (solid color blocks)
+- **Status**: Must be done before v1.0, but priority after gameplay
 
 ---
 
-## 待决策清单
+## Architecture Debt
 
-| 编号 | 主题 | 状态 | 说明 |
-|------|------|------|------|
-| P002 | 强化选择细节 | 待定 | 强化池、稀有度、星级影响 |
-| P003 | 关卡数据格式 | 待定 | JSON / .tres / 数组，依赖多关卡决策 |
-| - | 特殊砖块 | 未讨论 | 等强化系统确定 |
-| - | 音效美术 | 未讨论 | v1.0 前必须 |
+Known tech debt, not tied to versions, resolved opportunistically during related feature development:
+
+### main.gd God Object — Partially Addressed
+
+- **Problem**: main.gd handles many responsibilities (brick spawning, ball spawning, input, pause, score, win/lose, HUD)
+- **Progress**: State enum replaced 3 independent bools (`game_over`, `paused`, `ball_stuck`); ball decoupled via signals; ball spawning unified to dynamic creation
+- **Remaining**: main.gd still owns multiple responsibilities; further decomposition possible
+- **Key file**: [script/main.gd](../script/main.gd)
+
+### Ball Responsibility Overreach — ✅ Resolved
+
+- **Problem**: ball.gd's `_physics_process` contained game rules (brick destruction, combo reset, ball acceleration) and used `parent.call()` to invoke main's methods
+- **Resolution**: Ball now emits `hit_paddle` and `lost` signals; main connects them. Ball no longer knows about main's game rules.
+- **Key file**: [script/ball.gd](../script/ball.gd)
+
+### Inconsistent Wall Collision Mechanism
+
+- **Problem**: Walls use manual bounds checking, bricks/paddle use physics engine
+- **Priority**: Low, currently works fine
+
+---
+
+## Pending Decision List
+
+| ID | Topic | Status | Notes |
+|----|-------|--------|-------|
+| P002 | Upgrade selection details | Pending | Upgrade pool, rarity, star influence |
+| P003 | Level data format | Pending | JSON / .tres / array, depends on multi-level decision |
+| - | Special bricks | Undiscussed | Wait for upgrade system to settle |
+| - | Audio & art | Undiscussed | Must before v1.0 |

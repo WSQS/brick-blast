@@ -6,49 +6,55 @@ extends CharacterBody2D
 const SPEED: float = 320.0
 const MAX_SPEED: float = 550.0
 const RADIUS: float = 8.0
+const LOSE_MARGIN: float = 50.0
 
-var _speed: float = SPEED
+var speed: float = SPEED
+var pierce_count: int = 0
 
-# Playfield bounds (set by main on ready)
 var bounds: Rect2 = Rect2(0, 0, 480, 720)
+
+## Emitted when the ball hits the paddle. Parameter: this ball.
+signal hit_paddle(ball: CharacterBody2D)
+## Emitted when the ball falls below the playfield. Parameter: this ball.
+signal lost(ball: CharacterBody2D)
 
 
 func launch(direction: Vector2) -> void:
-	velocity = direction.normalized() * _speed
+	velocity = direction.normalized() * speed
 
 
 func _physics_process(delta: float) -> void:
-	var parent := get_parent()
-	# Skip physics when ball is stuck to paddle (D012)
-	if parent and parent.get("ball_stuck") == true:
-		return
-	# Skip physics when paused (D012)
-	if parent and parent.get("paused") == true:
+	var parent: Node = get_parent()
+	# If parent implements is_playing(), only move when game is actively playing.
+	# Otherwise (e.g. standalone in tests), always process.
+	if parent != null and parent.has_method("is_playing") and not parent.is_playing():
 		return
 
 	var collision := move_and_collide(velocity * delta)
-
-	# Wall collisions (left / right / top) via bounds check
 	_handle_walls()
 
 	if collision:
 		var collider := collision.get_collider()
-		if collider:
-			if collider.is_in_group("brick"):
+		if collider and collider.is_in_group("brick"):
+			if pierce_count > 0:
+				pierce_count -= 1
+				# Move ball through the brick by the remaining distance
+				global_position += collision.get_remainder()
+			else:
 				velocity = velocity.bounce(collision.get_normal())
-				collider.destroy()
-			elif parent and collider == parent.paddle:
-				velocity = bounce_off_paddle(global_position, collider.get_rect(), _speed)
-				_speed = minf(_speed * 1.03, MAX_SPEED)
-				velocity = velocity.normalized() * _speed
-				# Notify main to reset combo (D011)
-				if parent and parent.has_method("_on_paddle_hit"):
-					parent._on_paddle_hit()
+			collider.destroy()
+		elif collider == parent.get("paddle"):
+			if global_position.y < collider.global_position.y:
+				# Ball hits paddle from above — normal paddle bounce
+				velocity = bounce_off_paddle(global_position, collider.get_rect(), speed)
+				hit_paddle.emit(self)
+			else:
+				# Ball is below paddle (paddle slid over it) — bounce downward
+				# to prevent the ball from getting stuck against the paddle underside
+				velocity.y = absf(velocity.y)
 
-	# Fell below paddle — notify main
-	if global_position.y > bounds.end.y + 50:
-		if parent and parent.has_method("_on_ball_lost"):
-			parent._on_ball_lost()
+	if global_position.y > bounds.end.y + LOSE_MARGIN:
+		lost.emit(self)
 
 
 func _handle_walls() -> void:
@@ -60,6 +66,7 @@ func _handle_walls() -> void:
 # ---------------------------------------------------------------------------
 # Pure collision math — testable without physics engine
 # ---------------------------------------------------------------------------
+
 
 ## Returns [new_pos, new_vel] after wall collision.
 static func calc_wall_bounce(pos: Vector2, vel: Vector2, radius: float, playfield: Rect2) -> Array:

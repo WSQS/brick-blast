@@ -11,45 +11,54 @@ func before_each() -> void:
 	add_child_autofree(main)
 
 
+func _press_esc() -> void:
+	var event := InputEventKey.new()
+	event.keycode = KEY_ESCAPE
+	event.pressed = true
+	main._input(event)
+
+
 func test_pause_toggles_paused_flag() -> void:
-	assert_false(main.paused, "Should start unpaused")
-	main._toggle_pause()
-	assert_true(main.paused, "Should be paused after toggle")
-	main._toggle_pause()
-	assert_false(main.paused, "Should be unpaused after second toggle")
+	assert_eq(main.state, main.State.READY, "Should start in READY state")
+	_press_esc()
+	assert_eq(main.state, main.State.PAUSED, "Should be paused after toggle")
+	_press_esc()
+	assert_eq(main.state, main.State.READY, "Should be READY again after second toggle")
 
 
 func test_pause_sets_scene_tree_paused() -> void:
-	main._toggle_pause()
-	assert_true(main.paused, "paused flag should be true")
+	_press_esc()
+	assert_eq(main.state, main.State.PAUSED, "state should be PAUSED")
 	assert_false(get_tree().paused, "SceneTree.paused should NOT be used")
-	main._toggle_pause()
-	assert_false(main.paused, "paused flag should be false")
+	_press_esc()
+	assert_ne(main.state, main.State.PAUSED, "state should not be PAUSED")
 
 
 func test_pause_does_not_work_after_game_over() -> void:
 	# Force game over
 	main.lives = 1
-	main._on_ball_lost()  # lives -> 0, triggers _lose()
-	assert_true(main.game_over, "Should be game over")
+	main._on_ball_lost(main.balls[0])  # lives -> 0, triggers _game_over()
+	assert_eq(main.state, main.State.GAME_OVER, "Should be game over")
 
 	# Simulate Esc press during game over — _input should return early
 	var event := InputEventKey.new()
 	event.keycode = KEY_ESCAPE
 	event.pressed = true
 	main._input(event)
-	assert_false(main.paused, "Should not be able to pause after game over")
+	assert_eq(main.state, main.State.GAME_OVER, "Should not be able to pause after game over")
 
 
 func test_launch_does_not_work_while_paused() -> void:
-	# Ball is stuck at start, pause the game
-	main._toggle_pause()
-	assert_true(main.paused, "Should be paused")
+	# Ball is stuck at start (READY), pause the game
+	_press_esc()
+	assert_eq(main.state, main.State.PAUSED, "Should be paused")
 
-	# Simulate click/space while paused — ball should stay stuck
-	# _input doesn't check paused for launch, but ball._physics_process
-	# checks ball_stuck which stays true
-	assert_true(main.ball_stuck, "Ball should still be stuck while paused")
+	# Simulate Space press while paused — state should stay PAUSED
+	var event := InputEventAction.new()
+	event.action = "ui_accept"
+	event.pressed = true
+	main._input(event)
+	assert_eq(main.state, main.State.PAUSED, "Launch input should be ignored while paused")
 
 
 func test_paddle_does_not_move_while_paused() -> void:
@@ -57,8 +66,8 @@ func test_paddle_does_not_move_while_paused() -> void:
 	var x_before: float = paddle.position.x
 
 	# Pause the game
-	main._toggle_pause()
-	assert_true(main.paused, "Should be paused")
+	_press_esc()
+	assert_eq(main.state, main.State.PAUSED, "Should be paused")
 
 	# Simulate movement by calling _physics_process directly
 	paddle._physics_process(0.016)

@@ -8,6 +8,7 @@ A classic brick-breaker game built with [Godot 4.7](https://godotengine.org).
 - **Combo system**: consecutive brick destructions build combo, scaling score
 - **Ball stick**: ball waits on paddle until launch (Space / click)
 - **Star rating**: 1-3 stars based on combo performance and lives lost
+- **Upgrade system**: choose 1 of 3 upgrades after clearing all bricks (5 types: wide paddle, slow ball, extra life, multi-ball, pierce)
 - **Pause / resume**: Esc to toggle
 - **Main menu**: title screen with Start / Quit
 
@@ -53,6 +54,18 @@ brick-blast/
 └── CHANGELOG.md    # Change history
 ```
 
+## Code Formatting
+
+GDScript files are auto-formatted with [gdformat](https://github.com/Scony/godot-gdscript-toolkit) via a pre-commit hook.
+
+```bash
+# First-time setup (after cloning)
+sh hooks/install.sh
+
+# Format manually anytime
+gdformat script/ test/unit/
+```
+
 ## Running Tests
 
 ```bash
@@ -71,7 +84,7 @@ cmd /c '"C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.window
 - [docs/decisions.md](docs/decisions.md) - architecture decision records
 - [docs/roadmap.md](docs/roadmap.md) - version roadmap and feature plan
 - [docs/formal-elements-analysis.md](docs/formal-elements-analysis.md) - game design analysis
-- [copilot-instructions.md](copilot-instructions.md) - project conventions and gotchas
+- [.github/copilot-instructions.md](.github/copilot-instructions.md) - project conventions and gotchas
 
 ## License
 
