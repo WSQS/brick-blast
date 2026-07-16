@@ -241,3 +241,26 @@ func test_brick_collision_handler_triggers_on_brick_group() -> void:
 	watch_signals(brick)
 	# If brick still exists, destroy was already called (queue_free deferred)
 	# The key assertion is that ball bounced, proving the group check worked
+
+
+# ---------------------------------------------------------------------------
+# Bug reproduction: brick destroyed signal fires twice (multi-ball scenario)
+# ---------------------------------------------------------------------------
+
+
+## Reproduces: two balls hit the same brick in the same frame.
+## queue_free() is deferred, so the brick still exists when the second
+## ball calls destroy() — the destroyed signal fires twice.
+func test_brick_destroyed_signal_does_not_fire_twice() -> void:
+	brick.position = Vector2(200, 200)
+	if not brick.is_in_group("brick"):
+		brick.add_to_group("brick")
+
+	watch_signals(brick)
+
+	# Simulate two balls hitting the same brick in the same frame
+	brick.destroy()
+	brick.destroy()
+
+	var emit_count: int = get_signal_emit_count(brick, "destroyed")
+	assert_eq(emit_count, 1, "destroyed should fire only once, got %d" % emit_count)
