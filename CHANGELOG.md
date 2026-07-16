@@ -29,7 +29,23 @@ All notable changes to brick-blast will be documented in this file.
 - Extra balls follow paddle while stuck to it
 - New scene `scene/upgrade_panel.tscn`: upgrade selection UI
 - New scripts `script/upgrade.gd` (upgrade data model), `script/upgrade_panel.gd` (UI controller)
-- 73 unit tests (including 33 upgrade system tests)
+- 75 unit tests (including 33 upgrade system tests)
+
+### Changed (code review refactoring)
+
+- State transitions centralized: all `state = State.X` assignments moved to event handlers (`_ready`, `_input`, `_on_brick_destroyed`, `_on_ball_lost`, `_start_next_round`); behavior functions no longer mutate state
+- `_toggle_pause()` deleted: pause/resume logic inlined into `_input()`
+- Redundant `_update_hud()` calls removed from `_ready`, `_start_next_round`, `_on_ball_lost`
+- Unnecessary `is_instance_valid()` checks removed (balls array only contains valid nodes)
+- Ball speed unified: `ball_speed` variable on `main.gd` is the single source of truth; `_spawn_ball` uses it directly; SLOW_BALL upgrade and paddle-hit acceleration (`*= 1.03`) both update `ball_speed` then sync all balls
+- Ball speed acceleration (`*= 1.03`) moved from `ball.gd._physics_process` to `main.gd._on_paddle_hit`
+- Type annotations added: `_on_upgrade_selected(upgrade: Upgrade)`, `_apply_upgrade(id: Upgrade.Type)`, brick loop `Node` type, `show_choices(choices: Array[Upgrade])`
+- `gdformat` pre-commit hook added (`hooks/pre-commit`, `hooks/install.sh`)
+
+### Fixed (code review refactoring)
+
+- Losing last ball didn't spawn a new ball: `_on_ball_lost` now calls `_spawn_ball()` before `_reset_round()` when lives remain
+- Brick `destroyed` signal could fire twice: `queue_free()` is deferred, so two balls hitting the same brick in one frame both called `destroy()`. Added `_destroyed` guard flag to make `destroy()` idempotent
 
 ### Fixed (upgrade system)
 

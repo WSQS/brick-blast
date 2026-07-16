@@ -22,7 +22,7 @@ Version planning and feature roadmap. Organized by version number, with themes a
 - CharacterBody2D + move_and_collide (CCD prevents tunneling)
 - Full scene loop: main menu → game → end
 - CI/CD: GitHub Actions auto-build Windows/Linux/Android/Web, tag triggers draft release
-- 40/40 tests passing (total now 73, see v0.1)
+- 40/40 tests passing (total now 75, see v0.1)
 
 ---
 
@@ -39,7 +39,7 @@ Version planning and feature roadmap. Organized by version number, with themes a
 - ✅ Clear level → show stars → pop up 3-choice → apply upgrade → restart same level
 - ✅ All 5 upgrades implemented: wide paddle, slow ball, extra life, multi-ball, pierce
 - ✅ Multi-ball rules: extra balls don't collide with each other; no life cost while balls remain
-- ✅ 33 upgrade system unit tests (73 total)
+- ✅ 33 upgrade system unit tests (75 total)
 
 ### TODO
 
