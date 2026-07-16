@@ -63,7 +63,6 @@ func _ready() -> void:
 	_spawn_ball()
 	_spawn_bricks()
 	_reset_round()
-	_update_hud()
 
 
 func _input(event: InputEvent) -> void:
@@ -197,9 +196,9 @@ func _on_ball_lost(lost_ball: CharacterBody2D) -> void:
 		return
 	lives -= 1
 	lives_lost_this_level += 1
-	_update_hud()
 	if lives <= 0:
 		_game_over()
+		_update_hud()
 	else:
 		_reset_round()
 
@@ -280,7 +279,6 @@ func _start_next_round() -> void:
 	var multi_count: int = upgrades.get(Upgrade.Type.MULTI_BALL, 0)
 	for i in multi_count:
 		_spawn_ball()
-	_update_hud()
 
 
 func _spawn_ball() -> void:
