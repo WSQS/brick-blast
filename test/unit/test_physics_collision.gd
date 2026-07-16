@@ -303,3 +303,42 @@ func test_brick_destroyed_signal_does_not_fire_twice() -> void:
 
 	var emit_count: int = get_signal_emit_count(brick, "destroyed")
 	assert_eq(emit_count, 1, "destroyed should fire only once, got %d" % emit_count)
+
+
+# ---------------------------------------------------------------------------
+# Bug reproduction: pierce ball loses distance when hitting a brick
+# ---------------------------------------------------------------------------
+
+
+## Reproduces: when pierce_count > 0, move_and_collide stops the ball at the
+## brick edge and discards the remaining movement distance. The ball
+## "stutters" through bricks instead of flowing smoothly.
+## Fix: add collision.get_remainder() to global_position on pierce.
+func test_pierce_ball_does_not_lose_distance() -> void:
+	brick.position = Vector2(200, 200)
+	if not brick.is_in_group("brick"):
+		brick.add_to_group("brick")
+
+	# Ball above brick, moving down, with pierce
+	ball.position = Vector2(200, 180)
+	ball.pierce_count = 5
+	ball.launch(Vector2(0, 1))
+	ball.speed = 320.0
+
+	var pos_before := ball.position.y
+	# One physics step — ball should pass through the brick
+	_simulate_physics_process(1, 1.0 / 60.0)
+
+	var expected_distance := 320.0 / 60.0
+	var actual_distance := ball.position.y - pos_before
+	# Ball should have traveled approximately the full frame distance
+	# (not stopped at the brick edge)
+	assert_almost_eq(
+		actual_distance,
+		expected_distance,
+		5.0,
+		(
+			"Pierce ball should travel full frame distance (%f), got %f"
+			% [expected_distance, actual_distance]
+		)
+	)

@@ -154,7 +154,7 @@ func _spawn_bricks() -> void:
 
 func _reset_round() -> void:
 	for b in balls:
-		b.position = Vector2(playfield.size.x / 2.0, PADDLE_Y - BALL_OFFSET)
+		b.position = Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)
 		b.velocity = Vector2.ZERO
 	combo = 0
 	_update_hud()

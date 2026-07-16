@@ -38,6 +38,8 @@ func _physics_process(delta: float) -> void:
 		if collider and collider.is_in_group("brick"):
 			if pierce_count > 0:
 				pierce_count -= 1
+				# Move ball through the brick by the remaining distance
+				global_position += collision.get_remainder()
 			else:
 				velocity = velocity.bounce(collision.get_normal())
 			collider.destroy()
