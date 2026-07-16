@@ -26,7 +26,7 @@ Version planning and feature roadmap. Organized by version number, with themes a
 
 ---
 
-## v0.1 — Upgrade Selection System (Outwit) 🔧 In Progress
+## v0.1.0 ✅ (2026-07-16)
 
 **Theme: Roguelike-style growth loop (second step of D010 plan)**
 
@@ -39,7 +39,7 @@ Version planning and feature roadmap. Organized by version number, with themes a
 - ✅ Clear level → show stars → pop up 3-choice → apply upgrade → restart same level
 - ✅ All 5 upgrades implemented: wide paddle, slow ball, extra life, multi-ball, pierce
 - ✅ Multi-ball rules: extra balls don't collide with each other; no life cost while balls remain
-- ✅ 33 upgrade system unit tests (75 total)
+- ✅ 33 upgrade system unit tests (77 total)
 
 ### TODO
 
