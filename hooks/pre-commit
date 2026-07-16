@@ -1,0 +1,26 @@
+#!/bin/sh
+# Pre-commit hook: format staged .gd files with gdformat
+# Activated via: git config core.hooksPath hooks
+
+# Collect staged .gd files
+staged=$(git diff --cached --name-only --diff-filter=ACM -- '*.gd')
+
+if [ -z "$staged" ]; then
+	exit 0
+fi
+
+echo "Running gdformat on staged GDScript files..."
+
+# Format each staged .gd file
+for file in $staged; do
+	gdformat "$file" 2>&1
+	if [ $? -ne 0 ]; then
+		echo "Error: gdformat failed on $file"
+		exit 1
+	fi
+done
+
+# Re-stage any files that were modified by gdformat
+git add $staged
+
+echo "gdformat complete."
