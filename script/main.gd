@@ -239,7 +239,7 @@ func _apply_upgrade(id: int) -> void:
 		Upgrade.Type.SLOW_BALL:
 			for b in balls:
 				if is_instance_valid(b):
-					b.set_speed(b.get_speed() * 0.8)
+					b.speed *= 0.8
 		Upgrade.Type.EXTRA_LIFE:
 			lives += 1
 		Upgrade.Type.MULTI_BALL:
@@ -271,7 +271,7 @@ func _spawn_ball() -> void:
 	new_ball.bounds = playfield
 	# Inherit speed from the first ball
 	if balls.size() > 0 and is_instance_valid(balls[0]):
-		new_ball.set_speed(balls[0].get_speed())
+		new_ball.speed = balls[0].speed
 	add_child(new_ball)
 	balls.append(new_ball)
 	new_ball.position = Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)

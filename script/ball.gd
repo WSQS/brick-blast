@@ -7,22 +7,14 @@ const SPEED: float = 320.0
 const MAX_SPEED: float = 550.0
 const RADIUS: float = 8.0
 
-var _speed: float = SPEED
+var speed: float = SPEED
 var pierce_count: int = 0
 
 var bounds: Rect2 = Rect2(0, 0, 480, 720)
 
 
 func launch(direction: Vector2) -> void:
-	velocity = direction.normalized() * _speed
-
-
-func get_speed() -> float:
-	return _speed
-
-
-func set_speed(s: float) -> void:
-	_speed = s
+	velocity = direction.normalized() * speed
 
 
 func _physics_process(delta: float) -> void:
@@ -42,9 +34,9 @@ func _physics_process(delta: float) -> void:
 				velocity = velocity.bounce(collision.get_normal())
 			collider.destroy()
 		elif collider == parent.get("paddle"):
-			velocity = bounce_off_paddle(global_position, collider.get_rect(), _speed)
-			_speed = minf(_speed * 1.03, MAX_SPEED)
-			velocity = velocity.normalized() * _speed
+			velocity = bounce_off_paddle(global_position, collider.get_rect(), speed)
+			speed = minf(speed * 1.03, MAX_SPEED)
+			velocity = velocity.normalized() * speed
 			parent.call("_on_paddle_hit", self)
 
 	if global_position.y > bounds.end.y + 50:
