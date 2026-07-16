@@ -235,6 +235,7 @@ func test_multi_ball_extra_is_valid_node() -> void:
 func test_multi_ball_extra_has_velocity() -> void:
 	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
+	main.state = main.State.PLAYING
 	main._launch_ball()
 	await wait_seconds(0.1)
 	assert_gt(main.balls.size(), 1, "Extra ball should still exist after launch")

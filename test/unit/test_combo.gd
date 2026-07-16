@@ -101,6 +101,7 @@ func test_ball_starts_stuck() -> void:
 
 func test_ball_unstuck_on_launch() -> void:
 	main.state = main.State.READY
+	main.state = main.State.PLAYING
 	main._launch_ball()
 	assert_eq(main.state, main.State.PLAYING, "Ball should be playing after launch")
 

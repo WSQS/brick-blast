@@ -73,6 +73,7 @@ func _input(event: InputEvent) -> void:
 			event.is_action_pressed("ui_accept")
 			or (event is InputEventMouseButton and event.pressed)
 		):
+			state = State.PLAYING
 			_launch_ball()
 	if event.is_action_pressed("ui_cancel"):
 		_toggle_pause()
@@ -108,7 +109,6 @@ func _toggle_pause() -> void:
 
 
 func _launch_ball() -> void:
-	state = State.PLAYING
 	for b in balls:
 		if is_instance_valid(b):
 			_sync_pierce_count(b)
