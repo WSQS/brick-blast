@@ -53,8 +53,12 @@ func test_launch_does_not_work_while_paused() -> void:
 	_press_esc()
 	assert_eq(main.state, main.State.PAUSED, "Should be paused")
 
-	# Simulate click/space while paused — state stays PAUSED, not PLAYING
-	assert_ne(main.state, main.State.PLAYING, "Ball should not be playing while paused")
+	# Simulate Space press while paused — state should stay PAUSED
+	var event := InputEventAction.new()
+	event.action = "ui_accept"
+	event.pressed = true
+	main._input(event)
+	assert_eq(main.state, main.State.PAUSED, "Launch input should be ignored while paused")
 
 
 func test_paddle_does_not_move_while_paused() -> void:
