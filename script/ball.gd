@@ -6,6 +6,7 @@ extends CharacterBody2D
 const SPEED: float = 320.0
 const MAX_SPEED: float = 550.0
 const RADIUS: float = 8.0
+const LOSE_MARGIN: float = 50.0
 
 var speed: float = SPEED
 var pierce_count: int = 0
@@ -44,7 +45,7 @@ func _physics_process(delta: float) -> void:
 			velocity = velocity.normalized() * speed
 			hit_paddle.emit(self)
 
-	if global_position.y > bounds.end.y + 50:
+	if global_position.y > bounds.end.y + LOSE_MARGIN:
 		lost.emit(self)
 
 
