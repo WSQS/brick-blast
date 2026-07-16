@@ -1,0 +1,90 @@
+name: opencode-pr-metadata
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: opencode-pr-metadata-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  update-pr-metadata:
+    if: |
+      github.event.pull_request.draft == false &&
+      github.actor != 'opencode-agent[bot]' &&
+      github.actor != 'coderabbitai[bot]' &&
+      github.actor != 'github-actions[bot]' &&
+      github.event.pull_request.user.type != 'Bot'
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Update PR title and body with opencode
+        uses: anomalyco/opencode/github@latest
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          model: ns-deepseek/deepseek-v4-pro
+          use_github_token: true
+          prompt: |
+            You are maintaining the metadata of this pull request for a Godot 4.7
+            brick-breaker game written in GDScript.
+
+            PR number: #${{ github.event.pull_request.number }}
+            Repository: ${{ github.repository }}
+            PR URL: ${{ github.event.pull_request.html_url }}
+
+            Task:
+            1. Inspect the PR title, body, commits, and diff.
+            2. Rewrite the PR title as a concise summary of the overall change.
+               If the PR is a single focused change, use Angular commit format:
+               `type(scope): lowercase subject`
+               - type: feat | fix | refactor | test | docs | chore | style
+               - scope: ball | brick | paddle | upgrade | menu | physics | test
+               If the PR spans multiple areas, use a plain descriptive title instead.
+               Keep under 72 characters. Do not add a trailing period.
+            3. Append an AI-generated section to the PR body in English.
+               Do NOT overwrite or remove existing body content — preserve it
+               as-is and append below a `---` separator. If an existing
+               `<!-- opencode-generated -->` block is present, replace only
+               that block. Use this structure inside the block:
+
+               <!-- opencode-generated -->
+               ## Summary
+               - Briefly explain what changed and why.
+
+               ## Changes
+               - Group by feature/area, list the main implementation changes.
+
+               ## Testing
+               - If GUT unit tests exist in the diff, mention test count and coverage.
+               - Otherwise say "Not run".
+
+               ## Notes for Reviewers
+               - Highlight risk areas, edge cases, or breaking changes.
+               - If none, omit this section.
+               <!-- /opencode-generated -->
+
+            Rules:
+            - Base title and body strictly on the diff and commit messages.
+              Do not fabricate features or tests that don't exist.
+            - Do not modify source code.
+            - Do not create commits.
+            - Do not open a new PR.
+            - Do not post a normal review comment unless updating the title/body fails.
+            - Actually update the current PR title and body using the GitHub API or gh CLI.
+            - Preserve important information from the existing PR body.
