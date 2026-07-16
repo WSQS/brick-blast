@@ -53,9 +53,7 @@ jobs:
             2. Rewrite the PR title following Angular commit convention:
                `type(scope): lowercase subject` (e.g. `feat(ball): add multi-ball`).
                Keep under 72 characters.
-            3. Rewrite the PR body in the SAME language as the commits and existing
-               PR body (Chinese if commits are in Chinese, English otherwise).
-               Use this structure:
+            3. Rewrite the PR body in English. Use this structure:
 
                ## Summary
                - Briefly explain what changed and why.
