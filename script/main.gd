@@ -63,6 +63,7 @@ func _ready() -> void:
 	_spawn_ball()
 	_spawn_bricks()
 	_reset_round()
+	state = State.READY
 
 
 func _input(event: InputEvent) -> void:
@@ -76,7 +77,14 @@ func _input(event: InputEvent) -> void:
 			state = State.PLAYING
 			_launch_ball()
 	if event.is_action_pressed("ui_cancel"):
-		_toggle_pause()
+		if state == State.PAUSED:
+			state = _state_before_pause
+			message.hide()
+		elif state != State.GAME_OVER:
+			_state_before_pause = state
+			state = State.PAUSED
+			message.text = "PAUSED"
+			message.show()
 
 
 ## Returns true when the game is actively playing (ball in motion).
@@ -93,19 +101,6 @@ func is_paused() -> bool:
 func _connect_ball_signals(b: CharacterBody2D) -> void:
 	b.hit_paddle.connect(_on_paddle_hit)
 	b.lost.connect(_on_ball_lost)
-
-
-func _toggle_pause() -> void:
-	if state == State.GAME_OVER:
-		return
-	if state == State.PAUSED:
-		state = _state_before_pause
-		message.hide()
-	else:
-		_state_before_pause = state
-		state = State.PAUSED
-		message.text = "PAUSED"
-		message.show()
 
 
 func _launch_ball() -> void:
@@ -160,7 +155,6 @@ func _reset_round() -> void:
 		if is_instance_valid(b):
 			b.position = Vector2(playfield.size.x / 2.0, PADDLE_Y - BALL_OFFSET)
 			b.velocity = Vector2.ZERO
-	state = State.READY
 	combo = 0
 	_update_hud()
 
@@ -172,6 +166,7 @@ func _on_brick_destroyed() -> void:
 	bricks_left -= 1
 	_update_hud()
 	if bricks_left <= 0:
+		state = State.ROUND_CLEAR
 		_win()
 
 
@@ -197,14 +192,15 @@ func _on_ball_lost(lost_ball: CharacterBody2D) -> void:
 	lives -= 1
 	lives_lost_this_level += 1
 	if lives <= 0:
+		state = State.GAME_OVER
 		_game_over()
 		_update_hud()
 	else:
 		_reset_round()
+		state = State.READY
 
 
 func _game_over() -> void:
-	state = State.GAME_OVER
 	message.text = "GAME OVER"
 	message.show()
 	restart_button.show()
@@ -212,10 +208,7 @@ func _game_over() -> void:
 
 
 func _win() -> void:
-	if state == State.ROUND_CLEAR:
-		return
 	rounds_cleared += 1
-	state = State.ROUND_CLEAR
 	for b in balls:
 		if is_instance_valid(b):
 			b.velocity = Vector2.ZERO
@@ -274,6 +267,7 @@ func _start_next_round() -> void:
 	_spawn_ball()
 	_spawn_bricks()
 	_reset_round()
+	state = State.READY
 	lives_lost_this_level = 0
 	max_combo = 0
 	var multi_count: int = upgrades.get(Upgrade.Type.MULTI_BALL, 0)

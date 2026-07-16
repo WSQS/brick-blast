@@ -11,19 +11,26 @@ func before_each() -> void:
 	add_child_autofree(main)
 
 
+func _press_esc() -> void:
+	var event := InputEventKey.new()
+	event.keycode = KEY_ESCAPE
+	event.pressed = true
+	main._input(event)
+
+
 func test_pause_toggles_paused_flag() -> void:
 	assert_eq(main.state, main.State.READY, "Should start in READY state")
-	main._toggle_pause()
+	_press_esc()
 	assert_eq(main.state, main.State.PAUSED, "Should be paused after toggle")
-	main._toggle_pause()
+	_press_esc()
 	assert_eq(main.state, main.State.READY, "Should be READY again after second toggle")
 
 
 func test_pause_sets_scene_tree_paused() -> void:
-	main._toggle_pause()
+	_press_esc()
 	assert_eq(main.state, main.State.PAUSED, "state should be PAUSED")
 	assert_false(get_tree().paused, "SceneTree.paused should NOT be used")
-	main._toggle_pause()
+	_press_esc()
 	assert_ne(main.state, main.State.PAUSED, "state should not be PAUSED")
 
 
@@ -43,7 +50,7 @@ func test_pause_does_not_work_after_game_over() -> void:
 
 func test_launch_does_not_work_while_paused() -> void:
 	# Ball is stuck at start (READY), pause the game
-	main._toggle_pause()
+	_press_esc()
 	assert_eq(main.state, main.State.PAUSED, "Should be paused")
 
 	# Simulate click/space while paused — state stays PAUSED, not PLAYING
@@ -55,7 +62,7 @@ func test_paddle_does_not_move_while_paused() -> void:
 	var x_before: float = paddle.position.x
 
 	# Pause the game
-	main._toggle_pause()
+	_press_esc()
 	assert_eq(main.state, main.State.PAUSED, "Should be paused")
 
 	# Simulate movement by calling _physics_process directly

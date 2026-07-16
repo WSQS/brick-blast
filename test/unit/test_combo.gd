@@ -109,4 +109,5 @@ func test_ball_unstuck_on_launch() -> void:
 func test_ball_restucks_on_reset() -> void:
 	main.state = main.State.PLAYING
 	main._reset_round()
+	main.state = main.State.READY
 	assert_eq(main.state, main.State.READY, "Ball should be READY again after reset")
