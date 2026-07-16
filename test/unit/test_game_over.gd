@@ -21,7 +21,7 @@ func test_lives_do_not_decrease_after_game_over() -> void:
 	assert_eq(main.lives, 0, "Lives should be 0 after last ball lost")
 
 	# Simulate ball continuing to fall and calling _on_ball_lost again
-	# game_over guard prevents further life loss
+	# GAME_OVER state guard prevents further life loss
 	main._on_ball_lost(ball)
 	main._on_ball_lost(ball)
 	main._on_ball_lost(ball)

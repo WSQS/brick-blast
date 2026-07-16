@@ -9,7 +9,7 @@ var _last_mouse_x: float = -1.0
 
 func _physics_process(delta: float) -> void:
 	var parent := get_parent()
-	if parent and parent.get("paused"):
+	if parent and parent.has_method("is_paused") and parent.is_paused():
 		return
 	var target_x := position.x
 

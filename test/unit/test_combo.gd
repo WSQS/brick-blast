@@ -93,16 +93,16 @@ func test_two_stars_for_no_lives_lost_low_combo() -> void:
 # ---------------------------------------------------------------------------
 
 func test_ball_starts_stuck() -> void:
-	assert_true(main.ball_stuck, "Ball should be stuck to paddle at start")
+	assert_eq(main.state, main.State.READY, "Ball should be stuck (READY) at start")
 
 
 func test_ball_unstuck_on_launch() -> void:
-	main.ball_stuck = true
+	main.state = main.State.READY
 	main._launch_ball()
-	assert_false(main.ball_stuck, "Ball should not be stuck after launch")
+	assert_eq(main.state, main.State.PLAYING, "Ball should be playing after launch")
 
 
 func test_ball_restucks_on_reset() -> void:
-	main.ball_stuck = false
+	main.state = main.State.PLAYING
 	main._reset_round()
-	assert_true(main.ball_stuck, "Ball should be stuck again after reset")
+	assert_eq(main.state, main.State.READY, "Ball should be READY again after reset")

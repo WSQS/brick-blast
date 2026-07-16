@@ -42,18 +42,18 @@ const STAR_COMBO_THRESHOLD: int = 10
 var lives: int = START_LIVES
 var score: int = 0
 var bricks_left: int = 0
-var game_over: bool = false
-var paused: bool = false
 
 var combo: int = 0
 var max_combo: int = 0
 var lives_lost_this_level: int = 0
 
-var ball_stuck: bool = true
-
 var upgrades: Dictionary = {}  # Upgrade.Type -> stack count
 var rounds_cleared: int = 0
 var balls: Array[CharacterBody2D] = []
+
+enum State { READY, PLAYING, PAUSED, ROUND_CLEAR, GAME_OVER }
+var state: State = State.READY
+var _state_before_pause: State = State.READY
 
 
 func _ready() -> void:
@@ -73,26 +73,46 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if game_over or upgrade_panel.visible:
+	if state == State.GAME_OVER or state == State.ROUND_CLEAR:
 		return
-	if not paused and ball_stuck:
+	if state == State.READY:
 		if event.is_action_pressed("ui_accept") or (event is InputEventMouseButton and event.pressed):
 			_launch_ball()
 	if event.is_action_pressed("ui_cancel"):
 		_toggle_pause()
 
 
+## Returns true when the game is actively playing (ball in motion).
+func is_playing() -> bool:
+	return state == State.PLAYING
+
+
+## Returns true when the game is paused.
+func is_paused() -> bool:
+	return state == State.PAUSED
+
+
+## Connects hit_paddle and lost signals for a ball.
+func _connect_ball_signals(b: CharacterBody2D) -> void:
+	b.hit_paddle.connect(_on_paddle_hit)
+	b.lost.connect(_on_ball_lost)
+
+
 func _toggle_pause() -> void:
-	paused = !paused
-	if paused:
+	if state == State.GAME_OVER:
+		return
+	if state == State.PAUSED:
+		state = _state_before_pause
+		message.hide()
+	else:
+		_state_before_pause = state
+		state = State.PAUSED
 		message.text = "PAUSED"
 		message.show()
-	else:
-		message.hide()
 
 
 func _launch_ball() -> void:
-	ball_stuck = false
+	state = State.PLAYING
 	for b in balls:
 		if is_instance_valid(b):
 			_sync_pierce_count(b)
@@ -105,7 +125,7 @@ func _random_launch_dir() -> Vector2:
 
 
 func _process(_delta: float) -> void:
-	if not (ball_stuck and not paused):
+	if state != State.READY:
 		return
 	var stick_pos := Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)
 	for b in balls:
@@ -144,7 +164,7 @@ func _reset_round() -> void:
 		if is_instance_valid(b):
 			b.position = Vector2(playfield.size.x / 2.0, PADDLE_Y - BALL_OFFSET)
 			b.velocity = Vector2.ZERO
-	ball_stuck = true
+	state = State.READY
 	combo = 0
 	_update_hud()
 
@@ -171,7 +191,7 @@ func _sync_pierce_count(target: CharacterBody2D) -> void:
 
 
 func _on_ball_lost(lost_ball: CharacterBody2D) -> void:
-	if game_over:
+	if state == State.GAME_OVER:
 		return
 	balls.erase(lost_ball)
 	lost_ball.queue_free()
@@ -188,7 +208,7 @@ func _on_ball_lost(lost_ball: CharacterBody2D) -> void:
 
 
 func _game_over() -> void:
-	game_over = true
+	state = State.GAME_OVER
 	message.text = "GAME OVER"
 	message.show()
 	restart_button.show()
@@ -196,10 +216,10 @@ func _game_over() -> void:
 
 
 func _win() -> void:
-	if upgrade_panel.visible:
+	if state == State.ROUND_CLEAR:
 		return
 	rounds_cleared += 1
-	ball_stuck = true
+	state = State.ROUND_CLEAR
 	for b in balls:
 		if is_instance_valid(b):
 			b.velocity = Vector2.ZERO
@@ -279,10 +299,7 @@ func _spawn_ball() -> void:
 	new_ball.position = Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)
 
 
-## Connects hit_paddle and lost signals for a ball.
-func _connect_ball_signals(b: CharacterBody2D) -> void:
-	b.hit_paddle.connect(_on_paddle_hit)
-	b.lost.connect(_on_ball_lost)
+
 
 
 func _update_hud() -> void:

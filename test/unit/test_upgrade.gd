@@ -46,11 +46,11 @@ func test_clearing_bricks_shows_round_clear_message() -> void:
 
 func test_ball_stops_on_win() -> void:
 	var ball := _get_ball()
-	main.ball_stuck = false
+	main.state = main.State.PLAYING
 	ball.velocity = Vector2(100, 100)
 	main.bricks_left = 1
 	main._on_brick_destroyed()
-	assert_true(main.ball_stuck, "Ball should be stuck after win")
+	assert_eq(main.state, main.State.ROUND_CLEAR, "State should be ROUND_CLEAR after win")
 	assert_eq(ball.velocity, Vector2.ZERO, "Ball velocity should be zero after win")
 
 
@@ -71,13 +71,12 @@ func test_upgrade_panel_shown_after_win() -> void:
 
 
 func test_ball_stuck_set_false_after_win_flow() -> void:
-	# When win happens, ball should be stopped (stuck state for next round)
+	# When win happens, ball should be stopped (waiting for upgrade)
 	main.bricks_left = 1
-	main.ball_stuck = false
+	main.state = main.State.PLAYING
 	main._on_brick_destroyed()
 	await wait_seconds(1.5)
-	# Ball is still moving until upgrade is selected and next round starts
-	# But game should be in a "waiting for upgrade" state
+	# Game should be in ROUND_CLEAR state waiting for upgrade selection
 	var overlay: ColorRect = _get_overlay()
 	assert_true(overlay.visible, "Should be waiting for upgrade selection")
 
@@ -107,8 +106,8 @@ func test_selecting_upgrade_starts_next_round() -> void:
 	# Bricks should be respawned
 	assert_true(main.bricks_left > 0, "Bricks should be respawned for next round")
 
-	# Ball should be stuck
-	assert_true(main.ball_stuck, "Ball should be stuck for next round")
+	# Ball should be stuck (READY for next round)
+	assert_eq(main.state, main.State.READY, "Ball should be READY for next round")
 
 
 func test_win_calls_show_choices_on_panel() -> void:
@@ -246,7 +245,7 @@ func test_start_next_round_clears_extra_balls() -> void:
 func test_extra_ball_follows_paddle_while_stuck() -> void:
 	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
-	assert_true(main.ball_stuck, "Ball should be stuck after round start")
+	assert_eq(main.state, main.State.READY, "Ball should be READY after round start")
 	var extra: CharacterBody2D = main.balls[1]
 	# Move paddle to a new position
 	main.paddle.position.x = 300.0
@@ -286,7 +285,7 @@ func test_multi_ball_persists_across_rounds() -> void:
 func test_multi_ball_persists_after_losing_extra_ball() -> void:
 	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
-	main.ball_stuck = false
+	main.state = main.State.PLAYING
 	var extra: CharacterBody2D = main.balls[1]
 	extra.force_update_transform()
 	extra.global_position.y = main.playfield.end.y + 100
@@ -299,7 +298,7 @@ func test_multi_ball_persists_after_losing_extra_ball() -> void:
 func test_ball_lost_does_not_cost_life_with_others_present() -> void:
 	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
-	main.ball_stuck = false
+	main.state = main.State.PLAYING
 	var extra: CharacterBody2D = main.balls[1]
 	var lives_before: int = main.lives
 	extra.force_update_transform()
@@ -311,7 +310,7 @@ func test_ball_lost_does_not_cost_life_with_others_present() -> void:
 func test_first_ball_lost_no_life_cost_with_others_present() -> void:
 	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
-	main.ball_stuck = false
+	main.state = main.State.PLAYING
 	var lives_before: int = main.lives
 	var ball0: CharacterBody2D = main.balls[0]
 	ball0.force_update_transform()
@@ -323,21 +322,21 @@ func test_first_ball_lost_no_life_cost_with_others_present() -> void:
 func test_other_ball_keeps_moving_after_one_lost() -> void:
 	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
-	main.ball_stuck = false
+	main.state = main.State.PLAYING
 	var ball0: CharacterBody2D = main.balls[0]
 	var extra: CharacterBody2D = main.balls[1]
 	var extra_vel_before: Vector2 = extra.velocity
 	ball0.force_update_transform()
 	ball0.global_position.y = main.playfield.end.y + 100
 	ball0._physics_process(0.016)
-	assert_false(main.ball_stuck, "ball_stuck should NOT be true while another ball is alive")
+	assert_ne(main.state, main.State.READY, "State should NOT be READY while another ball is alive")
 	assert_eq(extra.velocity, extra_vel_before, "Remaining ball velocity should be unchanged")
 
 
 func test_all_balls_lost_costs_life() -> void:
 	main.upgrades[Upgrade.Type.MULTI_BALL] = 1
 	main._start_next_round()
-	main.ball_stuck = false
+	main.state = main.State.PLAYING
 	var lives_before: int = main.lives
 	# Lose one ball first
 	var ball0: CharacterBody2D = main.balls[0]
@@ -389,14 +388,14 @@ func test_upgrade_panel_click_does_not_launch_ball() -> void:
 	main.bricks_left = 1
 	main._on_brick_destroyed()
 	await wait_seconds(1.5)
-	# Panel is shown, ball is stuck
-	assert_true(main.ball_stuck, "Ball should be stuck while panel is shown")
+	# Panel is shown, state is ROUND_CLEAR
+	assert_eq(main.state, main.State.ROUND_CLEAR, "State should be ROUND_CLEAR while panel is shown")
 	# Simulate a mouse click (as if clicking a button)
 	var click := InputEventMouseButton.new()
 	click.button_index = MOUSE_BUTTON_LEFT
 	click.pressed = true
 	main._input(click)
-	assert_true(main.ball_stuck, "Ball should still be stuck — bug: click launches ball")
+	assert_eq(main.state, main.State.ROUND_CLEAR, "State should still be ROUND_CLEAR — click must not launch ball")
 
 
 # Helper

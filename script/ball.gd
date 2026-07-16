@@ -25,7 +25,9 @@ func launch(direction: Vector2) -> void:
 
 func _physics_process(delta: float) -> void:
 	var parent: Node = get_parent()
-	if parent == null or parent.get("ball_stuck") or parent.get("paused"):
+	# If parent implements is_playing(), only move when game is actively playing.
+	# Otherwise (e.g. standalone in tests), always process.
+	if parent != null and parent.has_method("is_playing") and not parent.is_playing():
 		return
 
 	var collision := move_and_collide(velocity * delta)
