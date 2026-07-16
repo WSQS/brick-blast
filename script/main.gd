@@ -60,13 +60,7 @@ func _ready() -> void:
 	paddle.bounds = playfield
 	if upgrade_panel and upgrade_panel.has_signal("upgrade_selected"):
 		upgrade_panel.upgrade_selected.connect(_on_upgrade_selected)
-	# Collect the scene-placed ball into the unified balls array
-	for child in get_children():
-		if child is CharacterBody2D:
-			child.bounds = playfield
-			_connect_ball_signals(child)
-			balls.append(child)
-			break
+	_spawn_ball()
 	_spawn_bricks()
 	_reset_round()
 	_update_hud()
@@ -270,11 +264,12 @@ func _apply_upgrade(id: int) -> void:
 
 
 func _start_next_round() -> void:
-	# Remove all balls except the first (scene-placed) one
-	for i in range(balls.size() - 1, 0, -1):
-		if is_instance_valid(balls[i]):
-			balls[i].queue_free()
-		balls.remove_at(i)
+	# Clear all balls, then respawn fresh
+	for b in balls:
+		if is_instance_valid(b):
+			b.queue_free()
+	balls.clear()
+	_spawn_ball()
 	_spawn_bricks()
 	_reset_round()
 	lives_lost_this_level = 0

@@ -21,9 +21,6 @@ color = Color(0.102, 0.102, 0.18, 1)
 [node name="Paddle" parent="." instance=ExtResource("3_paddle")]
 position = Vector2(240, 660)
 
-[node name="Ball" parent="." instance=ExtResource("2_ball")]
-position = Vector2(240, 620)
-
 [node name="HUD" type="CanvasLayer" parent="."]
 
 [node name="ScoreLabel" type="Label" parent="HUD"]
