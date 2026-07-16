@@ -105,9 +105,8 @@ func _connect_ball_signals(b: CharacterBody2D) -> void:
 
 func _launch_ball() -> void:
 	for b in balls:
-		if is_instance_valid(b):
-			_sync_pierce_count(b)
-			b.launch(_random_launch_dir())
+		_sync_pierce_count(b)
+		b.launch(_random_launch_dir())
 
 
 func _random_launch_dir() -> Vector2:
@@ -120,8 +119,7 @@ func _process(_delta: float) -> void:
 		return
 	var stick_pos := Vector2(paddle.position.x, PADDLE_Y - BALL_OFFSET)
 	for b in balls:
-		if is_instance_valid(b):
-			b.position = stick_pos
+		b.position = stick_pos
 
 
 func _compute_playfield() -> Rect2:
@@ -152,9 +150,8 @@ func _spawn_bricks() -> void:
 
 func _reset_round() -> void:
 	for b in balls:
-		if is_instance_valid(b):
-			b.position = Vector2(playfield.size.x / 2.0, PADDLE_Y - BALL_OFFSET)
-			b.velocity = Vector2.ZERO
+		b.position = Vector2(playfield.size.x / 2.0, PADDLE_Y - BALL_OFFSET)
+		b.velocity = Vector2.ZERO
 	combo = 0
 	_update_hud()
 
@@ -210,8 +207,7 @@ func _game_over() -> void:
 func _win() -> void:
 	rounds_cleared += 1
 	for b in balls:
-		if is_instance_valid(b):
-			b.velocity = Vector2.ZERO
+		b.velocity = Vector2.ZERO
 	var stars := "*".repeat(_compute_stars())
 	message.text = "ROUND CLEAR! %s" % stars
 	message.show()
@@ -248,8 +244,7 @@ func _apply_upgrade(id: int) -> void:
 				cr.position.x = -new_w / 2.0
 		Upgrade.Type.SLOW_BALL:
 			for b in balls:
-				if is_instance_valid(b):
-					b.speed *= 0.8
+				b.speed *= 0.8
 		Upgrade.Type.EXTRA_LIFE:
 			lives += 1
 		Upgrade.Type.MULTI_BALL:
