@@ -25,6 +25,9 @@ const START_LIVES: int = 3
 const PADDLE_WIDE_FACTOR: float = 1.5
 const PADDLE_MAX_WIDTH_RATIO: float = 0.8
 const STAR_COMBO_THRESHOLD: int = 10
+const BALL_SPEED: float = 320.0
+const BALL_MAX_SPEED: float = 550.0
+const BALL_SPEEDUP: float = 1.03
 
 @export var brick_scene: PackedScene
 @export var ball_scene: PackedScene
@@ -50,6 +53,7 @@ var lives_lost_this_level: int = 0
 var upgrades: Dictionary = {}  # Upgrade.Type -> stack count
 var rounds_cleared: int = 0
 var balls: Array[CharacterBody2D] = []
+var ball_speed: float = BALL_SPEED
 
 enum State { READY, PLAYING, PAUSED, ROUND_CLEAR, GAME_OVER }
 var state: State = State.READY
@@ -128,7 +132,7 @@ func _compute_playfield() -> Rect2:
 
 
 func _spawn_bricks() -> void:
-	for brick in bricks.get_children():
+	for brick: Node in bricks.get_children():
 		brick.queue_free()
 	bricks_left = 0
 	var total_w: float = COLS * BRICK_W + (COLS - 1) * BRICK_GAP
@@ -169,6 +173,9 @@ func _on_brick_destroyed() -> void:
 
 func _on_paddle_hit(hit_ball: CharacterBody2D) -> void:
 	combo = 0
+	ball_speed = minf(ball_speed * BALL_SPEEDUP, BALL_MAX_SPEED)
+	hit_ball.speed = ball_speed
+	hit_ball.velocity = hit_ball.velocity.normalized() * ball_speed
 	_sync_pierce_count(hit_ball)
 	_update_hud()
 
@@ -225,7 +232,7 @@ func _compute_stars() -> int:
 	return count
 
 
-func _on_upgrade_selected(upgrade) -> void:
+func _on_upgrade_selected(upgrade: Upgrade) -> void:
 	upgrades[upgrade.id] = upgrades.get(upgrade.id, 0) + 1
 	_apply_upgrade(upgrade.id)
 	_start_next_round()
@@ -243,8 +250,9 @@ func _apply_upgrade(id: int) -> void:
 				cr.size.x = new_w
 				cr.position.x = -new_w / 2.0
 		Upgrade.Type.SLOW_BALL:
+			ball_speed *= 0.8
 			for b in balls:
-				b.speed *= 0.8
+				b.speed = ball_speed
 		Upgrade.Type.EXTRA_LIFE:
 			lives += 1
 		Upgrade.Type.MULTI_BALL:
@@ -274,9 +282,7 @@ func _spawn_ball() -> void:
 		return
 	var new_ball: CharacterBody2D = ball_scene.instantiate()
 	new_ball.bounds = playfield
-	# Inherit speed from the first ball
-	if balls.size() > 0 and is_instance_valid(balls[0]):
-		new_ball.speed = balls[0].speed
+	new_ball.speed = ball_speed
 	add_child(new_ball)
 	_connect_ball_signals(new_ball)
 	balls.append(new_ball)

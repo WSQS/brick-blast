@@ -43,8 +43,6 @@ func _physics_process(delta: float) -> void:
 			collider.destroy()
 		elif collider == parent.get("paddle"):
 			velocity = bounce_off_paddle(global_position, collider.get_rect(), speed)
-			speed = minf(speed * 1.03, MAX_SPEED)
-			velocity = velocity.normalized() * speed
 			hit_paddle.emit(self)
 
 	if global_position.y > bounds.end.y + LOSE_MARGIN:

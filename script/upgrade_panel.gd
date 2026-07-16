@@ -27,7 +27,7 @@ func _create_buttons() -> void:
 
 
 func show_choices() -> void:
-	var choices: Array = Upgrade.random_choices(buttons.size())
+	var choices: Array[Upgrade] = Upgrade.random_choices(buttons.size())
 	for i in choices.size():
 		buttons[i].text = "%s\n%s" % [choices[i].display_name, choices[i].description]
 		buttons[i].set_meta("upgrade", choices[i])
@@ -37,7 +37,7 @@ func show_choices() -> void:
 func _on_choice_pressed(index: int) -> void:
 	if not visible:
 		return
-	var upgrade = buttons[index].get_meta("upgrade")
+	var upgrade: Upgrade = buttons[index].get_meta("upgrade")
 	_hide_panel()
 	upgrade_selected.emit(upgrade)
 
