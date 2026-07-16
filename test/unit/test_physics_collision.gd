@@ -244,6 +244,45 @@ func test_brick_collision_handler_triggers_on_brick_group() -> void:
 
 
 # ---------------------------------------------------------------------------
+# Bug reproduction: ball stuck under paddle (paddle moved over ball)
+# ---------------------------------------------------------------------------
+
+
+## Reproduces: player slides paddle fast, paddle ends up above the ball.
+## Ball collides with paddle from below, but bounce_off_paddle always
+## returns upward velocity — ball gets stuck bouncing against paddle
+## underside forever.
+func test_ball_not_stuck_when_paddle_above_ball() -> void:
+	paddle.position = Vector2(200, 400)
+	# Ball is BELOW the paddle, moving upward
+	ball.position = Vector2(200, 420)
+	ball.launch(Vector2(0, -1))
+
+	_simulate_physics_process(20, 1.0 / 60.0)
+
+	# Ball should NOT be stuck — it should either pass through or bounce
+	# downward. The key: it must not have upward velocity from paddle bounce.
+	assert_false(
+		_hit_paddle_from_below(ball, paddle),
+		"Ball should not bounce upward when hit from below paddle"
+	)
+	# Ball should be moving away (downward or passed through), not stuck
+	assert_true(
+		ball.velocity.y >= 0 or ball.position.y > paddle.position.y,
+		(
+			"Ball should not be stuck under paddle, velocity=%s pos.y=%s"
+			% [ball.velocity, ball.position.y]
+		)
+	)
+
+
+## Checks if the ball has an upward velocity while below the paddle center
+## — the signature of the "stuck under paddle" bug.
+func _hit_paddle_from_below(b: CharacterBody2D, p: StaticBody2D) -> bool:
+	return b.velocity.y < 0 and b.position.y > p.position.y
+
+
+# ---------------------------------------------------------------------------
 # Bug reproduction: brick destroyed signal fires twice (multi-ball scenario)
 # ---------------------------------------------------------------------------
 

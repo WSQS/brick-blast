@@ -42,8 +42,14 @@ func _physics_process(delta: float) -> void:
 				velocity = velocity.bounce(collision.get_normal())
 			collider.destroy()
 		elif collider == parent.get("paddle"):
-			velocity = bounce_off_paddle(global_position, collider.get_rect(), speed)
-			hit_paddle.emit(self)
+			if global_position.y < collider.global_position.y:
+				# Ball hits paddle from above — normal paddle bounce
+				velocity = bounce_off_paddle(global_position, collider.get_rect(), speed)
+				hit_paddle.emit(self)
+			else:
+				# Ball is below paddle (paddle slid over it) — bounce downward
+				# to prevent the ball from getting stuck against the paddle underside
+				velocity.y = absf(velocity.y)
 
 	if global_position.y > bounds.end.y + LOSE_MARGIN:
 		lost.emit(self)
