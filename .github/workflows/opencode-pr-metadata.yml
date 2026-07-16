@@ -57,8 +57,13 @@ jobs:
                - scope: ball | brick | paddle | upgrade | menu | physics | test
                If the PR spans multiple areas, use a plain descriptive title instead.
                Keep under 72 characters. Do not add a trailing period.
-            3. Rewrite the PR body in English. Use this structure:
+            3. Append an AI-generated section to the PR body in English.
+               Do NOT overwrite or remove existing body content — preserve it
+               as-is and append below a `---` separator. If an existing
+               `<!-- opencode-generated -->` block is present, replace only
+               that block. Use this structure inside the block:
 
+               <!-- opencode-generated -->
                ## Summary
                - Briefly explain what changed and why.
 
@@ -72,6 +77,7 @@ jobs:
                ## Notes for Reviewers
                - Highlight risk areas, edge cases, or breaking changes.
                - If none, omit this section.
+               <!-- /opencode-generated -->
 
             Rules:
             - Base title and body strictly on the diff and commit messages.
