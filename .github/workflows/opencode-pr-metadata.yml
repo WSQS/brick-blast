@@ -50,9 +50,13 @@ jobs:
 
             Task:
             1. Inspect the PR title, body, commits, and diff.
-            2. Rewrite the PR title following Angular commit convention:
-               `type(scope): lowercase subject` (e.g. `feat(ball): add multi-ball`).
-               Keep under 72 characters.
+            2. Rewrite the PR title as a concise summary of the overall change.
+               If the PR is a single focused change, use Angular commit format:
+               `type(scope): lowercase subject`
+               - type: feat | fix | refactor | test | docs | chore | style
+               - scope: ball | brick | paddle | upgrade | menu | physics | test
+               If the PR spans multiple areas, use a plain descriptive title instead.
+               Keep under 72 characters. Do not add a trailing period.
             3. Rewrite the PR body in English. Use this structure:
 
                ## Summary
