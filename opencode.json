@@ -29,5 +29,27 @@
     }
   },
   "model": "ns-deepseek/deepseek-v4-pro",
-  "small_model": "ns-deepseek/deepseek-v4-flash"
+  "small_model": "ns-deepseek/deepseek-v4-flash",
+  "mcp": {
+    "github": {
+      "type": "local",
+      "command": [
+        "docker",
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "-e",
+        "GITHUB_TOOLSETS=pull_requests,repos,issues",
+        "-e",
+        "GITHUB_FEATURES=pull_requests_granular",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "environment": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_TOKEN}"
+      },
+      "timeout": 30000
+    }
+  }
 }
