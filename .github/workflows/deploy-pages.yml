@@ -64,6 +64,7 @@ jobs:
           path: dist/Web
 
   deploy:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     needs: export_web
     runs-on: ubuntu-latest
     name: Deploy to GitHub Pages
