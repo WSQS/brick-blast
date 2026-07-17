@@ -23,6 +23,9 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Decode Android keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > brick-blast.keystore
+
       - name: Export game
         id: export
         uses: firebelley/godot-export@v7.0.0
@@ -30,8 +33,12 @@ jobs:
           godot_executable_download_url: https://downloads.godotengine.org/?flavor=stable&platform=linux.64&slug=linux.x86_64.zip&version=4.7
           godot_export_templates_download_url: https://downloads.godotengine.org/?flavor=stable&platform=templates&slug=export_templates.tpz&version=4.7
           relative_project_path: ./
-          export_debug: true
+          export_debug: false
           archive_output: false
+        env:
+          GODOT_ANDROID_KEYSTORE_RELEASE_PATH: ${{ github.workspace }}/brick-blast.keystore
+          GODOT_ANDROID_KEYSTORE_RELEASE_USER: brick-blast
+          GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASS }}
 
       - name: Upload Android APK
         uses: actions/upload-artifact@v4
