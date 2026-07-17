@@ -9,7 +9,7 @@ A classic brick-breaker game built with [Godot 4.7](https://godotengine.org).
 - **Ball stick**: ball waits on paddle until launch (Space / click)
 - **Star rating**: 1-3 stars based on combo performance and lives lost
 - **Upgrade system**: choose 1 of 3 upgrades after clearing all bricks (5 types: wide paddle, slow ball, extra life, multi-ball, pierce)
-- **Pause / resume**: Esc or on-screen pause button (top-right) to toggle
+- **Pause / resume**: Esc, on-screen pause button (top-right), or Android back gesture to toggle
 - **Main menu**: title screen with Start / Quit
 
 ## Requirements
@@ -36,7 +36,7 @@ The game starts at the main menu (`res://scene/menu.tscn`).
 |--------|-------------|
 | Move paddle | Mouse / Arrow keys |
 | Launch ball | Space / Click |
-| Pause | Esc / Pause button (top-right) |
+| Pause | Esc / Pause button (top-right) / Android back gesture |
 | Restart | Restart button (after game over) |
 
 ## Project Structure

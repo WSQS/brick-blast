@@ -52,7 +52,7 @@ Remaining questions: rarity mechanism, how star rating affects choice quantity/q
 **Context**: Ball auto-launches, player lacks control; no pause; no level transition.
 **Decisions**:
 1. Ball sticks to paddle (do): ball attaches to paddle and follows it, launch with click/Space. Pairs with combo system — player chooses starting position and launch timing, making combo skill-based rather than random
-2. Pause (do, minimal): Esc to pause, show Pause + Resume button + Menu button. On-screen pause button (top-right) added for touch devices (Android)
+2. Pause (do, minimal): Esc, on-screen pause button (top-right), or Android back gesture to pause, show Pause + Resume button + Menu button. Back gesture handled via `quit_on_go_back=false` + `go_back_requested` signal
 3. Level transition (defer to Phase 2): design when upgrade system starts
 **Priority**: Ball sticks + combo system together; pause added alongside; level transition deferred
 
