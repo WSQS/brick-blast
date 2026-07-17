@@ -1,0 +1,41 @@
+name: CI Build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  export-android:
+    runs-on: ubuntu-latest
+    name: Export Android APK
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Export game
+        id: export
+        uses: firebelley/godot-export@v7.0.0
+        with:
+          godot_executable_download_url: https://downloads.godotengine.org/?flavor=stable&platform=linux.64&slug=linux.x86_64.zip&version=4.7
+          godot_export_templates_download_url: https://downloads.godotengine.org/?flavor=stable&platform=templates&slug=export_templates.tpz&version=4.7
+          relative_project_path: ./
+          export_debug: true
+          archive_output: false
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: brick-blast-android-${{ github.sha }}
+          path: ${{ steps.export.outputs.build_directory }}/*.apk
+          retention-days: 30
