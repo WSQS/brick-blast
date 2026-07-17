@@ -41,6 +41,7 @@ const BALL_SPEEDUP: float = 1.03
 @onready var restart_button: Button = $HUD/RestartButton
 @onready var menu_button: Button = $HUD/MenuButton
 @onready var upgrade_panel: CanvasLayer = $UpgradePanel
+@onready var pause_button: Button = $HUD/PauseButton
 
 var lives: int = START_LIVES
 var score: int = 0
@@ -81,14 +82,20 @@ func _input(event: InputEvent) -> void:
 			state = State.PLAYING
 			_launch_ball()
 	if event.is_action_pressed("ui_cancel"):
-		if state == State.PAUSED:
-			state = _state_before_pause
-			message.hide()
-		elif state != State.GAME_OVER:
-			_state_before_pause = state
-			state = State.PAUSED
-			message.text = "PAUSED"
-			message.show()
+		toggle_pause()
+
+
+func toggle_pause() -> void:
+	if state == State.GAME_OVER or state == State.ROUND_CLEAR:
+		return
+	if state == State.PAUSED:
+		state = _state_before_pause
+		message.hide()
+	else:
+		_state_before_pause = state
+		state = State.PAUSED
+		message.text = "PAUSED"
+		message.show()
 
 
 ## Returns true when the game is actively playing (ball in motion).
@@ -299,6 +306,10 @@ func _update_hud() -> void:
 
 func _on_restart_pressed() -> void:
 	get_tree().reload_current_scene()
+
+
+func _on_pause_pressed() -> void:
+	toggle_pause()
 
 
 func _on_menu_pressed() -> void:

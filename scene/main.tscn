@@ -81,7 +81,19 @@ grow_horizontal = 0
 text = "Menu"
 visible = false
 
+[node name="PauseButton" type="Button" parent="HUD"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -56.0
+offset_top = 8.0
+offset_right = -16.0
+offset_bottom = 40.0
+grow_horizontal = 0
+text = "II"
+
 [node name="UpgradePanel" parent="." instance=ExtResource("5_upgrade")]
 
 [connection signal="pressed" from="HUD/RestartButton" to="." method="_on_restart_pressed"]
 [connection signal="pressed" from="HUD/MenuButton" to="." method="_on_menu_pressed"]
+[connection signal="pressed" from="HUD/PauseButton" to="." method="_on_pause_pressed"]
