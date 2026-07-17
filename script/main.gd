@@ -65,6 +65,7 @@ func _ready() -> void:
 	paddle.bounds = playfield
 	if upgrade_panel and upgrade_panel.has_signal("upgrade_selected"):
 		upgrade_panel.upgrade_selected.connect(_on_upgrade_selected)
+	get_tree().root.go_back_requested.connect(_on_go_back_requested)
 	_spawn_ball()
 	_spawn_bricks()
 	_reset_round()
@@ -309,6 +310,10 @@ func _on_restart_pressed() -> void:
 
 
 func _on_pause_pressed() -> void:
+	toggle_pause()
+
+
+func _on_go_back_requested() -> void:
 	toggle_pause()
 
 
