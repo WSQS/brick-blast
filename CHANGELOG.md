@@ -4,6 +4,20 @@ All notable changes to brick-blast will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- On-screen pause button (top-right "II") for touch devices (Android)
+- `toggle_pause()` method on `main.gd` — shared by Esc input and pause button
+- Android portrait orientation lock (`window/handheld/orientation=1`)
+- Fixed viewport stretch settings (`window/stretch/mode="viewport"`, `window/stretch/aspect="keep"`) to prevent adaptive scaling on Android
+- CI workflow `deploy-pages.yml`: exports Web + Android, deploys to GitHub Pages for direct APK download
+- CI workflow `ci-build.yml`: exports signed Android APK on push/PR as artifact
+- Copilot instruction: require explicit user approval before merging any PR
+
+### Changed
+
+- Pause logic refactored from inline `_input()` code back to `toggle_pause()` method, shared by both `_input()` (Esc/back button) and `_on_pause_pressed()` (button tap)
+
 ## [0.1.0] - 2026-07-16
 
 ### Added
@@ -36,7 +50,7 @@ All notable changes to brick-blast will be documented in this file.
 ### Changed (code review refactoring)
 
 - State transitions centralized: all `state = State.X` assignments moved to event handlers (`_ready`, `_input`, `_on_brick_destroyed`, `_on_ball_lost`, `_start_next_round`); behavior functions no longer mutate state
-- `_toggle_pause()` deleted: pause/resume logic inlined into `_input()`
+- `_toggle_pause()` inlined into `_input()` (later refactored back to `toggle_pause()` in Unreleased)
 - Redundant `_update_hud()` calls removed from `_ready`, `_start_next_round`, `_on_ball_lost`
 - Unnecessary `is_instance_valid()` checks removed (balls array only contains valid nodes)
 - Ball speed unified: `ball_speed` variable on `main.gd` is the single source of truth; `_spawn_ball` uses it directly; SLOW_BALL upgrade and paddle-hit acceleration (`*= 1.03`) both update `ball_speed` then sync all balls

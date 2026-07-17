@@ -34,6 +34,7 @@ Targets Windows + Android + Web.
 | Paddle | `StaticBody2D` | Mouse/keyboard controlled, angle-based reflection |
 | UpgradePanel | `CanvasLayer` | 3-choice upgrade selection UI (layer=10), buttons created dynamically |
 | Upgrade | `Resource` (class_name) | Data model for power-up types |
+| Menu | `Control` | Title screen with Start / Quit buttons |
 
 Collision is handled by the **physics engine** (`move_and_collide` returns immediate collision info). Pure math helpers (wall bounce, paddle angle) are static methods on `ball.gd` for unit testing.
 
@@ -167,5 +168,5 @@ This ensures every bug fix is backed by a test that prevents regression. See the
 
 ## Roadmap (see docs/roadmap.md)
 
-Current: upgrade system with 5 power-ups (wide paddle, slow ball, extra life, multi-ball, pierce)
+Current: upgrade system with 5 power-ups (wide paddle, slow ball, extra life, multi-ball, pierce), Android portrait lock, on-screen pause button, GitHub Pages deployment for direct APK download
 Next: rarity system, star-rating influence on choices, level evolution direction
