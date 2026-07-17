@@ -50,5 +50,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: brick-blast-android-${{ github.sha }}
-          path: ${{ steps.export.outputs.build_directory }}/*.apk
+          path: ${{ steps.export.outputs.build_directory }}/**/*.apk
           retention-days: 30
