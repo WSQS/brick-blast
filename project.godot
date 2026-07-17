@@ -20,7 +20,7 @@ config/icon="res://icon.svg"
 
 window/size/viewport_width=480
 window/size/viewport_height=720
-window/handheld/orientation=0
+window/handheld/orientation=1
 window/stretch/mode="viewport"
 window/stretch/aspect="keep"
 
