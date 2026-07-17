@@ -21,7 +21,7 @@ Version planning and feature roadmap. Organized by version number, with themes a
 - GUT v9.6.1 test framework, 40 unit tests
 - CharacterBody2D + move_and_collide (CCD prevents tunneling)
 - Full scene loop: main menu → game → end
-- CI/CD: GitHub Actions auto-build Windows/Linux/Android/Web, tag triggers draft release
+- CI/CD: GitHub Actions auto-build Windows/Linux/Android/Web, tag triggers draft release, GitHub Pages deploys Web + APK on push to master
 - 40/40 tests passing (total now 75, see v0.1)
 
 ---
