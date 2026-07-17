@@ -91,7 +91,7 @@ func toggle_pause() -> void:
 	if state == State.PAUSED:
 		state = _state_before_pause
 		message.hide()
-	elif state != State.GAME_OVER:
+	else:
 		_state_before_pause = state
 		state = State.PAUSED
 		message.text = "PAUSED"
