@@ -4,7 +4,6 @@ on:
   push:
     branches: [master]
   pull_request:
-    branches: [master]
   workflow_dispatch:
 
 concurrency:
@@ -65,7 +64,6 @@ jobs:
           path: dist/Web
 
   deploy:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     needs: export_web
     runs-on: ubuntu-latest
     name: Deploy to GitHub Pages
