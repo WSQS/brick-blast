@@ -105,6 +105,7 @@ Start-Process "C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.
 
 ## Git Merge Convention
 
+- **Always ask the User before merging any PR.** Never merge without explicit approval.
 - **Always use `--merge` (not `--squash`)** when merging PRs.
 - **Use `merge` (not `rebase`)** when resolving conflicts with the base branch.
 - Preserve the full commit history and the merge commit.
