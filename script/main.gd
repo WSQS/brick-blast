@@ -179,7 +179,10 @@ func _spawn_bricks() -> void:
 			var ch: String = row_str[col]
 			if ch == " ":
 				continue
-			var color_idx: int = LEVEL_CHAR_MAP.get(ch, 0)
+			var color_idx: int = LEVEL_CHAR_MAP.get(ch, -1)
+			if color_idx == -1:
+				push_error("Unknown level character: '%s' in level %d" % [ch, current_level])
+				continue
 			var brick: StaticBody2D = brick_scene.instantiate()
 			brick.color = COLORS[color_idx]
 			brick.position = Vector2(
