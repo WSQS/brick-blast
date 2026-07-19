@@ -145,7 +145,7 @@ jobs:
             - **Proposed fix** (when applicable): a diff block
 
             Format:
-            ```
+            ````
             <severity> | <category>
 
             <description>
@@ -156,7 +156,7 @@ jobs:
             - old code
             + new code
             ```
-            ```
+            ````
 
             Guidelines:
             - Only comment on actionable issues. Skip trivial praise.
