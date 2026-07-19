@@ -116,16 +116,9 @@ Start-Process "C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.
 - Scene scripts go in `script/`, scene files in `scene/`, tests in `test/unit/`
 - Update `CHANGELOG.md` for notable changes
 
-## Git Merge Convention
+## PR & Git Workflow
 
-- **Always ask the User before merging any PR.** Never merge without explicit approval.
-- **Always use `--merge` (not `--squash`)** when merging PRs.
-- **Use `merge` (not `rebase`)** when resolving conflicts with the base branch.
-- Preserve the full commit history and the merge commit.
-- Example: `gh pr merge <N> --merge --delete-branch`
-- Example: `git merge origin/master` (not `git rebase`)
-
-## Git Commit Convention (Angular)
+### Commits
 
 Follow the [Angular commit convention](https://github.com/angular/angular/blob/main/CONTRIBUTING.md#commit). Format:
 
@@ -137,8 +130,6 @@ Follow the [Angular commit convention](https://github.com/angular/angular/blob/m
 <optional footer>
 ```
 
-### Types
-
 | Type | When to use |
 |------|-------------|
 | `feat` | New feature |
@@ -149,16 +140,14 @@ Follow the [Angular commit convention](https://github.com/angular/angular/blob/m
 | `style` | Formatting, no code change |
 | `chore` | Build, tooling, dependencies, CI |
 
-### Rules
-
+Rules:
 - Subject line: lowercase, no period, imperative mood (e.g. "add", not "added")
 - Scope: optional, single word for the affected area (e.g. `ball`, `brick`, `menu`, `test`)
 - Body: explain **what** and **why**, not how
 - Breaking changes: add `BREAKING CHANGE:` in footer
 - Use multiple `-m` flags if needed, but keep the structure
 
-### Examples
-
+Examples:
 ```
 feat(menu): add main menu with start and quit buttons
 fix(ball): bounce off brick surface instead of sticking
@@ -167,7 +156,33 @@ test(collision): add game-over regression test
 docs: update changelog with architecture decision
 ```
 
-## Bug Fix Workflow
+### Creating a PR
+
+1. Create a feature branch: `git checkout -b <type>/<description>`
+2. Make changes, commit following the convention above
+3. Push: `git push origin <branch>`
+4. Create PR: `gh pr create --base <target> --head <branch> --title "..." --body "..."`
+5. Stay on the branch to address review feedback; switch back to `master` only after the PR is merged or closed
+
+### Reviewing
+
+When a reviewer (human or bot) leaves a comment:
+
+1. **Fix the issue** — commit to the PR branch.
+2. **Reply to the comment** — mention the fix commit, e.g. `Fixed in <sha>: <description>`.
+3. **Push** — the automated review workflow re-runs on new commits.
+4. **Resolve** — once the reviewer confirms, the conversation can be resolved.
+
+### Merging
+
+- **Always ask the User before merging any PR.** Never merge without explicit approval.
+- **Always use `--merge` (not `--squash`)** when merging PRs.
+- **Use `merge` (not `rebase`)** when resolving conflicts with the base branch.
+- Preserve the full commit history and the merge commit.
+- Example: `gh pr merge <N> --merge --delete-branch`
+- Example: `git merge origin/master` (not `git rebase`)
+
+### Bug Fixes
 
 When fixing a bug, follow this process:
 
