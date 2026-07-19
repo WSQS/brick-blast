@@ -184,12 +184,12 @@ When a reviewer (human or bot) leaves a comment:
 
 When fixing a bug:
 
-1. **Write a failing test that reproduces the bug** before making any code changes.
+1. **Write a failing test that reproduces the bug** before making any code changes. The test should assert the expected (correct) behavior and fail because of the bug.
 2. **Fix the code** so the test passes.
 3. **Keep the test** — it serves as regression protection. Place it in `test/unit/`.
 4. **Document the root cause** in the test comments and/or `CHANGELOG.md`.
 
-See the "groups lost on instantiation" fix as a reference example.
+This ensures every bug fix is backed by a test that prevents regression. See the "groups lost on instantiation" fix as a reference example.
 
 ## Roadmap (see docs/roadmap.md)
 
