@@ -4,6 +4,10 @@ All notable changes to brick-blast will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Multi-level system: 5 static levels with different brick layouts, level progression after each clear
+
 ### Changed
 
 - Release workflow: only upload APK instead of both APK and Android export zip

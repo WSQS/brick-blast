@@ -18,6 +18,29 @@ const COLORS: Array[Color] = [
 	Color("7c3aed"),
 ]
 
+# Level definitions: each level is an array of 5 rows (8 chars each).
+# Characters: R=red, O=orange, G=green, B=blue, P=purple, space=empty
+const LEVEL_CHAR_MAP: Dictionary = {
+	"R": 0,
+	"O": 1,
+	"G": 2,
+	"B": 3,
+	"P": 4,
+}
+
+const LEVELS: Array[Array] = [
+	# Level 1: Full grid
+	["RRRRRRRR", "OOOOOOOO", "GGGGGGGG", "BBBBBBBB", "PPPPPPPP"],
+	# Level 2: Diamond
+	["   RR   ", "  OOOO  ", " GGGGGG ", "  BBBB  ", "   PP   "],
+	# Level 3: Checkerboard
+	["R R R R ", " O O O O", "G G G G ", " B B B B", "P P P P "],
+	# Level 4: Frame
+	["RRRRRRRR", "R      R", "G      G", "B      B", "PPPPPPPP"],
+	# Level 5: Pillars
+	["R  O  G ", "R  O  G ", "R  O  G ", "R  O  G ", "R  O  G "],
+]
+
 # Paddle & ball
 const PADDLE_Y: float = 660.0
 const BALL_OFFSET: float = 40.0
@@ -53,6 +76,7 @@ var lives_lost_this_level: int = 0
 
 var upgrades: Dictionary = {}  # Upgrade.Type -> stack count
 var rounds_cleared: int = 0
+var current_level: int = 0
 var balls: Array[CharacterBody2D] = []
 var ball_speed: float = BALL_SPEED
 
@@ -143,13 +167,21 @@ func _spawn_bricks() -> void:
 	for brick: Node in bricks.get_children():
 		brick.queue_free()
 	bricks_left = 0
+	var level_data: Array = _current_level_data()
 	var total_w: float = COLS * BRICK_W + (COLS - 1) * BRICK_GAP
 	var start_x: float = (playfield.size.x - total_w) / 2.0
 
 	for row in range(ROWS):
+		var row_str: String = level_data[row] if row < level_data.size() else ""
 		for col in range(COLS):
+			if col >= row_str.length():
+				continue
+			var ch: String = row_str[col]
+			if ch == " ":
+				continue
+			var color_idx: int = LEVEL_CHAR_MAP.get(ch, 0)
 			var brick: StaticBody2D = brick_scene.instantiate()
-			brick.color = COLORS[row % COLORS.size()]
+			brick.color = COLORS[color_idx]
 			brick.position = Vector2(
 				start_x + col * (BRICK_W + BRICK_GAP) + BRICK_W / 2.0,
 				BRICK_MARGIN_TOP + row * (BRICK_H + BRICK_GAP) + BRICK_H / 2.0,
@@ -158,6 +190,10 @@ func _spawn_bricks() -> void:
 			brick.destroyed.connect(_on_brick_destroyed)
 			bricks.add_child(brick)
 			bricks_left += 1
+
+
+func _current_level_data() -> Array:
+	return LEVELS[current_level % LEVELS.size()]
 
 
 func _reset_round() -> void:
@@ -275,6 +311,7 @@ func _start_next_round() -> void:
 	for b in balls:
 		b.queue_free()
 	balls.clear()
+	current_level += 1
 	_spawn_ball()
 	_spawn_bricks()
 	_reset_round()
@@ -299,7 +336,7 @@ func _spawn_ball() -> void:
 
 
 func _update_hud() -> void:
-	score_label.text = "Score: %d" % score
+	score_label.text = "Score: %d   Lv.%d" % [score, current_level + 1]
 	lives_label.text = "Lives: %d" % lives
 	if combo > 0:
 		score_label.text += "  Combo: x%d" % combo

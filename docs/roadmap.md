@@ -46,6 +46,10 @@ Version planning and feature roadmap. Organized by version number, with themes a
 
 - [ ] Star rating affects upgrade choice quantity/quality
 
+### Completed (post v0.1.0)
+
+- ✅ Static multi-level system (D015): 5 levels with different brick layouts, level progression after each clear, upgrades persist across levels
+
 ### Candidate Upgrades (need playtest validation)
 
 | Upgrade | Effect | Type |

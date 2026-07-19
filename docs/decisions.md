@@ -14,14 +14,23 @@ Remaining questions: rarity mechanism, how star rating affects choice quantity/q
 **Status**: Core gameplay complete, see [roadmap.md](roadmap.md) v0.1.
 
 ### P003: Level Data Format
-- JSON files
-- Godot Resource (.tres)
-- 2D array / string
-**Status**: Deferred. D014 established single-level infinite mode, so multi-level data format is not needed yet. Revisit when level evolution direction is decided (see roadmap.md).
+**Status**: Resolved (2026-07-19). See D015 below.
+- Chose inline GDScript string arrays: each level is an array of 5 strings (8 chars each), characters map to brick colors.
+- Rationale: simplest format, no external files, readable, easy to add levels.
 
 ---
 
 ## Resolved Decisions
+
+### D015: Static Multi-Level System (2026-07-19)
+
+**Context**: Single-level infinite mode (D014) validated the upgrade loop. Now add variety with different brick layouts.
+
+**Decision**: 5 static levels with string-based brick definitions. Clear level → upgrade → advance to next level. When all 5 levels are cleared, loop back to level 1 (upgrades persist).
+
+**Format**: Inline GDScript arrays — each level is an array of 5 strings (8 chars each). Characters R/O/G/B/P map to brick colors, space = empty cell.
+
+**Rationale**: Simple format, no external file dependencies, easy to add/modify levels. Looping back keeps the infinite mode feel while adding variety.
 
 ### D014: Upgrade Selection System — Single-Level Infinite Mode (2026-07-14)
 
