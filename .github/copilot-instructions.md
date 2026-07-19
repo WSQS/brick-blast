@@ -145,6 +145,7 @@ Rules:
 - Scope: optional, single word for the affected area (e.g. `ball`, `brick`, `menu`, `test`)
 - Body: explain **what** and **why**, not how
 - Breaking changes: add `BREAKING CHANGE:` in footer
+- Use multiple `-m` flags if needed, but keep the structure
 
 Examples:
 ```
@@ -177,6 +178,7 @@ When a reviewer (human or bot) leaves a comment:
 - **Always ask the User before merging any PR.** Never merge without explicit approval.
 - **Always use `--merge` (not `--squash`)** when merging PRs.
 - **Use `merge` (not `rebase`)** when resolving conflicts with the base branch.
+- Preserve the full commit history and the merge commit.
 - Example: `gh pr merge <N> --merge --delete-branch`
 - Example: `git merge origin/master` (not `git rebase`)
 
