@@ -158,7 +158,7 @@ docs: update changelog with architecture decision
 
 ### Creating a PR
 
-1. Create a feature branch from `master`: `git checkout -b <type>/<description>`
+1. Create a feature branch: `git checkout -b <type>/<description>`
 2. Make changes, commit following the convention above
 3. Push: `git push origin <branch>`
 4. Create PR: `gh pr create --base master --head <branch> --title "..." --body "..."`
