@@ -50,9 +50,7 @@ jobs:
           for f in *Android*.zip; do
             unzip -o "$f" -d .
           done
-          # Collect final release files: zips + raw apk
           mkdir -p release
-          cp *.zip release/ 2>/dev/null || true
           cp *.apk release/ 2>/dev/null || true
           ls -la release/
 
