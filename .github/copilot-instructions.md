@@ -82,14 +82,14 @@ Declaring `[ext_resource type="Script" ...]` is not enough — the root node mus
 "~/path/to/godot" --headless -s addons/gut/gut_cmdln.gd -gtest=res://test/unit/test_physics_collision.gd -gexit 2>&1
 
 # Windows — run all tests
-cmd /c '"C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.windows.opt.tools.64.exe" --headless -s addons\gut\gut_cmdln.gd -gdir=res://test/unit -gexit 2>&1'
+cmd /c '"<godot_path>" --headless -s addons\gut\gut_cmdln.gd -gdir=res://test/unit -gexit 2>&1'
 
 # Windows — run a single test file
-cmd /c '"C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.windows.opt.tools.64.exe" --headless -s addons\gut\gut_cmdln.gd -gtest=res://test/unit/test_physics_collision.gd -gexit 2>&1'
+cmd /c '"<godot_path>" --headless -s addons\gut\gut_cmdln.gd -gtest=res://test/unit/test_physics_collision.gd -gexit 2>&1'
 
 # After changing scripts, clear cache and reimport
 Remove-Item .godot -Recurse -Force
-cmd /c '"C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.windows.opt.tools.64.exe" --headless --import 2>&1'
+cmd /c '"<godot_path>" --headless --import 2>&1'
 ```
 
 ## Running the Game
