@@ -161,7 +161,7 @@ docs: update changelog with architecture decision
 1. Create a feature branch: `git checkout -b <type>/<description>`
 2. Make changes, commit following the convention above
 3. Push: `git push origin <branch>`
-4. Create PR: `gh pr create --base master --head <branch> --title "..." --body "..."`
+4. Create PR: `gh pr create --base <target> --head <branch> --title "..." --body "..."`
 5. Stay on the branch to address review feedback; switch back to `master` only after the PR is merged or closed
 
 ### Reviewing
