@@ -23,7 +23,7 @@ Version planning and feature roadmap. Organized by version number, with themes a
 - Full scene loop: main menu → game → end
 - CI/CD: GitHub Actions auto-build Windows/Linux/Android/Web, tag triggers draft release, GitHub Pages deploys Web + APK on push to master
 - Android back gesture handling (`quit_on_go_back=false`, `go_back_requested` → pause/quit)
-- 40/40 tests passing (total now 75, see v0.1)
+- 40/40 tests passing (total now 77, see v0.1)
 
 ---
 
