@@ -20,7 +20,7 @@ const COLORS: Array[Color] = [
 
 # Level definitions: each level is an array of 5 rows (8 chars each).
 # Characters: R=red, O=orange, G=green, B=blue, P=purple, space=empty
-const LEVEL_CHAR_MAP: Dictionary = {
+const LEVEL_CHAR_MAP: Dictionary[String, int] = {
 	"R": 0,
 	"O": 1,
 	"G": 2,
@@ -28,7 +28,7 @@ const LEVEL_CHAR_MAP: Dictionary = {
 	"P": 4,
 }
 
-const LEVELS: Array[Array] = [
+const LEVELS: Array = [
 	# Level 1: Full grid
 	["RRRRRRRR", "OOOOOOOO", "GGGGGGGG", "BBBBBBBB", "PPPPPPPP"],
 	# Level 2: Diamond
