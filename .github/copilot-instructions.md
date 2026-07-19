@@ -66,6 +66,10 @@ In synchronous tests, `is_instance_valid(node)` returns `true` even after `destr
 
 Declaring `[ext_resource type="Script" ...]` is not enough — the root node must have `script = ExtResource("id")` to actually bind it. Without this, custom signals and methods won't exist at runtime.
 
+### 7. Android back gesture quits the app by default
+
+`SceneTree.quit_on_go_back` defaults to `true`, causing the Android system back gesture to immediately close the app. Set `application/config/quit_on_go_back=false` in `project.godot`, then connect `get_tree().root.go_back_requested` to handle it (e.g., call `toggle_pause()` in-game, `get_tree().quit()` in menus).
+
 ## Running Tests
 
 ```powershell
@@ -168,5 +172,5 @@ This ensures every bug fix is backed by a test that prevents regression. See the
 
 ## Roadmap (see docs/roadmap.md)
 
-Current: upgrade system with 5 power-ups (wide paddle, slow ball, extra life, multi-ball, pierce), Android portrait lock, on-screen pause button, GitHub Pages deployment for direct APK download
+Current: upgrade system with 5 power-ups (wide paddle, slow ball, extra life, multi-ball, pierce), Android portrait lock, on-screen pause button, Android back gesture handling, GitHub Pages deployment for direct APK download
 Next: rarity system, star-rating influence on choices, level evolution direction

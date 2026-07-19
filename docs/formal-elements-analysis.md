@@ -58,7 +58,7 @@ Fullerton's objective types:
 
 **Decision (D012)** — all implemented:
 1. **Ball sticks to paddle** ✅: ball attaches to paddle and follows, click/Space to launch
-2. **Pause** ✅: Esc or on-screen pause button (top-right) to toggle, minimal UI
+2. **Pause** ✅: Esc, on-screen pause button (top-right), or Android back gesture to toggle, minimal UI
 3. **Level transition**: deferred to Phase 2
 
 **Target flow**:

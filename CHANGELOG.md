@@ -7,7 +7,8 @@ All notable changes to brick-blast will be documented in this file.
 ### Added
 
 - On-screen pause button (top-right "II") for touch devices (Android)
-- `toggle_pause()` method on `main.gd` — shared by Esc input and pause button
+- `toggle_pause()` method on `main.gd` — shared by Esc input, pause button, and back gesture
+- Android back gesture handling: `application/config/quit_on_go_back=false` in `project.godot`, `go_back_requested` signal connected to `toggle_pause()` in `main.gd` and `get_tree().quit()` in `menu.gd`
 - Android portrait orientation lock (`window/handheld/orientation=1`)
 - Fixed viewport stretch settings (`window/stretch/mode="viewport"`, `window/stretch/aspect="keep"`) to prevent adaptive scaling on Android
 - CI workflow `deploy-pages.yml`: exports Web + Android, deploys to GitHub Pages for direct APK download
@@ -16,7 +17,7 @@ All notable changes to brick-blast will be documented in this file.
 
 ### Changed
 
-- Pause logic refactored from inline `_input()` code back to `toggle_pause()` method, shared by both `_input()` (Esc/back button) and `_on_pause_pressed()` (button tap)
+- Pause logic refactored from inline `_input()` code back to `toggle_pause()` method, shared by `_input()` (Esc), `_on_pause_pressed()` (button tap), and `_on_go_back_requested()` (Android back gesture)
 
 ## [0.1.0] - 2026-07-16
 
