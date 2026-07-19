@@ -125,6 +125,17 @@ Start-Process "C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.
 - Example: `gh pr merge <N> --merge --delete-branch`
 - Example: `git merge origin/master` (not `git rebase`)
 
+## Review Comment Workflow
+
+When a reviewer (human or bot) leaves a comment on a PR:
+
+1. **Fix the issue** — commit to the PR branch.
+2. **Reply to the comment** — mention the fix commit, e.g. `Fixed in <sha>: <description>`.
+3. **Push** — the automated review workflow re-runs on new commits.
+4. **Resolve** — once the reviewer confirms, the conversation can be resolved.
+
+This ensures every comment has a clear trail showing whether it was addressed.
+
 ## Git Commit Convention (Angular)
 
 Follow the [Angular commit convention](https://github.com/angular/angular/blob/main/CONTRIBUTING.md#commit). Format:
