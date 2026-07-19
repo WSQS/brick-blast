@@ -51,7 +51,10 @@ jobs:
             unzip -o "$f" -d .
           done
           mkdir -p release
+          cp *.zip release/ 2>/dev/null || true
           cp *.apk release/ 2>/dev/null || true
+          # Remove redundant Android zip; APK is already included
+          rm -f release/*Android*.zip
           ls -la release/
 
       - name: Create release
