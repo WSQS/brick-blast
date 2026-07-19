@@ -23,77 +23,75 @@ position = Vector2(240, 660)
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
-[node name="ScoreLabel" type="Label" parent="HUD"]
-offset_left = 16.0
-offset_top = 8.0
-offset_right = 200.0
-offset_bottom = 40.0
+[node name="MarginContainer" type="MarginContainer" parent="HUD"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="HUD/MarginContainer"]
+layout_mode = 2
+
+[node name="TopBar" type="HBoxContainer" parent="HUD/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="ScoreLabel" type="Label" parent="HUD/MarginContainer/VBox/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Score: 0"
 
-[node name="LivesLabel" type="Label" parent="HUD"]
-offset_left = 340.0
-offset_top = 8.0
-offset_right = 464.0
-offset_bottom = 40.0
+[node name="LivesLabel" type="Label" parent="HUD/MarginContainer/VBox/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
 text = "Lives: 3"
 horizontal_alignment = 2
 
-[node name="Message" type="Label" parent="HUD"]
+[node name="PauseButton" type="Button" parent="HUD/MarginContainer/VBox/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "II"
+
+[node name="SpacerTop" type="Control" parent="HUD/MarginContainer/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CenterContainer" type="CenterContainer" parent="HUD/MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="CenterVBox" type="VBoxContainer" parent="HUD/MarginContainer/VBox/CenterContainer"]
+layout_mode = 2
+
+[node name="Message" type="Label" parent="HUD/MarginContainer/VBox/CenterContainer/CenterVBox"]
+unique_name_in_owner = true
+layout_mode = 2
 visible = false
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -120.0
-offset_top = -30.0
-offset_right = 120.0
-offset_bottom = 30.0
-grow_horizontal = 2
-grow_vertical = 2
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="RestartButton" type="Button" parent="HUD"]
+[node name="RestartButton" type="Button" parent="HUD/MarginContainer/VBox/CenterContainer/CenterVBox"]
+unique_name_in_owner = true
+layout_mode = 2
 visible = false
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -60.0
-offset_top = 20.0
-offset_right = 60.0
-offset_bottom = 60.0
-grow_horizontal = 2
-grow_vertical = 2
 text = "Restart"
 
-[node name="MenuButton" type="Button" parent="HUD"]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -80.0
-offset_top = 40.0
-offset_right = -16.0
-offset_bottom = 72.0
-grow_horizontal = 0
-text = "Menu"
+[node name="MenuButton" type="Button" parent="HUD/MarginContainer/VBox/CenterContainer/CenterVBox"]
+unique_name_in_owner = true
+layout_mode = 2
 visible = false
+text = "Menu"
 
-[node name="PauseButton" type="Button" parent="HUD"]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -56.0
-offset_top = 8.0
-offset_right = -16.0
-offset_bottom = 40.0
-grow_horizontal = 0
-text = "II"
+[node name="SpacerBottom" type="Control" parent="HUD/MarginContainer/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
 
 [node name="UpgradePanel" parent="." instance=ExtResource("5_upgrade")]
 
-[connection signal="pressed" from="HUD/RestartButton" to="." method="_on_restart_pressed"]
-[connection signal="pressed" from="HUD/MenuButton" to="." method="_on_menu_pressed"]
-[connection signal="pressed" from="HUD/PauseButton" to="." method="_on_pause_pressed"]
+[connection signal="pressed" from="HUD/MarginContainer/VBox/CenterContainer/CenterVBox/RestartButton" to="." method="_on_restart_pressed"]
+[connection signal="pressed" from="HUD/MarginContainer/VBox/CenterContainer/CenterVBox/MenuButton" to="." method="_on_menu_pressed"]
+[connection signal="pressed" from="HUD/MarginContainer/VBox/TopBar/PauseButton" to="." method="_on_pause_pressed"]
