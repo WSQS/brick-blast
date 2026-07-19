@@ -2,6 +2,8 @@
 
 All notable changes to brick-blast will be documented in this file.
 
+## [Unreleased]
+
 ## [0.1.1] - 2026-07-19
 
 ### Changed
