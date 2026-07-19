@@ -68,14 +68,14 @@ gdformat script/ test/unit/
 
 ## Running Tests
 
+**Linux:**
 ```bash
-cmd /c '"<godot_path>" --headless -s addons\gut\gut_cmdln.gd -gdir=res://test/unit -gexit 2>&1'
+"/path/to/godot" --headless -s addons/gut/gut_cmdln.gd -gdir=res://test/unit -gexit 2>&1
 ```
 
-Example:
-
+**Windows:**
 ```bash
-cmd /c '"C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.windows.opt.tools.64.exe" --headless -s addons\gut\gut_cmdln.gd -gdir=res://test/unit -gexit 2>&1'
+cmd /c '"<godot_path>" --headless -s addons\gut\gut_cmdln.gd -gdir=res://test/unit -gexit 2>&1'
 ```
 
 ## Documentation

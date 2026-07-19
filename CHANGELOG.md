@@ -4,6 +4,11 @@ All notable changes to brick-blast will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- HUD refactored to use container-based adaptive layout (MarginContainer, VBoxContainer, HBoxContainer, CenterContainer) instead of manual offset positioning
+- `@onready` paths in `main.gd` switched to `%` unique name references for HUD nodes
+
 ### Added
 
 - On-screen pause button (top-right "II") for touch devices (Android)

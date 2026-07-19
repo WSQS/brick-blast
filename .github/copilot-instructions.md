@@ -7,7 +7,9 @@ Targets Windows + Android + Web.
 
 ## Tech Stack
 
-- **Engine**: Godot 4.7 (Steam, path: `C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.windows.opt.tools.64.exe`)
+- **Engine**: Godot 4.7 (Steam)
+  - Windows: `C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.windows.opt.tools.64.exe`
+  - Linux: `~/.local/share/Steam/steamapps/common/Godot Engine/godot.x11.opt.tools.64`
 - **Language**: GDScript
 - **Testing**: GUT (Godot Unit Test) v9.6.1, installed at `addons/gut/`
 - **Resolution**: 480×720 (portrait)
@@ -73,10 +75,16 @@ Declaring `[ext_resource type="Script" ...]` is not enough — the root node mus
 ## Running Tests
 
 ```powershell
-# Run all tests
+# Linux — run all tests
+"~/path/to/godot" --headless -s addons/gut/gut_cmdln.gd -gdir=res://test/unit -gexit 2>&1
+
+# Linux — run a single test file
+"~/path/to/godot" --headless -s addons/gut/gut_cmdln.gd -gtest=res://test/unit/test_physics_collision.gd -gexit 2>&1
+
+# Windows — run all tests
 cmd /c '"C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.windows.opt.tools.64.exe" --headless -s addons\gut\gut_cmdln.gd -gdir=res://test/unit -gexit 2>&1'
 
-# Run a single test file
+# Windows — run a single test file
 cmd /c '"C:\Program Files (x86)\Steam\steamapps\common\Godot Engine\godot.windows.opt.tools.64.exe" --headless -s addons\gut\gut_cmdln.gd -gtest=res://test/unit/test_physics_collision.gd -gexit 2>&1'
 
 # After changing scripts, clear cache and reimport
