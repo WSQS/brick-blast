@@ -20,7 +20,6 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write
       contents: read
       pull-requests: write
       issues: write
@@ -91,6 +90,8 @@ jobs:
 
   review:
     needs: update-pr-metadata
+    # NOTE: This if condition is intentionally duplicated from the update-pr-metadata job.
+    # Keep both in sync when adding/removing bot exclusions.
     if: |
       github.event.pull_request.draft == false &&
       github.actor != 'opencode-agent[bot]' &&
@@ -101,7 +102,6 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write
       contents: read
       pull-requests: write
       issues: write
