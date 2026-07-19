@@ -193,7 +193,7 @@ func _spawn_bricks() -> void:
 
 
 func _current_level_data() -> Array:
-	return LEVELS[current_level % LEVELS.size()]
+	return LEVELS[current_level]
 
 
 func _reset_round() -> void:
@@ -311,7 +311,7 @@ func _start_next_round() -> void:
 	for b in balls:
 		b.queue_free()
 	balls.clear()
-	current_level += 1
+	current_level = (current_level + 1) % LEVELS.size()
 	_spawn_ball()
 	_spawn_bricks()
 	_reset_round()
