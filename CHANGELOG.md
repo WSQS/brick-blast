@@ -4,10 +4,14 @@ All notable changes to brick-blast will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-07-19
+
 ### Changed
 
 - HUD refactored to use container-based adaptive layout (MarginContainer, VBoxContainer, HBoxContainer, CenterContainer) instead of manual offset positioning
 - `@onready` paths in `main.gd` switched to `%` unique name references for HUD nodes
+- Pause logic refactored from inline `_input()` code back to `toggle_pause()` method, shared by `_input()` (Esc), `_on_pause_pressed()` (button tap), and `_on_go_back_requested()` (Android back gesture)
+- Consolidated 4 scattered git-related sections into `## PR & Git Workflow` in copilot instructions
 
 ### Added
 
@@ -18,11 +22,13 @@ All notable changes to brick-blast will be documented in this file.
 - Fixed viewport stretch settings (`window/stretch/mode="viewport"`, `window/stretch/aspect="keep"`) to prevent adaptive scaling on Android
 - CI workflow `deploy-pages.yml`: exports Web + Android, deploys to GitHub Pages for direct APK download
 - CI workflow `ci-build.yml`: exports signed Android APK on push/PR as artifact
+- CI workflow `opencode-pr`: auto-generates PR metadata and runs code review on every PR open/sync
 - Copilot instruction: require explicit user approval before merging any PR
+- Pre-commit `gdformat` hook via `hooks/pre-commit` and `sh hooks/install.sh`
 
-### Changed
+### Fixed
 
-- Pause logic refactored from inline `_input()` code back to `toggle_pause()` method, shared by `_input()` (Esc), `_on_pause_pressed()` (button tap), and `_on_go_back_requested()` (Android back gesture)
+- Pre-commit hook missing executable permission
 
 ## [0.1.0] - 2026-07-16
 
