@@ -59,12 +59,13 @@ Fullerton's objective types:
 **Decision (D012)** — all implemented:
 1. **Ball sticks to paddle** ✅: ball attaches to paddle and follows, click/Space to launch
 2. **Pause** ✅: Esc, on-screen pause button (top-right), or Android back gesture to toggle, minimal UI
-3. **Level transition**: deferred to Phase 2
+3. **Level transition** ✅: 5 levels cycle after each clear (D016); upgrades persist across levels
 
 **Target flow**:
 ```
 Menu → Start → Ball sticks to paddle → Click/Space to launch → Play (combo, bricks)
-  → Win/Lose → Restart/Menu
+  → Clear level → Upgrade choice → Advance to next level (loops after 5)
+  → Game Over �� Restart/Menu
   Esc → Pause (Resume / Menu)
 ```
 
@@ -78,7 +79,7 @@ Menu → Start → Ball sticks to paddle → Click/Space to launch → Play (com
 - Paddle moves horizontally, stops at walls
 - Ball bounces off walls, bricks, paddle
 - Paddle hit angle depends on contact position (center = straight up, edges = angled)
-- Bricks are one-hit destroy
+- Bricks default to one-hit destroy; hp is configurable per `BrickSpec` (D016), current levels all use hp=1
 - 3 lives, lose one only when ALL balls fall below paddle (multi-ball: extra balls don't cost lives)
 - Ball speed increases 3% per paddle hit (capped at 550)
 - Multi-ball: extra balls don't collide with each other (layer 2, mask 1)
@@ -86,7 +87,7 @@ Menu → Start → Ball sticks to paddle → Click/Space to launch → Play (com
 
 **Gaps**:
 - No dynamic effect rules (e.g. "speed up after N bricks destroyed")
-- No special brick types (hard, explosive, indestructible, power-up carrier)
+- No special brick types yet (hard, explosive, indestructible, power-up carrier). The `BrickBehavior` infrastructure (D016) is in place but no concrete behaviors are shipped.
 
 ---
 
@@ -157,7 +158,7 @@ No issues identified.
 |---------|--------|----------|
 | Players | ✅ | No change needed |
 | Objectives | ⚠️ | D010: Construction + Forbidden Act → Outwit (core implemented, star-upgrade link TODO) |
-| Procedures | ✅ | D012: Ball sticks + pause implemented, level transition deferred |
+| Procedures | ✅ | D012: Ball sticks + pause + level transition (D016) all implemented |
 | Rules | ✅ | Combo (D011), multi-ball, pierce rules all implemented |
 | Resources | ✅ | D011 combo + D014 upgrades (5/5) all implemented |
 | Conflict | ✅ | Solved by D011 (combo dilemma) + D014 (upgrade choices) |

@@ -1,6 +1,6 @@
 # Level System Design
 
-Status: **Draft** (2026-07-20) — awaiting implementation.
+Status: **Implemented** (2026-07-20, PR #37) — shipped in `feat/level-data-architecture`.
 
 This document specifies the architecture for level data, brick specs, and brick behaviors. It is the authoritative design reference; `decisions.md` (D016) records the decision to adopt it.
 
@@ -234,17 +234,24 @@ func configure(s: BrickSpec, poly: PackedVector2Array) -> void:
     _rebuild_visual()
     _rebuild_collision()
 
+## Trigger on_spawn lifecycle hooks. Call after configure() and add_child().
+func trigger_on_spawn(context: Node) -> void:
+    if spec:
+        for b in spec.behaviors:
+            b.on_spawn(self, context)
+
 func on_hit(ball: Node, context: Node) -> void:
     if _destroyed:
         return
     hp -= 1
-    var consumed := false
-    for b in spec.behaviors:
-        if b.on_hit(self, ball, context):
-            consumed = true
-    if hp <= 0:
+    if spec:
         for b in spec.behaviors:
-            b.on_destroy(self, context)
+            if b.on_hit(self, ball, context):
+                break  # behavior consumed the hit; skip remaining
+    if hp <= 0:
+        if spec:
+            for b in spec.behaviors:
+                b.on_destroy(self, context)
         destroy()
 
 func destroy() -> void:
@@ -450,7 +457,7 @@ The following are explicitly out of scope for this design:
 
 ## Migration Plan
 
-The implementation is split into steps, each ending with all tests green and the game bootable headless. One PR; commits per step.
+The implementation was split into steps, each ending with all tests green and the game bootable headless. All steps shipped in PR #37 (`feat/level-data-architecture`).
 
 1. **Step 1**: Add `BrickSpec` + `BrickBehavior` base classes. No consumers yet.
 2. **Step 2**: Add `BrickLayout` base + `AsciiLayout` + `PolygonLayout`. Unit tests for both.
@@ -459,9 +466,11 @@ The implementation is split into steps, each ending with all tests green and the
 5. **Step 5**: Create 5 level `.tres` files. Rewrite `main.gd` to consume `LevelData`. Wire `main.tscn`. Add level data integrity tests.
 6. **Step 6**: Sync documentation (`CHANGELOG.md`, `decisions.md` D016, `roadmap.md`, `copilot-instructions.md`).
 
-Future PRs:
-- **Step 7**: First concrete `BrickBehavior` (e.g., ExplodeBehavior) when a design need appears.
-- **Step 8**: Multi-hp brick gameplay validation.
+Post-merge review added: `trigger_on_spawn(context)` on `brick.gd`, invoked by `_spawn_bricks()` after `configure()` — completes the `on_spawn` lifecycle wiring.
+
+Future PRs (not yet started):
+- First concrete `BrickBehavior` (e.g., ExplodeBehavior) when a design need appears.
+- Multi-hp brick gameplay validation.
 
 ---
 

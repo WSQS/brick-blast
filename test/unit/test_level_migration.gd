@@ -48,7 +48,7 @@ func test_checker_produces_40_bricks() -> void:
 	assert_eq(main.bricks_left, 40, "Checker should have 40 bricks")
 
 
-func test_frame_produces_24_bricks() -> void:
+func test_frame_produces_22_bricks() -> void:
 	# Frame: row 0 = 8, row 4 = 8, rows 1-3 = 2 each → 8 + 2 + 2 + 2 + 8 = 22
 	var main := MainScene.instantiate()
 	add_child_autofree(main)

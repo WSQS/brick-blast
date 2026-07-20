@@ -17,7 +17,8 @@ All notable changes to brick-blast will be documented in this file.
   `ConvexPolygonShape2D`. Rectangles are 4-vertex polygons.
 - `on_hit()` on `brick.gd` with hp decrement and BrickBehavior lifecycle hooks
   (`on_hit` / `on_destroy` / `on_spawn`). Ball now calls `brick.on_hit()` for
-  non-pierce collisions; pierce still bypasses hp.
+  non-pierce collisions; pierce still bypasses hp. `trigger_on_spawn()` is
+  invoked by `_spawn_bricks()` after `configure()` to fire `on_spawn` hooks.
 - HUD shows current level number (`Lv.%d`).
 - 35 new unit tests covering layouts, level data, brick configuration, and
   level migration (112 total, all passing).

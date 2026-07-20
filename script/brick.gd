@@ -38,6 +38,13 @@ func configure(s: BrickSpec, poly: PackedVector2Array) -> void:
 	_rebuild_collision()
 
 
+## Trigger on_spawn lifecycle hooks. Call after configure() and add_child().
+func trigger_on_spawn(context: Node) -> void:
+	if spec:
+		for b in spec.behaviors:
+			b.on_spawn(self, context)
+
+
 ## Called when the ball hits this brick. Decrements hp, triggers behaviors,
 ## and destroys when hp reaches 0.
 func on_hit(ball: Node, context: Node) -> void:

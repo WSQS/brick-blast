@@ -148,6 +148,7 @@ func _spawn_bricks() -> void:
 		brick.add_to_group("brick")
 		brick.destroyed.connect(_on_brick_destroyed)
 		bricks.add_child(brick)
+		brick.trigger_on_spawn(self)
 		bricks_left += 1
 
 
