@@ -40,9 +40,11 @@ func _physics_process(delta: float) -> void:
 				pierce_count -= 1
 				# Move ball through the brick by the remaining distance
 				global_position += collision.get_remainder()
+				# Pierce destroys immediately (bypasses hp/behaviors)
+				collider.destroy()
 			else:
 				velocity = velocity.bounce(collision.get_normal())
-			collider.destroy()
+				collider.on_hit(self, parent)
 		elif collider == parent.get("paddle"):
 			if global_position.y < collider.global_position.y:
 				# Ball hits paddle from above — normal paddle bounce
