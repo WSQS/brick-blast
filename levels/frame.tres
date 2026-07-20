@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="LevelData" load_steps=8]
+
+[ext_resource type="Script" path="res://script/level_data.gd" id="1_level_data"]
+[ext_resource type="Script" path="res://script/ascii_layout.gd" id="2_ascii_layout"]
+[ext_resource type="Script" path="res://script/brick_spec.gd" id="3_brick_spec"]
+
+[sub_resource type="Resource" id="spec_R"]
+script = ExtResource("3_brick_spec")
+color = Color(0.913, 0.27, 0.376, 1)
+hp = 1
+
+[sub_resource type="Resource" id="spec_O"]
+script = ExtResource("3_brick_spec")
+color = Color(0.961, 0.651, 0.137, 1)
+hp = 1
+
+[sub_resource type="Resource" id="spec_G"]
+script = ExtResource("3_brick_spec")
+color = Color(0.086, 0.78, 0.604, 1)
+hp = 1
+
+[sub_resource type="Resource" id="spec_B"]
+script = ExtResource("3_brick_spec")
+color = Color(0.059, 0.204, 0.376, 1)
+hp = 1
+
+[sub_resource type="Resource" id="spec_P"]
+script = ExtResource("3_brick_spec")
+color = Color(0.486, 0.227, 0.929, 1)
+hp = 1
+
+[sub_resource type="Resource" id="layout"]
+script = ExtResource("2_ascii_layout")
+rows = ["RRRRRRRR", "R      R", "G      G", "B      B", "PPPPPPPP"]
+cell_size = Vector2(52, 22)
+grid_origin = Vector2(0, 80)
+gap = 4.0
+
+[resource]
+script = ExtResource("1_level_data")
+name = "Frame"
+encoding = SubResource("layout")
+specs = {
+"R": SubResource("spec_R"),
+"O": SubResource("spec_O"),
+"G": SubResource("spec_G"),
+"B": SubResource("spec_B"),
+"P": SubResource("spec_P")
+}
