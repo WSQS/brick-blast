@@ -9,8 +9,6 @@ extends StaticBody2D
 
 signal destroyed
 
-const BrickSpec = preload("res://script/brick_spec.gd")
-
 @export var color: Color = Color("e94560"):
 	set(v):
 		color = v
@@ -48,7 +46,8 @@ func on_hit(ball: Node, context: Node) -> void:
 	hp -= 1
 	if spec:
 		for b in spec.behaviors:
-			b.on_hit(self, ball, context)
+			if b.on_hit(self, ball, context):
+				break  # behavior consumed the hit; skip remaining
 	if hp <= 0:
 		if spec:
 			for b in spec.behaviors:

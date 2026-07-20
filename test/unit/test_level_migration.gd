@@ -29,7 +29,7 @@ func test_full_grid_produces_40_bricks() -> void:
 	assert_eq(main.bricks_left, 40, "Full Grid should have 40 bricks")
 
 
-func test_diamond_produces_20_bricks() -> void:
+func test_diamond_produces_18_bricks() -> void:
 	# Diamond layout: 2 + 4 + 6 + 4 + 2 = 18
 	var main := MainScene.instantiate()
 	add_child_autofree(main)

@@ -5,9 +5,6 @@ extends Node2D
 ## list is wired via the scene's `levels` export property (main.tscn), so Godot
 ## tracks the .tres files as dependencies for export.
 
-const LevelData = preload("res://script/level_data.gd")
-const BrickSpec = preload("res://script/brick_spec.gd")
-
 # Paddle & ball
 const PADDLE_Y: float = 660.0
 const BALL_OFFSET: float = 40.0
@@ -169,6 +166,8 @@ func _recenter_polygon(polygon: PackedVector2Array, offset: Vector2) -> PackedVe
 
 
 func _advance_level() -> void:
+	if levels.is_empty():
+		return
 	current_level = (current_level + 1) % levels.size()
 
 
