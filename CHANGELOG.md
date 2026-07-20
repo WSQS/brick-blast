@@ -4,9 +4,31 @@ All notable changes to brick-blast will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Level system architecture (D016): BrickSpec / BrickBehavior / BrickLayout
+  / LevelData Resource types with strategy-pattern layouts (AsciiLayout,
+  PolygonLayout). See `docs/design/level-system.md`.
+- 5 levels migrated to per-level `.tres` files under `levels/` (full_grid,
+  diamond, checker, frame, pillars), each self-contained with its own brick
+  specs table.
+- Per-level polygon rendering: all bricks (including ASCII rectangles) are
+  represented as polygons. Rendering uses `Polygon2D`; collision uses
+  `ConvexPolygonShape2D`. Rectangles are 4-vertex polygons.
+- `on_hit()` on `brick.gd` with hp decrement and BrickBehavior lifecycle hooks
+  (`on_hit` / `on_destroy` / `on_spawn`). Ball now calls `brick.on_hit()` for
+  non-pierce collisions; pierce still bypasses hp.
+- HUD shows current level number (`Lv.%d`).
+- 35 new unit tests covering layouts, level data, brick configuration, and
+  level migration (112 total, all passing).
+
 ### Changed
 
 - Release workflow: only upload APK instead of both APK and Android export zip
+- `main.gd` no longer hardcodes `COLS` / `ROWS` / `COLORS` / `LEVELS` /
+  `LEVEL_CHAR_MAP`. Level data is provided via the `levels` export property on
+  the scene (wired through `main.tscn` ext_resource for export dependency
+  tracking).
 
 ## [0.1.1] - 2026-07-19
 
