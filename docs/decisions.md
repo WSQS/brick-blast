@@ -68,7 +68,7 @@ Remaining questions: rarity mechanism, how star rating affects choice quantity/q
 **Decision**: Single-level infinite mode — clear level → choose upgrade → restart same level with upgrade state. No difficulty scaling for now, first validate whether upgrades are fun.
 
 **Initial upgrades** (5):
-- Wide paddle (+50%), slow ball (-20%), extra life (+1), multi-ball (+1 ball), pierce (pass through bricks without bouncing, limited to N bricks)
+- Wide paddle (+50%), slow ball (-20%), extra life (+1), multi-ball (+1 ball), pierce (1:1 exchange with brick hp, limited to N; dies → pass, else bounce)
 
 **Trigger**: 3-choice panel appears after each level clear.
 

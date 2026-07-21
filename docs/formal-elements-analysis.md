@@ -83,7 +83,7 @@ Menu → Start → Ball sticks to paddle → Click/Space to launch → Play (com
 - 3 lives, lose one only when ALL balls fall below paddle (multi-ball: extra balls don't cost lives)
 - Ball speed increases 3% per paddle hit (capped at 550)
 - Multi-ball: extra balls don't collide with each other (layer 2, mask 1)
-- Pierce: ball passes through up to N bricks without bouncing, resets on paddle hit
+- Pierce: ball exchanges pierce 1:1 with brick hp (dies → pass through; survives → bounce); resets on paddle hit
 
 **Gaps**:
 - No dynamic effect rules (e.g. "speed up after N bricks destroyed")

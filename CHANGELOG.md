@@ -15,16 +15,19 @@ All notable changes to brick-blast will be documented in this file.
 - Per-level polygon rendering: all bricks (including ASCII rectangles) are
   represented as polygons. Rendering uses `Polygon2D`; collision uses
   `ConvexPolygonShape2D`. Rectangles are 4-vertex polygons.
-- `on_hit()` on `brick.gd` with hp decrement and BrickBehavior lifecycle hooks
-  (`on_hit` / `on_destroy` / `on_spawn`). Ball now calls `brick.on_hit()` for
-  non-pierce collisions; pierce still bypasses hp. `trigger_on_spawn()` is
-  invoked by `_spawn_bricks()` after `configure()` to fire `on_spawn` hooks.
+- `on_hit()` / `apply_damage()` on `brick.gd` with hp decrement and BrickBehavior
+  lifecycle hooks (`on_hit` / `on_destroy` / `on_spawn`). Ball calls `on_hit()`
+  for non-pierce hits; pierce uses 1:1 exchange via `apply_damage(exchange)`.
+  `trigger_on_spawn()` is invoked by `_spawn_bricks()` after `configure()`.
 - HUD shows current level number (`Lv.%d`).
-- 35 new unit tests covering layouts, level data, brick configuration, and
-  level migration (112 total, all passing).
+- Unit tests covering layouts, level data, brick configuration, pierce exchange,
+  and level migration (all passing).
 
 ### Changed
 
+- Pierce is no longer instant kill: `min(pierce, hp)` is exchanged from both;
+  brick dies → pass through, brick survives → bounce (pierce spent). Behaviors
+  always run via `apply_damage`.
 - Release workflow: only upload APK instead of both APK and Android export zip
 - `main.gd` no longer hardcodes `COLS` / `ROWS` / `COLORS` / `LEVELS` /
   `LEVEL_CHAR_MAP`. Level data is provided via the `levels` export property on

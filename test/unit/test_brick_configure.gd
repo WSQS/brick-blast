@@ -77,6 +77,37 @@ func test_on_hit_destroys_at_zero_hp() -> void:
 	assert_true(brick._destroyed, "Brick should be marked destroyed")
 
 
+func test_apply_damage_partial_does_not_destroy() -> void:
+	var brick := BrickScene.instantiate()
+	add_child_autofree(brick)
+	brick.configure(_make_spec(Color.RED, 5), _make_rect_polygon())
+	var destroyed: bool = brick.apply_damage(3, null, null)
+	assert_false(destroyed, "Partial damage should not destroy")
+	assert_eq(brick.hp, 2, "hp 5 - 3 = 2")
+	assert_false(brick._destroyed, "Brick should still be alive")
+
+
+func test_apply_damage_exact_destroys() -> void:
+	var brick := BrickScene.instantiate()
+	add_child_autofree(brick)
+	brick.configure(_make_spec(Color.RED, 3), _make_rect_polygon())
+	watch_signals(brick)
+	var destroyed: bool = brick.apply_damage(3, null, null)
+	assert_true(destroyed, "Exact damage should destroy")
+	assert_true(brick.hp <= 0, "hp should be <= 0")
+	assert_signal_emitted(brick, "destroyed", "destroyed should fire on exact damage")
+
+
+func test_apply_damage_overkill_destroys() -> void:
+	var brick := BrickScene.instantiate()
+	add_child_autofree(brick)
+	brick.configure(_make_spec(Color.RED, 2), _make_rect_polygon())
+	watch_signals(brick)
+	var destroyed: bool = brick.apply_damage(5, null, null)
+	assert_true(destroyed, "Overkill damage should destroy")
+	assert_signal_emitted(brick, "destroyed", "destroyed should fire on overkill")
+
+
 func test_on_hit_is_noop_when_already_destroyed() -> void:
 	var brick := BrickScene.instantiate()
 	add_child_autofree(brick)

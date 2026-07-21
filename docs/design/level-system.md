@@ -278,14 +278,19 @@ func _rebuild_collision() -> void:
 ### Ball collision (`script/ball.gd`)
 
 ```gdscript
-# Before:
-collider.destroy()
+# No pierce:
+collider.on_hit(self, parent)  # apply_damage(1); bounce
 
-# After:
-collider.on_hit(self, get_parent())
+# With pierce (1:1 exchange with brick hp):
+exchange = min(pierce_count, brick.hp)
+pierce_count -= exchange
+destroyed = collider.apply_damage(exchange, self, parent)
+# destroyed → pass through (remainder); else → bounce
 ```
 
-The ball no longer calls `destroy()` directly; it calls `on_hit()`, which decrements hp, triggers behaviors, and destroys when hp reaches 0. For a 1-hp brick this is equivalent to the old behavior.
+- **No pierce**: `on_hit()` applies 1 damage, always bounces.
+- **Pierce**: exchanges `min(pierce, hp)` from both. Brick dies → pass through; brick survives → bounce (pierce spent). Behaviors (`on_hit` / `on_destroy`) always run via `apply_damage`.
+- Examples: pierce 3 + hp 5 → hp 2, pierce 0, bounce; pierce 3 + hp 3 → brick dies, pierce 0, pass; pierce 3 + hp 1 → brick dies, pierce 2, pass.
 
 ---
 

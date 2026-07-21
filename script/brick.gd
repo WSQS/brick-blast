@@ -45,12 +45,17 @@ func trigger_on_spawn(context: Node) -> void:
 			b.on_spawn(self, context)
 
 
-## Called when the ball hits this brick. Decrements hp, triggers behaviors,
-## and destroys when hp reaches 0.
+## Called when the ball hits this brick without pierce. Applies 1 damage.
 func on_hit(ball: Node, context: Node) -> void:
-	if _destroyed:
-		return
-	hp -= 1
+	apply_damage(1, ball, context)
+
+
+## Apply `amount` damage (pierce exchange may be > 1). Triggers on_hit behaviors
+## once, then on_destroy + destroy when hp reaches 0. Returns true if destroyed.
+func apply_damage(amount: int, ball: Node, context: Node) -> bool:
+	if _destroyed or amount <= 0:
+		return _destroyed
+	hp -= amount
 	if spec:
 		for b in spec.behaviors:
 			if b.on_hit(self, ball, context):
@@ -60,6 +65,7 @@ func on_hit(ball: Node, context: Node) -> void:
 			for b in spec.behaviors:
 				b.on_destroy(self, context)
 		destroy()
+	return _destroyed
 
 
 func destroy() -> void:

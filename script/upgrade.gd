@@ -14,7 +14,7 @@ static func all() -> Array[Upgrade]:
 		_create(Type.SLOW_BALL, "Slow Ball", "-20% ball speed"),
 		_create(Type.EXTRA_LIFE, "Extra Life", "+1 life"),
 		_create(Type.MULTI_BALL, "Multi-Ball", "Launch an extra ball"),
-		_create(Type.PIERCE, "Pierce", "Ball pierces through 3 bricks"),
+		_create(Type.PIERCE, "Pierce", "Ball exchanges 3 pierce with brick hp (pass if destroyed)"),
 	]
 
 

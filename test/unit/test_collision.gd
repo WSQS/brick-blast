@@ -113,3 +113,31 @@ func test_circle_overlaps_rect_false_when_gap() -> void:
 		circle_overlaps_rect(Vector2(100 + 26 + RADIUS + 5, 50), RADIUS, BRICK_RECT),
 		"Clear gap should not overlap"
 	)
+
+
+# ---------------------------------------------------------------------------
+# Pierce exchange (calc_pierce_exchange) — 1:1 with brick hp
+# ---------------------------------------------------------------------------
+
+
+func test_pierce_exchange_partial_leaves_brick_alive() -> void:
+	# pierce 3, hp 5 → exchange 3; hp left 2, pierce 0 → bounce
+	assert_eq(BallScript.calc_pierce_exchange(3, 5), 3, "exchange = min(3, 5) = 3")
+
+
+func test_pierce_exchange_exact_destroys_and_spends_all() -> void:
+	# pierce 3, hp 3 → exchange 3; brick dies, pierce 0 → pass through
+	assert_eq(BallScript.calc_pierce_exchange(3, 3), 3, "exchange = min(3, 3) = 3")
+
+
+func test_pierce_exchange_overkill_keeps_remaining_pierce() -> void:
+	# pierce 3, hp 1 → exchange 1; brick dies, pierce 2 left → pass through
+	assert_eq(BallScript.calc_pierce_exchange(3, 1), 1, "exchange = min(3, 1) = 1")
+
+
+func test_pierce_exchange_zero_pierce() -> void:
+	assert_eq(BallScript.calc_pierce_exchange(0, 5), 0, "No pierce → no exchange")
+
+
+func test_pierce_exchange_zero_hp() -> void:
+	assert_eq(BallScript.calc_pierce_exchange(3, 0), 0, "Dead brick → no exchange")

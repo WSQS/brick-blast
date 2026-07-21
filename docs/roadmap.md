@@ -58,7 +58,7 @@ Version planning and feature roadmap. Organized by version number, with themes a
 | Upgrade | Effect | Type |
 |---------|--------|------|
 | Multi-ball | Spawn 1 extra ball | Offense |
-| Pierce | Ball passes through bricks without bouncing (limit N) | Offense |
+| Pierce | 1:1 exchange with brick hp (dies → pass; survives → bounce; limit N) | Offense |
 | Wide paddle | Paddle width +50% | Defense |
 | Slow ball | Ball speed -20% | Defense |
 | Extra life | +1 life | Defense |
