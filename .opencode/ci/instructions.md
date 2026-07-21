@@ -1,22 +1,37 @@
-# Agent Instructions
+# CI Agent Instructions
 
-## Critical: Git and Branch Rules
+These instructions apply **only** when opencode runs inside GitHub Actions
+(both the `/oc` command workflow and the PR-metadata workflow). They are
+loaded via `OPENCODE_CONFIG=.opencode/ci/opencode.json`.
 
-**Do NOT run any git commands.** Do not create branches, switch branches, commit, or push.
+The local opencode CLI does **not** load this file — local users may run git
+normally.
 
-The opencode infrastructure automatically:
-1. Creates a working branch for you
-2. Commits your file changes
-3. Pushes the branch
-4. Opens a pull request
+---
 
-If you switch branches yourself, opencode detects the mismatch and **skips PR creation entirely**. Your work will be lost.
+## Critical: Git Is Owned by the Action, Not the Agent
 
-Just create and edit files. Let opencode handle the rest.
+**Do NOT run any git commands.** Do not create branches, switch branches,
+commit, stage, or push.
+
+The GitHub Action workflow is the sole git writer:
+1. It creates the working branch before invoking opencode.
+2. It commits file changes after opencode finishes.
+3. It pushes the branch and opens / updates the pull request.
+
+If the agent runs git itself, the action detects the resulting state mismatch
+and **silently skips PR creation** — the work is lost. This is enforced both
+by policy (this file) and by `permission.bash` in
+`.opencode/ci/opencode.json` (`"git *": "deny"`).
+
+Just create and edit files. Let the action handle git.
+
+---
 
 ## Code Review Mode
 
-When asked to "review" a pull request (including bare `/oc` or `/oc review`), follow this structured review workflow using the GitHub MCP tools.
+When asked to "review" a pull request (including bare `/oc` or `/oc review`),
+follow this structured review workflow using the GitHub MCP tools.
 
 ### Step 1: Gather Context
 
