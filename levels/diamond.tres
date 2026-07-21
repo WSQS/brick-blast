@@ -35,6 +35,7 @@ rows = ["   RR   ", "  OOOO  ", " GGGGGG ", "  BBBB  ", "   PP   "]
 cell_size = Vector2(52, 22)
 grid_origin = Vector2(0, 80)
 gap = 4.0
+target_width = 480.0
 
 [resource]
 script = ExtResource("1_level_data")
