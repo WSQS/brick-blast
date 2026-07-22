@@ -53,7 +53,7 @@
         "GITHUB_TOOLSETS=pull_requests,repos,issues",
         "-e",
         "GITHUB_FEATURES=pull_requests_granular",
-        "ghcr.io/github/github-mcp-server"
+        "ghcr.io/github/github-mcp-server:v1.5.0"
       ],
       "environment": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_TOKEN}"
