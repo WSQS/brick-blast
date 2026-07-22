@@ -39,9 +39,6 @@
       "git *": "deny"
     }
   },
-  "tools": {
-    "list_mcp_resource_templates": false
-  },
   "mcp": {
     "github": {
       "type": "local",
