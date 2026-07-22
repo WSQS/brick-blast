@@ -30,7 +30,15 @@
   },
   "model": "ns-deepseek/deepseek-v4-pro",
   "small_model": "ns-deepseek/deepseek-v4-flash",
-  "instructions": [".github/copilot-instructions.md"],
+  "instructions": [
+    ".github/copilot-instructions.md",
+    ".opencode/ci/instructions.md"
+  ],
+  "permission": {
+    "bash": {
+      "git *": "deny"
+    }
+  },
   "mcp": {
     "github": {
       "type": "local",
