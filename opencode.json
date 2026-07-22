@@ -31,9 +31,6 @@
   "model": "ns-deepseek/deepseek-v4-pro",
   "small_model": "ns-deepseek/deepseek-v4-flash",
   "instructions": [".github/copilot-instructions.md"],
-  "tools": {
-    "list_mcp_resource_templates": false
-  },
   "mcp": {
     "github": {
       "type": "local",
