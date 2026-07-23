@@ -29,16 +29,22 @@ Targets Windows + Android + Web.
 
 ## Architecture
 
-| Node | Type | Role |
+| Node / Type | Kind | Role |
 |------|------|------|
 | Ball | `CharacterBody2D` | `move_and_collide()` for CCD, velocity-based bouncing. Emits `hit_paddle` / `lost` signals |
-| Brick | `StaticBody2D` | Destructible block, emits `destroyed` signal |
+| Brick | `StaticBody2D` | Destructible block, emits `destroyed` signal. Configured via `configure(spec, polygon)`; ball calls `on_hit()` which decrements hp and triggers behaviors |
 | Paddle | `StaticBody2D` | Mouse/keyboard controlled, angle-based reflection |
 | UpgradePanel | `CanvasLayer` | 3-choice upgrade selection UI (layer=10), buttons created dynamically |
-| Upgrade | `Resource` (class_name) | Data model for power-up types |
+| Upgrade | `Resource` (`class_name`) | Data model for power-up types |
 | Menu | `Control` | Title screen with Start / Quit buttons |
+| LevelData | `Resource` (`class_name`) | Per-level config: name, encoding (BrickLayout), specs table. Loaded from `levels/*.tres` |
+| BrickLayout | `Resource` (abstract) | Strategy base. Subclasses: `AsciiLayout`, `PolygonLayout`. `build()` returns `Array[{polygon, spec}]` |
+| BrickSpec | `Resource` (`class_name`) | Brick type: color, hp, behaviors array. No position |
+| BrickBehavior | `Resource` (abstract) | Lifecycle hooks (`on_hit` / `on_destroy` / `on_spawn`). Concrete behaviors subclass and compose |
 
-Collision is handled by the **physics engine** (`move_and_collide` returns immediate collision info). Pure math helpers (wall bounce, paddle angle) are static methods on `ball.gd` for unit testing.
+**Level system**: levels are `LevelData` Resources stored as `levels/*.tres`. The level list is wired via `main.tscn` ext_resource declarations (not `const preload`) so Godot tracks them as export dependencies. See [docs/design/level-system.md](docs/design/level-system.md).
+
+Collision is handled by the **physics engine** (`move_and_collide` returns immediate collision info). Bricks use `Polygon2D` + `ConvexPolygonShape2D` uniformly (rectangles are 4-vertex polygons). Pure math helpers (wall bounce, paddle angle) are static methods on `ball.gd` for unit testing.
 
 Game state is managed by a **State enum** on `main.gd`: `READY` (ball stuck to paddle) → `PLAYING` (ball in motion) → `PAUSED` / `ROUND_CLEAR` / `GAME_OVER`. Child nodes query state via `is_playing()` / `is_paused()` methods.
 

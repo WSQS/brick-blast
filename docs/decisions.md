@@ -17,11 +17,49 @@ Remaining questions: rarity mechanism, how star rating affects choice quantity/q
 - JSON files
 - Godot Resource (.tres)
 - 2D array / string
-**Status**: Deferred. D014 established single-level infinite mode, so multi-level data format is not needed yet. Revisit when level evolution direction is decided (see roadmap.md).
+**Status**: Resolved by D016 (2026-07-20). Chose Resource (`.tres`) with strategy-pattern layouts. See [`docs/design/level-system.md`](design/level-system.md).
 
 ---
 
 ## Resolved Decisions
+
+### D016: Level System Architecture (2026-07-20)
+
+**Context**: The existing single-level infinite mode (D014) validated the upgrade loop. The abandoned `feat/multi-level` branch (D015) added 5 static levels with inline ASCII arrays, but its data model was limited: characters only mapped to colors, no extension path for special bricks (hard, explosive, drop-upgrade), and no separation between a level's metadata and its spatial data.
+
+**Decision**: Adopt a resource-based architecture as specified in [`docs/design/level-system.md`](design/level-system.md). Key elements:
+
+- **LevelData** (Resource): per-level config (name, encoding strategy, specs table).
+- **BrickLayout** (abstract Resource) with strategy subclasses:
+  - **AsciiLayout**: parses string rows into rectangles (4-vertex polygons).
+  - **PolygonLayout**: reads explicit polygon vertices.
+  - Future encodings (path, hex grid, procedural) are purely additive.
+- **BrickSpec** (Resource): color, hp, behaviors. No position (position comes from the layout).
+- **BrickBehavior** (abstract Resource): lifecycle hooks (`on_hit` / `on_destroy` / `on_spawn`). Concrete behaviors (Explode, DropUpgrade) subclass it and compose in a `behaviors` array on BrickSpec.
+
+**Key sub-decisions** (full rationale in the design doc):
+
+| ID | Decision | Rationale |
+|----|----------|-----------|
+| A | Strategy pattern for layouts | New encodings are additive; consumer code stays encoding-agnostic. |
+| B | Unified polygon representation | Single code path; rectangles are 4-vertex polygons. |
+| C | Resource (`.tres`) carrier | Serializable, Inspector-editable, future-proof for procedural generation. |
+| D | Per-level `specs` table, no cross-level reuse | Levels are independent design units; sharing introduces debug friction. |
+| E | Behavior strategy (D2) | Composable behaviors; per-instance parameters. |
+| F | `context` is `main.gd` (duck-typed) | YAGNI; only one context implementation today. |
+| G | Levels wired via scene `ext_resource` | Godot dependency tracking and export pipeline key off `.tscn` ext_resource. |
+
+**Migration**: 5 levels re-encoded from D015's inline ASCII to `.tres` files under `levels/`. All 112 tests pass.
+
+**Supersedes**: P003 (level data format) — resolved by this decision. D015's inline ASCII approach is abandoned in favor of the resource-based architecture; D015's level *content* (5 layouts) is preserved.
+
+---
+
+### D015: Static Multi-Level System (ABANDONED, superseded by D016)
+
+**Status**: Superseded. The inline ASCII data model was limited (char→color only, no extension path). D016 replaces it with a resource-based architecture that preserves D015's 5 level layouts but re-encodes them as `.tres` files.
+
+**Original decision** (2026-07-19): 5 static levels with string-based brick definitions. Clear level → upgrade → advance to next level. Loop back to level 1 when all 5 are cleared. Format: inline GDScript arrays (5 strings of 8 chars; R/O/G/B/P map to colors, space = empty).
 
 ### D014: Upgrade Selection System — Single-Level Infinite Mode (2026-07-14)
 
@@ -30,7 +68,7 @@ Remaining questions: rarity mechanism, how star rating affects choice quantity/q
 **Decision**: Single-level infinite mode — clear level → choose upgrade → restart same level with upgrade state. No difficulty scaling for now, first validate whether upgrades are fun.
 
 **Initial upgrades** (5):
-- Wide paddle (+50%), slow ball (-20%), extra life (+1), multi-ball (+1 ball), pierce (pass through bricks without bouncing, limited to N bricks)
+- Wide paddle (+50%), slow ball (-20%), extra life (+1), multi-ball (+1 ball), pierce (1:1 exchange with brick hp, limited to N; dies → pass, else bounce)
 
 **Trigger**: 3-choice panel appears after each level clear.
 

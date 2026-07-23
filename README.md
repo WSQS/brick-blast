@@ -9,6 +9,7 @@ A classic brick-breaker game built with [Godot 4.7](https://godotengine.org).
 - **Ball stick**: ball waits on paddle until launch (Space / click)
 - **Star rating**: 1-3 stars based on combo performance and lives lost
 - **Upgrade system**: choose 1 of 3 upgrades after clearing all bricks (5 types: wide paddle, slow ball, extra life, multi-ball, pierce)
+- **Multi-level**: 5 levels with different brick layouts (full grid, diamond, checker, frame, pillars), level advances after each clear and loops
 - **Pause / resume**: Esc, on-screen pause button (top-right), or Android back gesture to toggle
 - **Main menu**: title screen with Start / Quit
 
@@ -45,7 +46,8 @@ The game starts at the main menu (`res://scene/menu.tscn`).
 brick-blast/
 ├── scene/          # .tscn scene files (main, menu, ball, brick, paddle, upgrade_panel)
 ├── script/         # .gd scripts
-├── test/unit/      # GUT unit tests (77 tests)
+├── levels/         # LevelData .tres files (one per level)
+├── test/unit/      # GUT unit tests (112 tests)
 ├── docs/           # Design decisions, roadmap, analysis
 ├── addons/gut/     # GUT testing framework
 ├── .github/        # CI workflows, copilot instructions, skills

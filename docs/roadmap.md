@@ -46,12 +46,19 @@ Version planning and feature roadmap. Organized by version number, with themes a
 
 - [ ] Star rating affects upgrade choice quantity/quality
 
+### Completed (post v0.1.0)
+
+- ✅ Level system architecture (D016): BrickSpec / BrickBehavior / BrickLayout / LevelData Resource types with strategy-pattern layouts. See [design/level-system.md](design/level-system.md).
+- ✅ 5 levels migrated to `.tres` files with per-level specs tables (full_grid, diamond, checker, frame, pillars).
+- ✅ Polygon-based brick rendering and collision (rectangles are 4-vertex polygons).
+- ✅ Behavior lifecycle hooks infrastructure (`on_hit` / `on_destroy` / `on_spawn`); no concrete behaviors yet.
+
 ### Candidate Upgrades (need playtest validation)
 
 | Upgrade | Effect | Type |
 |---------|--------|------|
 | Multi-ball | Spawn 1 extra ball | Offense |
-| Pierce | Ball passes through bricks without bouncing (limit N) | Offense |
+| Pierce | 1:1 exchange with brick hp (dies → pass; survives → bounce; limit N) | Offense |
 | Wide paddle | Paddle width +50% | Defense |
 | Slow ball | Ball speed -20% | Defense |
 | Extra life | +1 life | Defense |

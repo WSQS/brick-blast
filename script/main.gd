@@ -1,22 +1,9 @@
 extends Node2D
 ## Main — orchestrates the game: spawns bricks, manages score, win/lose state.
-
-## Upgrade types are accessed via the global Upgrade class (class_name Upgrade).
-
-# Brick grid
-const COLS: int = 8
-const ROWS: int = 5
-const BRICK_W: float = 52.0
-const BRICK_H: float = 22.0
-const BRICK_GAP: float = 4.0
-const BRICK_MARGIN_TOP: float = 80.0
-const COLORS: Array[Color] = [
-	Color("e94560"),
-	Color("f5a623"),
-	Color("16c79a"),
-	Color("0f3460"),
-	Color("7c3aed"),
-]
+##
+## Levels are LevelData Resources (see docs/design/level-system.md). The level
+## list is wired via the scene's `levels` export property (main.tscn), so Godot
+## tracks the .tres files as dependencies for export.
 
 # Paddle & ball
 const PADDLE_Y: float = 660.0
@@ -31,6 +18,7 @@ const BALL_SPEEDUP: float = 1.03
 
 @export var brick_scene: PackedScene
 @export var ball_scene: PackedScene
+@export var levels: Array[LevelData] = []
 
 @onready var playfield: Rect2 = _compute_playfield()
 @onready var paddle: StaticBody2D = $Paddle
@@ -55,6 +43,7 @@ var upgrades: Dictionary = {}  # Upgrade.Type -> stack count
 var rounds_cleared: int = 0
 var balls: Array[CharacterBody2D] = []
 var ball_speed: float = BALL_SPEED
+var current_level: int = 0
 
 enum State { READY, PLAYING, PAUSED, ROUND_CLEAR, GAME_OVER }
 var state: State = State.READY
@@ -143,21 +132,44 @@ func _spawn_bricks() -> void:
 	for brick: Node in bricks.get_children():
 		brick.queue_free()
 	bricks_left = 0
-	var total_w: float = COLS * BRICK_W + (COLS - 1) * BRICK_GAP
-	var start_x: float = (playfield.size.x - total_w) / 2.0
+	if levels.is_empty():
+		push_error("main.gd: no levels configured")
+		return
+	var level: LevelData = levels[current_level]
+	var pending: Array[Dictionary] = level.build_bricks()
+	for entry: Dictionary in pending:
+		var polygon: PackedVector2Array = entry["polygon"]
+		var spec: BrickSpec = entry["spec"]
+		var node_pos: Vector2 = _polygon_centroid(polygon)
+		var local_poly: PackedVector2Array = _recenter_polygon(polygon, node_pos)
+		var brick: StaticBody2D = brick_scene.instantiate()
+		brick.position = node_pos
+		brick.configure(spec, local_poly)
+		brick.add_to_group("brick")
+		brick.destroyed.connect(_on_brick_destroyed)
+		bricks.add_child(brick)
+		brick.trigger_on_spawn(self)
+		bricks_left += 1
 
-	for row in range(ROWS):
-		for col in range(COLS):
-			var brick: StaticBody2D = brick_scene.instantiate()
-			brick.color = COLORS[row % COLORS.size()]
-			brick.position = Vector2(
-				start_x + col * (BRICK_W + BRICK_GAP) + BRICK_W / 2.0,
-				BRICK_MARGIN_TOP + row * (BRICK_H + BRICK_GAP) + BRICK_H / 2.0,
-			)
-			brick.add_to_group("brick")
-			brick.destroyed.connect(_on_brick_destroyed)
-			bricks.add_child(brick)
-			bricks_left += 1
+
+func _polygon_centroid(polygon: PackedVector2Array) -> Vector2:
+	var sum := Vector2.ZERO
+	for v in polygon:
+		sum += v
+	return sum / float(polygon.size())
+
+
+func _recenter_polygon(polygon: PackedVector2Array, offset: Vector2) -> PackedVector2Array:
+	var result := PackedVector2Array()
+	for v in polygon:
+		result.append(v - offset)
+	return result
+
+
+func _advance_level() -> void:
+	if levels.is_empty():
+		return
+	current_level = (current_level + 1) % levels.size()
 
 
 func _reset_round() -> void:
@@ -275,6 +287,7 @@ func _start_next_round() -> void:
 	for b in balls:
 		b.queue_free()
 	balls.clear()
+	_advance_level()
 	_spawn_ball()
 	_spawn_bricks()
 	_reset_round()
@@ -299,7 +312,7 @@ func _spawn_ball() -> void:
 
 
 func _update_hud() -> void:
-	score_label.text = "Score: %d" % score
+	score_label.text = "Score: %d   Lv.%d" % [score, current_level + 1]
 	lives_label.text = "Lives: %d" % lives
 	if combo > 0:
 		score_label.text += "  Combo: x%d" % combo

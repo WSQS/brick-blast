@@ -1,15 +1,21 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://script/main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://scene/ball.tscn" id="2_ball"]
 [ext_resource type="PackedScene" path="res://scene/paddle.tscn" id="3_paddle"]
 [ext_resource type="PackedScene" path="res://scene/brick.tscn" id="4_brick"]
 [ext_resource type="PackedScene" path="res://scene/upgrade_panel.tscn" id="5_upgrade"]
+[ext_resource type="Resource" path="res://levels/full_grid.tres" id="6_level_01"]
+[ext_resource type="Resource" path="res://levels/diamond.tres" id="7_level_02"]
+[ext_resource type="Resource" path="res://levels/checker.tres" id="8_level_03"]
+[ext_resource type="Resource" path="res://levels/frame.tres" id="9_level_04"]
+[ext_resource type="Resource" path="res://levels/pillars.tres" id="10_level_05"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
 brick_scene = ExtResource("4_brick")
 ball_scene = ExtResource("2_ball")
+levels = [ExtResource("6_level_01"), ExtResource("7_level_02"), ExtResource("8_level_03"), ExtResource("9_level_04"), ExtResource("10_level_05")]
 
 [node name="Background" type="ColorRect" parent="."]
 offset_right = 480.0

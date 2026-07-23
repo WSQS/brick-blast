@@ -36,13 +36,18 @@ func _physics_process(delta: float) -> void:
 	if collision:
 		var collider := collision.get_collider()
 		if collider and collider.is_in_group("brick"):
-			if pierce_count > 0:
-				pierce_count -= 1
-				# Move ball through the brick by the remaining distance
-				global_position += collision.get_remainder()
+			if pierce_count > 0 and collider.get("hp") != null:
+				# Pierce exchanges 1:1 with brick hp. Dies → pass through; else bounce.
+				var exchange: int = calc_pierce_exchange(pierce_count, collider.hp)
+				pierce_count -= exchange
+				var destroyed: bool = collider.apply_damage(exchange, self, parent)
+				if destroyed:
+					global_position += collision.get_remainder()
+				else:
+					velocity = velocity.bounce(collision.get_normal())
 			else:
 				velocity = velocity.bounce(collision.get_normal())
-			collider.destroy()
+				collider.on_hit(self, parent)
 		elif collider == parent.get("paddle"):
 			if global_position.y < collider.global_position.y:
 				# Ball hits paddle from above — normal paddle bounce
@@ -66,6 +71,16 @@ func _handle_walls() -> void:
 # ---------------------------------------------------------------------------
 # Pure collision math — testable without physics engine
 # ---------------------------------------------------------------------------
+
+
+## Pierce exchanges 1:1 with brick hp. Returns damage amount applied to both.
+## pierce 3 + hp 5 → 3 (hp left 2, pierce 0, bounce)
+## pierce 3 + hp 3 → 3 (brick dies, pierce 0, pass through)
+## pierce 3 + hp 1 → 1 (brick dies, pierce 2, pass through)
+static func calc_pierce_exchange(pierce: int, brick_hp: int) -> int:
+	if pierce <= 0 or brick_hp <= 0:
+		return 0
+	return mini(pierce, brick_hp)
 
 
 ## Returns [new_pos, new_vel] after wall collision.
